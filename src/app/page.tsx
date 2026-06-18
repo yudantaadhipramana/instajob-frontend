@@ -56,8 +56,8 @@ export default function Dashboard() {
             <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#1E293B' }}>System Status</h2>
           </div>
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.3s' }}>
-              <Bell size={18} color="rgba(255,255,255,0.4)" />
+            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#F1F5F9', border: '1px solid #CBD5E1', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.3s' }}>
+              <Bell size={18} color="#64748B" />
             </div>
             <button style={{ 
               background: 'linear-gradient(135deg, #0051FF, #0051FF)', 
@@ -87,9 +87,7 @@ export default function Dashboard() {
             fontWeight: 800, 
             letterSpacing: '-0.04em', 
             lineHeight: 1.1, 
-            background: 'linear-gradient(180deg, #fff 0%, #94a3b8 100%)', 
-            WebkitBackgroundClip: 'text', 
-            WebkitTextFillColor: 'transparent', 
+            color: '#1E293B',
             marginBottom: '24px' 
           }}>
             Everything is working for <br /> your next big move.
@@ -104,8 +102,8 @@ export default function Dashboard() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', marginBottom: '48px' }}>
           {stats.map((stat) => (
             <div key={stat.label} style={{ 
-              background: 'rgba(255, 255, 255, 0.02)', 
-              border: '1px solid rgba(255, 255, 255, 0.05)', 
+              background: '#F8FAFC', 
+              border: '1px solid #E2E8F0', 
               backdropFilter: 'blur(24px)', 
               borderRadius: '16px', 
               padding: '32px',
@@ -141,15 +139,15 @@ export default function Dashboard() {
                 <div key={job.id} style={{ 
                   padding: '24px', 
                   borderRadius: '12px', 
-                  background: 'rgba(255, 255, 255, 0.02)', 
-                  border: '1px solid rgba(255, 255, 255, 0.05)', 
+                  background: '#F8FAFC', 
+                  border: '1px solid #E2E8F0', 
                   marginBottom: '12px',
                   transition: 'all 0.3s',
                   cursor: 'pointer'
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-                      <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', fontWeight: 800, color: 'rgba(255,255,255,0.1)' }}>
+                      <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#F1F5F9', border: '1px solid #CBD5E1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', fontWeight: 800, color: '#94A3B8' }}>
                         {job.company.charAt(0)}
                       </div>
                       <div>
@@ -168,9 +166,9 @@ export default function Dashboard() {
                         fontWeight: 800, 
                         padding: '4px 12px', 
                         borderRadius: '99px', 
-                        background: job.status === 'Applied' ? 'rgba(0, 81, 255, 0.1)' : 'rgba(255,255,255,0.03)',
-                        color: job.status === 'Applied' ? '#a855f7' : 'rgba(255,255,255,0.3)',
-                        border: '1px solid rgba(255,255,255,0.05)'
+                        background: job.status === 'Applied' ? 'rgba(0, 81, 255, 0.1)' : '#F1F5F9',
+                        color: job.status === 'Applied' ? '#7C3AED' : '#64748B',
+                        border: job.status === 'Applied' ? '1px solid rgba(0, 81, 255, 0.2)' : '1px solid #CBD5E1'
                       }}>
                         {job.status.toUpperCase()}
                       </span>
@@ -201,7 +199,7 @@ export default function Dashboard() {
                 80% of jobs in your target area require <span style={{ color: '#1E293B' }}>TypeScript</span> and <span style={{ color: '#1E293B' }}>Tailwind CSS</span>. Adding these could boost your match rate to 98%.
               </p>
               <button style={{ 
-                background: '#fff', 
+                background: '#0051FF', 
                 color: '#FFFFFF', 
                 fontWeight: 700, 
                 padding: '12px 24px', 
@@ -220,15 +218,15 @@ export default function Dashboard() {
 
             <div style={{ marginTop: '48px' }}>
               <p style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#64748B', marginBottom: '24px' }}>Activity Feed</p>
-              <div style={{ paddingLeft: '16px', borderLeft: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              <div style={{ paddingLeft: '16px', borderLeft: '1px solid #E2E8F0', display: 'flex', flexDirection: 'column', gap: '24px' }}>
                 <div style={{ position: 'relative' }}>
                   <div style={{ position: 'absolute', left: '-20.5px', top: '6px', width: '8px', height: '8px', borderRadius: '50%', background: '#0051FF', boxShadow: '0 0 10px #0051FF' }}></div>
-                  <p style={{ fontSize: '10px', fontWeight: 800, color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', marginBottom: '4px' }}>12m ago</p>
+                  <p style={{ fontSize: '10px', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', marginBottom: '4px' }}>12m ago</p>
                   <p style={{ fontSize: '14px', color: '#475569' }}>Found 3 new roles at <span style={{ color: '#1E293B', fontWeight: 600 }}>Microsoft</span></p>
                 </div>
                 <div style={{ position: 'relative' }}>
                   <div style={{ position: 'absolute', left: '-20.5px', top: '6px', width: '8px', height: '8px', borderRadius: '50%', background: '#0051FF', boxShadow: '0 0 10px #0051FF' }}></div>
-                  <p style={{ fontSize: '10px', fontWeight: 800, color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', marginBottom: '4px' }}>1h ago</p>
+                  <p style={{ fontSize: '10px', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', marginBottom: '4px' }}>1h ago</p>
                   <p style={{ fontSize: '14px', color: '#475569' }}>CV optimized for <span style={{ color: '#1E293B', fontWeight: 600 }}>Stripe</span></p>
                 </div>
               </div>

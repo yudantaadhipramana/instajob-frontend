@@ -11,8 +11,8 @@ export default function Sidebar() {
 
   return (
     <aside style={{ 
-      background: 'rgba(255, 255, 255, 0.8)', 
-      borderRight: '1px solid rgba(255, 255, 255, 0.05)', 
+      background: '#FFFFFF', 
+      borderRight: '1px solid #E2E8F0', 
       backdropFilter: 'blur(40px)', 
       padding: '32px 24px', 
       display: 'flex', 
@@ -41,8 +41,8 @@ export default function Sidebar() {
         marginTop: '24px', 
         padding: '16px', 
         borderRadius: '16px', 
-        background: 'rgba(255,255,255,0.05)', 
-        border: '1px solid rgba(255,255,255,0.05)', 
+        background: '#F8FAFC', 
+        border: '1px solid #E2E8F0', 
         display: 'flex', 
         alignItems: 'center', 
         gap: '12px', 
@@ -68,7 +68,7 @@ export default function Sidebar() {
           <p style={{ fontSize: '14px', fontWeight: 600, color: '#1E293B', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Yudanta A.</p>
           <p style={{ fontSize: '10px', fontWeight: 800, color: '#0051FF', textTransform: 'uppercase' }}>PRO PLAN</p>
         </div>
-        <ChevronRight size={16} color="rgba(255,255,255,0.2)" />
+        <ChevronRight size={16} color="#CBD5E1" />
       </div>
     </aside>
   );
@@ -83,9 +83,9 @@ function SidebarLink({ icon: Icon, label, href, active }: any) {
       padding: '10px 12px', 
       borderRadius: '8px', 
       textDecoration: 'none',
-      color: active ? '#fff' : 'rgba(255,255,255,0.3)',
-      background: active ? 'rgba(255,255,255,0.05)' : 'transparent',
-      border: active ? '1px solid rgba(255,255,255,0.05)' : '1px solid transparent',
+      color: active ? '#1E293B' : '#94A3B8',
+      background: active ? '#F1F5F9' : 'transparent',
+      border: active ? '1px solid #CBD5E1' : '1px solid transparent',
       transition: 'all 0.2s ease',
       fontSize: '14px',
       fontWeight: 600
