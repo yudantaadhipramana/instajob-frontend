@@ -59,16 +59,16 @@ export default function Dashboard() {
             <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#F1F5F9', border: '1px solid #CBD5E1', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.3s' }}>
               <Bell size={18} color="#64748B" />
             </div>
-            <button style={{ 
-              background: 'linear-gradient(135deg, #0051FF, #0051FF)', 
-              color: '#1E293B', 
-              fontWeight: 700, 
-              padding: '12px 24px', 
-              borderRadius: '12px', 
-              border: 'none', 
-              cursor: 'pointer', 
-              display: 'flex', 
-              alignItems: 'center', 
+            <button style={{
+              background: 'linear-gradient(135deg, #0051FF, #0051FF)',
+              color: '#FFFFFF',
+              fontWeight: 700,
+              padding: '12px 24px',
+              borderRadius: '12px',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
               gap: '8px',
               fontSize: '14px',
               transition: 'all 0.2s',
