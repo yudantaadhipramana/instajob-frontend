@@ -1,174 +1,118 @@
+"use client";
+
 import React from 'react';
 import Sidebar from '@/components/Sidebar';
-import { 
-  Sparkles, 
-  FileText, 
-  CheckCircle2, 
-  AlertCircle, 
-  Plus, 
-  Pencil,
-  Code2,
-  LineChart,
-  Target
-} from 'lucide-react';
+import { FileText, Plus, CheckCircle2, Target, Award } from 'lucide-react';
+
+const stats = [
+  { label: 'Skills Matching', value: '12/15', desc: '80% coverage', color: '#10B981' },
+  { label: 'CV Scans', value: '48', desc: 'Viewed this week', color: '#0051FF' },
+  { label: 'Profile Strength', value: '92%', desc: 'Strong', color: '#0051FF' },
+  { label: 'Endorsements', value: '24', desc: 'From recruiters', color: '#8B5CF6' },
+];
+
+const skills = [
+  { name: 'React', level: 95, verified: true },
+  { name: 'TypeScript', level: 90, verified: true },
+  { name: 'Next.js', level: 88, verified: true },
+  { name: 'Node.js', level: 82, verified: false },
+  { name: 'PostgreSQL', level: 75, verified: false },
+  { name: 'Tailwind CSS', level: 92, verified: true },
+  { name: 'GraphQL', level: 70, verified: false },
+  { name: 'Docker', level: 65, verified: false },
+];
+
+const experiences = [
+  { title: 'Senior Frontend Developer', company: 'Tech Corp', period: '2022 - Present', description: 'Built scalable web applications serving 100k+ users' },
+  { title: 'Fullstack Developer', company: 'StartupXYZ', period: '2020 - 2022', description: 'Developed microservices architecture' },
+  { title: 'Junior Developer', company: 'WebStudio', period: '2018 - 2020', description: 'Frontend development with React' },
+];
 
 export default function ProfilePage() {
-  const profileStrength = 85;
-  
   return (
-    <div className="flex h-screen overflow-hidden bg-[#051126]">
+    <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', height: '100vh', overflow: 'hidden', background: '#FFFFFF' }}>
       <Sidebar />
       
-      <main className="flex-1 overflow-y-auto">
-        <header className="h-16 border-b border-white/10 flex items-center justify-between px-8 sticky top-0 bg-navy/80 backdrop-blur-md z-10">
-          <h2 className="text-lg font-semibold">Profile & AI Resume</h2>
-          <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm font-medium transition-all">
-              <FileText size={16} />
-              <span>Export CV</span>
-            </button>
-            <button className="flex items-center gap-2 px-4 py-1.5 bg-[#2D68FF] hover:bg-blue-600 rounded-lg text-sm font-medium transition-all">
-              <Sparkles size={16} />
-              <span>AI Improve</span>
-            </button>
-          </div>
-        </header>
+      <main style={{ overflowY: 'auto', position: 'relative', padding: '48px' }}>
+        <div style={{ marginBottom: '40px' }}>
+          <p style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#64748B', marginBottom: '8px' }}>Profile & Resume</p>
+          <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#1E293B', margin: 0 }}>My Profile</h1>
+        </div>
 
-        <div className="p-8 max-w-7xl mx-auto space-y-8">
-          {/* Top Section: Strength & Quick Info */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 glass p-8 rounded-3xl relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-[#2D68FF]/10 blur-[80px] -mr-32 -mt-32 rounded-full"></div>
-              
-              <div className="relative flex items-center gap-8">
-                {/* Circular Progress */}
-                <div className="relative w-32 h-32 flex items-center justify-center">
-                  <svg className="w-full h-full transform -rotate-90">
-                    <circle className="text-white/5" strokeWidth="8" stroke="currentColor" fill="transparent" r="58" cx="64" cy="64" />
-                    <circle className="text-[#2D68FF]" strokeWidth="8" strokeDasharray={364.4} strokeDashoffset={364.4 * (1 - profileStrength/100)} strokeLinecap="round" stroke="currentColor" fill="transparent" r="58" cx="64" cy="64" />
-                  </svg>
-                  <span className="absolute text-2xl font-bold">{profileStrength}%</span>
-                </div>
+        {/* Stats */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '40px' }}>
+          {stats.map((s, i) => (
+            <div key={i} style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '20px' }}>
+              <p style={{ fontSize: '13px', fontWeight: 600, color: '#64748B', margin: '0 0 8px 0' }}>{s.label}</p>
+              <p style={{ fontSize: '28px', fontWeight: 800, color: s.color, margin: '0 0 4px 0' }}>{s.value}</p>
+              <p style={{ fontSize: '12px', color: '#64748B', margin: 0 }}>{s.desc}</p>
+            </div>
+          ))}
+        </div>
 
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold mb-2">Resume Strength</h3>
-                  <p className="text-white/50 text-sm mb-4 leading-relaxed">
-                    CV Anda sangat baik, tapi ada **3 area** yang bisa ditingkatkan untuk mencapai target 95% Match Score.
-                  </p>
-                  <div className="flex gap-2">
-                    <span className="px-2 py-1 rounded bg-green-500/10 text-green-400 text-[10px] font-bold uppercase tracking-wider">ATS Friendly</span>
-                    <span className="px-2 py-1 rounded bg-blue-500/10 text-blue-400 text-[10px] font-bold uppercase tracking-wider">Keywords Optimized</span>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
+          {/* Skills Section */}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+              <Target size={20} color="#0051FF" />
+              <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1E293B', margin: 0 }}>Skills</h2>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {skills.map((skill, i) => (
+                <div key={i} style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '14px', fontWeight: 600, color: '#1E293B' }}>{skill.name}</span>
+                      {skill.verified && <CheckCircle2 size={14} color="#10B981" />}
+                    </div>
+                    <span style={{ fontSize: '14px', fontWeight: 800, color: '#0051FF' }}>{skill.level}%</span>
+                  </div>
+                  <div style={{ height: '6px', background: '#F1F5F9', borderRadius: '99px', overflow: 'hidden' }}>
+                    <div style={{ width: `${skill.level}%`, height: '100%', background: `linear-gradient(90deg, #0051FF, #0051FF)`, borderRadius: '99px' }}></div>
                   </div>
                 </div>
-              </div>
+              ))}
             </div>
-
-            <div className="glass p-8 rounded-3xl space-y-4">
-              <h4 className="font-semibold flex items-center gap-2">
-                <Target size={18} className="text-[#7030D1]" />
-                Job Search Target
-              </h4>
-              <div className="space-y-3">
-                <div className="p-3 bg-white/5 rounded-xl border border-white/10">
-                  <p className="text-[10px] text-white/40 uppercase font-bold tracking-widest">Target Role</p>
-                  <p className="text-sm font-medium">Commercial BI Specialist</p>
-                </div>
-                <div className="p-3 bg-white/5 rounded-xl border border-white/10">
-                  <p className="text-[10px] text-white/40 uppercase font-bold tracking-widest">Expected Salary</p>
-                  <p className="text-sm font-medium">IDR 25M - 35M / month</p>
-                </div>
-              </div>
-            </div>
+            <button style={{ marginTop: '16px', padding: '10px 16px', background: '#F1F5F9', border: '1px solid #E2E8F0', borderRadius: '8px', color: '#64748B', fontWeight: 600, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Plus size={14} />
+              Add Skill
+            </button>
           </div>
 
-          {/* Experience & Skills */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-6">
-              <div className="flex items-center justify-between">
-                <h4 className="text-xl font-bold">Experience</h4>
-                <button className="p-1.5 hover:bg-white/10 rounded-lg text-white/50 hover:text-white transition-all">
-                  <Plus size={20} />
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <ExperienceCard 
-                  role="Commercial BI Specialist" 
-                  company="LensaData Academy" 
-                  date="Jan 2023 - Present"
-                  description="Automating data pipelines and building commercial intelligence dashboards using Power BI and Python."
-                />
-                <ExperienceCard 
-                  role="Electrical Engineer" 
-                  company="Finxina" 
-                  date="Jun 2020 - Dec 2022"
-                  description="Managed large-scale electrical infrastructure projects and optimized industrial energy management systems."
-                />
-              </div>
+          {/* Experience Section */}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+              <Award size={20} color="#0051FF" />
+              <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1E293B', margin: 0 }}>Experience</h2>
             </div>
-
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h4 className="text-xl font-bold">Top Skills</h4>
-                <button className="text-xs text-[#2D68FF] hover:underline">Edit Skills</button>
-              </div>
-
-              <div className="glass p-6 rounded-3xl space-y-6">
-                <SkillGroup icon={Code2} title="Tech Stack" skills={['Python', 'TypeScript', 'SQL', 'Fastify', 'React']} />
-                <SkillGroup icon={LineChart} title="BI Tools" skills={['Power BI', 'Tableau', 'Excel (Expert)']} />
-                
-                <div className="p-4 bg-orange-500/5 border border-orange-500/20 rounded-2xl flex gap-3">
-                  <AlertCircle className="text-orange-400 shrink-0" size={18} />
-                  <div>
-                    <p className="text-xs font-bold text-orange-400 uppercase tracking-wider mb-1">Missing Skill</p>
-                    <p className="text-xs text-white/70">
-                      Target job memerlukan **Prisma ORM**. Tambahkan ke CV untuk menaikkan skor.
-                    </p>
-                  </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {experiences.map((exp, i) => (
+                <div key={i} style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px' }}>
+                  <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#1E293B', margin: '0 0 4px 0' }}>{exp.title}</h3>
+                  <p style={{ fontSize: '13px', color: '#0051FF', fontWeight: 600, margin: '0 0 4px 0' }}>{exp.company} • {exp.period}</p>
+                  <p style={{ fontSize: '13px', color: '#64748B', margin: 0 }}>{exp.description}</p>
                 </div>
-              </div>
+              ))}
             </div>
+            <button style={{ marginTop: '16px', padding: '10px 16px', background: '#F1F5F9', border: '1px solid #E2E8F0', borderRadius: '8px', color: '#64748B', fontWeight: 600, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Plus size={14} />
+              Add Experience
+            </button>
+          </div>
+        </div>
+
+        {/* CV Upload */}
+        <div style={{ marginTop: '40px' }}>
+          <div style={{ background: '#F8FAFC', border: '2px dashed #CBD5E1', borderRadius: '16px', padding: '48px', textAlign: 'center' }}>
+            <FileText size={40} color="#0051FF" style={{ marginBottom: '16px' }} />
+            <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#1E293B', margin: '0 0 8px 0' }}>Upload Your CV</h3>
+            <p style={{ fontSize: '14px', color: '#64748B', marginBottom: '20px', margin: '0 0 20px 0' }}>PDF, DOCX or TXT files. Max 10MB.</p>
+            <button style={{ background: '#0051FF', color: '#FFFFFF', fontWeight: 700, padding: '12px 32px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '14px' }}>
+              Choose File
+            </button>
           </div>
         </div>
       </main>
-    </div>
-  );
-}
-
-function ExperienceCard({ role, company, date, description }: any) {
-  return (
-    <div className="glass p-6 rounded-2xl glass-hover relative group">
-      <button className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-all p-2 hover:bg-white/10 rounded-lg text-white/40">
-        <Pencil size={14} />
-      </button>
-      <div className="flex items-start gap-4">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 flex items-center justify-center font-bold text-white/20">
-          {company.charAt(0)}
-        </div>
-        <div className="space-y-1">
-          <p className="font-bold text-lg">{role}</p>
-          <p className="text-sm text-[#2D68FF] font-medium">{company} • {date}</p>
-          <p className="text-sm text-white/50 leading-relaxed mt-2">{description}</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function SkillGroup({ icon: Icon, title, skills }: any) {
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-2 text-white/40 mb-3">
-        <Icon size={16} />
-        <span className="text-[10px] font-bold uppercase tracking-widest">{title}</span>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {skills.map((s: string) => (
-          <span key={s} className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs font-medium hover:border-[#2D68FF]/50 transition-all cursor-default">
-            {s}
-          </span>
-        ))}
-      </div>
     </div>
   );
 }

@@ -1,108 +1,122 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
-import { Sparkles, Filter, Search } from 'lucide-react';
+import { Search, SlidersHorizontal, MapPin, Building2, Clock, Zap, Bookmark } from 'lucide-react';
 
-const jobBoardData = [
-  { id: 1, title: 'Senior Frontend Engineer', company: 'Stripe', match: 98, status: 'Applied', time: '2h ago', logo: 'S', location: 'Remote', salary: '$150k - $200k' },
-  { id: 2, title: 'Product Designer', company: 'Linear', match: 95, status: 'Scouted', time: '5h ago', logo: 'L', location: 'Remote', salary: '$120k - $160k' },
-  { id: 3, title: 'Fullstack Developer', company: 'Vercel', match: 92, status: 'Interviewing', time: '1d ago', logo: 'V', location: 'Remote', salary: '$130k - $180k' },
-  { id: 4, title: 'Data Scientist', company: 'OpenAI', match: 88, status: 'Scouted', time: '2d ago', logo: 'O', location: 'SF, CA', salary: '$180k - $250k' },
+const jobData = [
+  { id: 1, title: 'Senior Frontend Engineer', company: 'Stripe', location: 'San Francisco, CA', type: 'Full-time', salary: '$150k - $200k', match: 98, posted: '2h ago', description: 'Build the next generation of payment infrastructure...', tags: ['React', 'TypeScript', 'Next.js'] },
+  { id: 2, title: 'Product Designer', company: 'Linear', location: 'Remote', type: 'Full-time', salary: '$130k - $170k', match: 95, posted: '5h ago', description: 'Design beautiful and functional interfaces...', tags: ['Figma', 'UI/UX', 'Design Systems'] },
+  { id: 3, title: 'Fullstack Developer', company: 'Vercel', location: 'Remote', type: 'Full-time', salary: '$140k - $190k', match: 92, posted: '1d ago', description: 'Help build the platform for frontend developers...', tags: ['Next.js', 'Node.js', 'PostgreSQL'] },
+  { id: 4, title: 'Backend Engineer', company: 'Supabase', location: 'Singapore', type: 'Full-time', salary: '$120k - $160k', match: 89, posted: '2d ago', description: 'Build scalable backend services...', tags: ['PostgreSQL', 'Go', 'Rust'] },
+  { id: 5, title: 'DevOps Engineer', company: 'Cloudflare', location: 'Austin, TX', type: 'Full-time', salary: '$135k - $180k', match: 87, posted: '3d ago', description: 'Manage infrastructure for global edge network...', tags: ['Kubernetes', 'AWS', 'Terraform'] },
+  { id: 6, title: 'Mobile Developer', company: 'Notion', location: 'New York, NY', type: 'Full-time', salary: '$140k - $185k', match: 85, posted: '4d ago', description: 'Build native mobile apps...', tags: ['React Native', 'Swift', 'Kotlin'] },
 ];
 
-export default function JobBoard() {
+export default function JobsPage() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState('all');
+
   return (
-    <div className="app-layout">
+    <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', height: '100vh', overflow: 'hidden', background: '#FFFFFF' }}>
       <Sidebar />
       
-      <main className="app-main">
-        <div className="glow-blue" style={{ top: '-200px', right: '-200px' }}></div>
-        <div className="glow-purple" style={{ bottom: '-200px', left: '-200px' }}></div>
-
-        <header className="app-header">
-          <div>
-            <h2 className="text-xl font-bold text-white">Job Board</h2>
-            <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">AI-Scouted Opportunities</p>
-          </div>
-          
-          <div className="flex items-center gap-6">
-            <button className="btn-ghost p-2.5 rounded-xl">
-              <Filter size={20} className="text-white/60" />
-            </button>
-            <button className="btn-gradient">
-              <Sparkles size={18} className="fill-current" />
-              <span>AI Refresh</span>
-            </button>
-          </div>
-        </header>
-
-        <div className="app-content">
-          {/* Filter Bar */}
-          <div className="glass-card p-6 mb-10 flex items-center gap-4">
-            <div className="flex items-center gap-2 flex-1 px-4 py-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
-              <Search size={18} className="text-white/40" />
-              <input type="text" placeholder="Search jobs..." className="bg-transparent border-none outline-none text-sm w-full text-white" />
+      <main style={{ overflowY: 'auto', position: 'relative', padding: '48px' }}>
+        {/* Header */}
+        <div style={{ marginBottom: '48px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <div>
+              <p style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#64748B', marginBottom: '8px' }}>Job Discovery</p>
+              <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#1E293B', margin: 0 }}>Opportunity Feed</h1>
             </div>
-            <button className="btn-ghost text-xs font-bold uppercase tracking-widest">Remote Only</button>
-            <button className="btn-ghost text-xs font-bold uppercase tracking-widest">Top Match</button>
-            <button className="btn-ghost text-xs font-bold uppercase tracking-widest">High Salary</button>
+            <button style={{ background: '#F8FAFC', border: '1px solid #CBD5E1', color: '#1E293B', fontWeight: 600, padding: '12px 20px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
+              <SlidersHorizontal size={16} />
+              Filters
+            </button>
           </div>
+          <p style={{ fontSize: '16px', color: '#64748B', margin: 0 }}>{jobData.length} opportunities matching your profile</p>
+        </div>
 
-          {/* Job Grid */}
-          <div className="jobs-grid">
-            {jobBoardData.map((job) => (
-              <div key={job.id} className="job-card">
-                <div className="flex items-center gap-5 mb-4">
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-bold" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.2)' }}>
-                    {job.logo}
-                  </div>
-                  <div>
-                    <p className="text-lg font-bold text-white">{job.title}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm text-white/40">{job.company}</span>
-                      <span className="w-1 h-1 bg-white/20 rounded-full"></span>
-                      <span className="text-xs text-white/30">{job.location}</span>
-                    </div>
-                  </div>
-                </div>
+        {/* Search Bar */}
+        <div style={{ marginBottom: '32px', position: 'relative', maxWidth: '600px' }}>
+          <Search size={18} color="#94A3B8" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)' }} />
+          <input type="text" placeholder="Search jobs, companies, keywords..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ width: '100%', padding: '14px 16px 14px 48px', borderRadius: '12px', border: '1px solid #E2E8F0', background: '#FFFFFF', fontSize: '14px', color: '#1E293B', outline: 'none', boxSizing: 'border-box' }} />
+        </div>
 
-                <div className="flex items-center justify-between mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                  <div className="text-right">
-                    <div className="match-score">{job.match}%</div>
-                    <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest">Match</p>
-                  </div>
-                  <div className={job.status === 'Applied' ? 'status-applied' : job.status === 'Interviewing' ? 'status-interviewing' : 'status-scouted'}>
-                    {job.status}
-                  </div>
-                </div>
+        {/* Filter Pills */}
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '32px', flexWrap: 'wrap' }}>
+          {['all', 'high-match', 'remote', 'new'].map((filter) => (
+            <button key={filter} onClick={() => setSelectedFilter(filter)} style={{ padding: '8px 16px', borderRadius: '8px', border: selectedFilter === filter ? '1px solid #0051FF' : '1px solid #E2E8F0', background: selectedFilter === filter ? 'rgba(0, 81, 255, 0.1)' : '#FFFFFF', color: selectedFilter === filter ? '#0051FF' : '#64748B', fontSize: '13px', fontWeight: 600, cursor: 'pointer', textTransform: 'capitalize' }}>
+              {filter.replace('-', ' ')}
+            </button>
+          ))}
+        </div>
 
-                {/* AI Match Breakdown */}
-                <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                  <div className="flex items-center justify-between text-white/40 text-sm font-medium cursor-pointer mb-3">
-                    <span>Why AI matched you</span>
-                    <Sparkles size={16} className="text-blue-500" />
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
-                      <span className="text-xs text-white/60">Skills match: 95%</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-blue-400"></div>
-                      <span className="text-xs text-white/60">Experience aligned</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-purple-400"></div>
-                      <span className="text-xs text-white/60">Salary range: {job.salary}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+        {/* Job Cards */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {jobData.map((job) => (
+            <JobCard key={job.id} job={job} />
+          ))}
         </div>
       </main>
+    </div>
+  );
+}
+
+function JobCard({ job }: any) {
+  return (
+    <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '24px', cursor: 'pointer', position: 'relative' }}>
+      <div style={{ position: 'absolute', top: '24px', right: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+        <div style={{ fontSize: '24px', fontWeight: 800, color: '#0051FF', fontStyle: 'italic', lineHeight: 1 }}>{job.match}%</div>
+        <div style={{ fontSize: '9px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#64748B' }}>Match</div>
+      </div>
+
+      <div style={{ display: 'flex', gap: '20px', paddingRight: '80px' }}>
+        <div style={{ width: '56px', height: '56px', borderRadius: '12px', background: '#F1F5F9', border: '1px solid #CBD5E1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 800, color: '#94A3B8', flexShrink: 0 }}>
+          {job.company.charAt(0)}
+        </div>
+
+        <div style={{ flex: 1 }}>
+          <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#1E293B', marginBottom: '8px', margin: 0 }}>{job.title}</h3>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '12px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Building2 size={14} color="#64748B" />
+              <span style={{ fontSize: '14px', color: '#64748B', fontWeight: 600 }}>{job.company}</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <MapPin size={14} color="#64748B" />
+              <span style={{ fontSize: '14px', color: '#64748B' }}>{job.location}</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Clock size={14} color="#64748B" />
+              <span style={{ fontSize: '14px', color: '#64748B' }}>{job.posted}</span>
+            </div>
+          </div>
+
+          <p style={{ fontSize: '14px', color: '#475569', marginBottom: '16px', lineHeight: 1.6, margin: '0 0 16px 0' }}>{job.description}</p>
+
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
+            {job.tags.map((tag: string, idx: number) => (
+              <span key={idx} style={{ fontSize: '12px', fontWeight: 600, padding: '4px 10px', borderRadius: '6px', background: '#F1F5F9', color: '#475569', border: '1px solid #E2E8F0' }}>{tag}</span>
+            ))}
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ fontSize: '15px', fontWeight: 700, color: '#1E293B' }}>{job.salary}</div>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button style={{ background: 'transparent', border: '1px solid #E2E8F0', color: '#64748B', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 600 }}>
+                <Bookmark size={14} />
+                Save
+              </button>
+              <button style={{ background: '#0051FF', color: '#FFFFFF', fontWeight: 700, padding: '8px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px' }}>
+                <Zap size={14} fill="white" />
+                Quick Apply
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
