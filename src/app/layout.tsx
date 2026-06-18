@@ -4,6 +4,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "InstaJob Dashboard",
   description: "AI Job Hunting Automation Platform",
+  icons: {
+    icon: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({

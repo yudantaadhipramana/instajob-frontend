@@ -6,8 +6,8 @@ export default function Logo({ className = "" }: { className?: string }) {
   return (
     <div className={`flex flex-col items-center ${className}`}>
       {/* Lightning Bolt Logo - Blue */}
-      <svg width="64" height="64" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M50 10 L70 45 L55 45 L65 90 L30 50 L45 50 Z" fill="#0051FF" stroke="#0051FF" strokeWidth="1" strokeLinejoin="round"/>
+      <svg width="64" height="64" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M128 16L80 120H112L96 240L176 96H144L128 16Z" fill="#0051FF" stroke="#0051FF" strokeWidth="0" strokeLinejoin="round" strokeLinecap="round"/>
       </svg>
       
       {/* Wordmark */}
