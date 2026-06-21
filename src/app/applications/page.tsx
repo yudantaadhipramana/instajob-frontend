@@ -33,7 +33,8 @@ export default function ApplicationsPage() {
       }
 
       try {
-        const response = await fetch('http://127.0.0.1:3001/api/applications', {
+        const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3001';
+        const response = await fetch(`${apiBase}/api/applications`, {
           headers: { 'Authorization': `Bearer ${token}` },
         });
 

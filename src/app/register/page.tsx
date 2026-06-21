@@ -33,7 +33,8 @@ export default function RegisterPage() {
     }
 
     try {
-      const response = await fetch('http://127.0.0.1:3001/api/auth/register', {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3001';
+      const response = await fetch(`${apiBase}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -65,7 +66,8 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://127.0.0.1:3001/api/auth/google', {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3001';
+      const response = await fetch(`${apiBase}/api/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: credentialResponse.credential }),

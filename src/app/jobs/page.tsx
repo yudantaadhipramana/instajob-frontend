@@ -37,7 +37,8 @@ export default function JobsPage() {
       setUser(JSON.parse(userData));
 
       try {
-        const response = await fetch('http://127.0.0.1:3001/api/jobs', {
+        const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3001';
+        const response = await fetch(`${apiBase}/api/jobs`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -96,7 +97,8 @@ export default function JobsPage() {
 
     try {
       console.log('[DEBUG] Sending application:', { userId: user.id, jobId });
-      const response = await fetch('http://127.0.0.1:3001/api/applications', {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3001';
+      const response = await fetch(`${apiBase}/api/applications`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
