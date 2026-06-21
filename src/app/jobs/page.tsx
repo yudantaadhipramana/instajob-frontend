@@ -1,122 +1,276 @@
-"use client";
+'use client';
 
-import React, { useState } from 'react';
-import Sidebar from '@/components/Sidebar';
-import { Search, SlidersHorizontal, MapPin, Building2, Clock, Zap, Bookmark } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
-const jobData = [
-  { id: 1, title: 'Senior Frontend Engineer', company: 'Stripe', location: 'San Francisco, CA', type: 'Full-time', salary: '$150k - $200k', match: 98, posted: '2h ago', description: 'Build the next generation of payment infrastructure...', tags: ['React', 'TypeScript', 'Next.js'] },
-  { id: 2, title: 'Product Designer', company: 'Linear', location: 'Remote', type: 'Full-time', salary: '$130k - $170k', match: 95, posted: '5h ago', description: 'Design beautiful and functional interfaces...', tags: ['Figma', 'UI/UX', 'Design Systems'] },
-  { id: 3, title: 'Fullstack Developer', company: 'Vercel', location: 'Remote', type: 'Full-time', salary: '$140k - $190k', match: 92, posted: '1d ago', description: 'Help build the platform for frontend developers...', tags: ['Next.js', 'Node.js', 'PostgreSQL'] },
-  { id: 4, title: 'Backend Engineer', company: 'Supabase', location: 'Singapore', type: 'Full-time', salary: '$120k - $160k', match: 89, posted: '2d ago', description: 'Build scalable backend services...', tags: ['PostgreSQL', 'Go', 'Rust'] },
-  { id: 5, title: 'DevOps Engineer', company: 'Cloudflare', location: 'Austin, TX', type: 'Full-time', salary: '$135k - $180k', match: 87, posted: '3d ago', description: 'Manage infrastructure for global edge network...', tags: ['Kubernetes', 'AWS', 'Terraform'] },
-  { id: 6, title: 'Mobile Developer', company: 'Notion', location: 'New York, NY', type: 'Full-time', salary: '$140k - $185k', match: 85, posted: '4d ago', description: 'Build native mobile apps...', tags: ['React Native', 'Swift', 'Kotlin'] },
-];
-
-export default function JobsPage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState('all');
-
-  return (
-    <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', height: '100vh', overflow: 'hidden', background: '#FFFFFF' }}>
-      <Sidebar />
-      
-      <main style={{ overflowY: 'auto', position: 'relative', padding: '48px' }}>
-        {/* Header */}
-        <div style={{ marginBottom: '48px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <div>
-              <p style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#64748B', marginBottom: '8px' }}>Job Discovery</p>
-              <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#1E293B', margin: 0 }}>Opportunity Feed</h1>
-            </div>
-            <button style={{ background: '#F8FAFC', border: '1px solid #CBD5E1', color: '#1E293B', fontWeight: 600, padding: '12px 20px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
-              <SlidersHorizontal size={16} />
-              Filters
-            </button>
-          </div>
-          <p style={{ fontSize: '16px', color: '#64748B', margin: 0 }}>{jobData.length} opportunities matching your profile</p>
-        </div>
-
-        {/* Search Bar */}
-        <div style={{ marginBottom: '32px', position: 'relative', maxWidth: '600px' }}>
-          <Search size={18} color="#94A3B8" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)' }} />
-          <input type="text" placeholder="Search jobs, companies, keywords..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ width: '100%', padding: '14px 16px 14px 48px', borderRadius: '12px', border: '1px solid #E2E8F0', background: '#FFFFFF', fontSize: '14px', color: '#1E293B', outline: 'none', boxSizing: 'border-box' }} />
-        </div>
-
-        {/* Filter Pills */}
-        <div style={{ display: 'flex', gap: '12px', marginBottom: '32px', flexWrap: 'wrap' }}>
-          {['all', 'high-match', 'remote', 'new'].map((filter) => (
-            <button key={filter} onClick={() => setSelectedFilter(filter)} style={{ padding: '8px 16px', borderRadius: '8px', border: selectedFilter === filter ? '1px solid #0051FF' : '1px solid #E2E8F0', background: selectedFilter === filter ? 'rgba(0, 81, 255, 0.1)' : '#FFFFFF', color: selectedFilter === filter ? '#0051FF' : '#64748B', fontSize: '13px', fontWeight: 600, cursor: 'pointer', textTransform: 'capitalize' }}>
-              {filter.replace('-', ' ')}
-            </button>
-          ))}
-        </div>
-
-        {/* Job Cards */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {jobData.map((job) => (
-            <JobCard key={job.id} job={job} />
-          ))}
-        </div>
-      </main>
-    </div>
-  );
+interface Job {
+  id: string;
+  title: string;
+  description: string;
+  company: string;
+  location: string;
+  salary: string;
+  createdAt: string;
 }
 
-function JobCard({ job }: any) {
-  return (
-    <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '24px', cursor: 'pointer', position: 'relative' }}>
-      <div style={{ position: 'absolute', top: '24px', right: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-        <div style={{ fontSize: '24px', fontWeight: 800, color: '#0051FF', fontStyle: 'italic', lineHeight: 1 }}>{job.match}%</div>
-        <div style={{ fontSize: '9px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#64748B' }}>Match</div>
-      </div>
+export default function JobsPage() {
+  const router = useRouter();
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterLocation, setFilterLocation] = useState('all');
+  const [user, setUser] = useState<any>(null);
 
-      <div style={{ display: 'flex', gap: '20px', paddingRight: '80px' }}>
-        <div style={{ width: '56px', height: '56px', borderRadius: '12px', background: '#F1F5F9', border: '1px solid #CBD5E1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 800, color: '#94A3B8', flexShrink: 0 }}>
-          {job.company.charAt(0)}
+  useEffect(() => {
+    const checkAuthAndFetchJobs = async () => {
+      const token = localStorage.getItem('instajob_token');
+      const userData = localStorage.getItem('instajob_user');
+
+      if (!token || !userData) {
+        router.push('/login');
+        return;
+      }
+
+      setUser(JSON.parse(userData));
+
+      try {
+        const response = await fetch('http://127.0.0.1:3001/api/jobs', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const jobsList = data.jobs || data;
+          setJobs(jobsList);
+          setFilteredJobs(jobsList);
+        } else {
+          setError('Failed to load jobs');
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load jobs');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuthAndFetchJobs();
+  }, [router]);
+
+  // Apply filters
+  useEffect(() => {
+    let filtered = jobs;
+
+    if (searchQuery.trim()) {
+      filtered = filtered.filter(job =>
+        job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        job.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        job.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    if (filterLocation !== 'all') {
+      filtered = filtered.filter(job => job.location === filterLocation);
+    }
+
+    setFilteredJobs(filtered);
+  }, [searchQuery, filterLocation, jobs]);
+
+  const handleApply = async (jobId: string) => {
+    console.log('[DEBUG] handleApply called with jobId:', jobId, 'type:', typeof jobId);
+    const token = localStorage.getItem('instajob_token');
+    const userData = localStorage.getItem('instajob_user');
+    
+    if (!token || !userData) {
+      router.push('/login');
+      return;
+    }
+
+    const user = JSON.parse(userData);
+
+    try {
+      console.log('[DEBUG] Sending application:', { userId: user.id, jobId });
+      const response = await fetch('http://127.0.0.1:3001/api/applications', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          jobId: jobId,
+          status: 'pending',
+        }),
+      });
+
+      const responseText = await response.text();
+      console.log('[DEBUG] Response status:', response.status, 'body:', responseText);
+
+      if (response.ok) {
+        alert('Application submitted successfully!');
+      } else {
+        alert('Failed to submit application: ' + responseText);
+      }
+    } catch (err) {
+      console.error('[DEBUG] Error:', err);
+      alert('Error submitting application');
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('instajob_token');
+    localStorage.removeItem('instajob_user');
+    router.push('/');
+  };
+
+  const uniqueLocations = Array.from(new Set(jobs.map(job => job.location)));
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl font-bold text-indigo-600 mb-4">InstaJob</div>
+          <div className="text-lg text-gray-600">Loading jobs...</div>
         </div>
+      </div>
+    );
+  }
 
-        <div style={{ flex: 1 }}>
-          <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#1E293B', marginBottom: '8px', margin: 0 }}>{job.title}</h3>
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '12px', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Building2 size={14} color="#64748B" />
-              <span style={{ fontSize: '14px', color: '#64748B', fontWeight: 600 }}>{job.company}</span>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Header */}
+      <header className="bg-white shadow-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-indigo-600">Browse Jobs</h1>
+            <p className="text-gray-600 text-sm mt-1">Found {filteredJobs.length} opportunities</p>
+          </div>
+          <div className="flex gap-4">
+            <Link
+              href="/dashboard"
+              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+            >
+              Dashboard
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+            {error}
+          </div>
+        )}
+
+        {/* Filters Section */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">Search & Filter</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Search Box */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Search Jobs</label>
+              <input
+                type="text"
+                placeholder="Job title, company..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <MapPin size={14} color="#64748B" />
-              <span style={{ fontSize: '14px', color: '#64748B' }}>{job.location}</span>
+
+            {/* Location Filter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+              <select
+                value={filterLocation}
+                onChange={(e) => setFilterLocation(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="all">All Locations</option>
+                {uniqueLocations.map(location => (
+                  <option key={location} value={location}>{location}</option>
+                ))}
+              </select>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Clock size={14} color="#64748B" />
-              <span style={{ fontSize: '14px', color: '#64748B' }}>{job.posted}</span>
+
+            {/* Results Count */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Results</label>
+              <div className="px-4 py-2 bg-indigo-50 rounded-lg text-indigo-700 font-semibold">
+                {filteredJobs.length} / {jobs.length} jobs
+              </div>
             </div>
           </div>
+        </div>
 
-          <p style={{ fontSize: '14px', color: '#475569', marginBottom: '16px', lineHeight: 1.6, margin: '0 0 16px 0' }}>{job.description}</p>
+        {/* Jobs Grid */}
+        {filteredJobs.length === 0 ? (
+          <div className="bg-white rounded-lg shadow-md p-12 text-center">
+            <p className="text-xl text-gray-600 mb-4">No jobs found matching your criteria.</p>
+            <button
+              onClick={() => { setSearchQuery(''); setFilterLocation('all'); }}
+              className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            >
+              Clear Filters
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {filteredJobs.map((job) => (
+              <div key={job.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden">
+                <div className="p-6">
+                  {/* Job Header */}
+                  <div className="mb-4">
+                    <h3 className="text-xl font-bold text-gray-800 mb-2">{job.title}</h3>
+                    <p className="text-indigo-600 font-semibold text-sm">{job.company}</p>
+                  </div>
 
-          <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
-            {job.tags.map((tag: string, idx: number) => (
-              <span key={idx} style={{ fontSize: '12px', fontWeight: 600, padding: '4px 10px', borderRadius: '6px', background: '#F1F5F9', color: '#475569', border: '1px solid #E2E8F0' }}>{tag}</span>
+                  {/* Job Details */}
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center text-gray-600 text-sm">
+                      <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
+                      </svg>
+                      {job.location}
+                    </div>
+                    <div className="flex items-center text-gray-600 text-sm">
+                      <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M8.5 13a3.5 3.5 0 01-.369-6.98 4 4 0 117.753 1.977A4.5 4.5 0 1113.5 13H11V9.413l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13H8.5z"/>
+                      </svg>
+                      {job.salary}
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">{job.description}</p>
+
+                  {/* Action Button */}
+                  <button
+                    onClick={() => handleApply(job.id)}
+                    className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold transition"
+                  >
+                    Apply Now
+                  </button>
+                </div>
+              </div>
             ))}
           </div>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ fontSize: '15px', fontWeight: 700, color: '#1E293B' }}>{job.salary}</div>
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button style={{ background: 'transparent', border: '1px solid #E2E8F0', color: '#64748B', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 600 }}>
-                <Bookmark size={14} />
-                Save
-              </button>
-              <button style={{ background: '#0051FF', color: '#FFFFFF', fontWeight: 700, padding: '8px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px' }}>
-                <Zap size={14} fill="white" />
-                Quick Apply
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+        )}
+      </main>
     </div>
   );
 }

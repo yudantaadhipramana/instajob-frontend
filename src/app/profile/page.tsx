@@ -1,116 +1,279 @@
-"use client";
+'use client';
 
-import React from 'react';
-import Sidebar from '@/components/Sidebar';
-import { FileText, Plus, CheckCircle2, Target, Award } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
-const stats = [
-  { label: 'Skills Matching', value: '12/15', desc: '80% coverage', color: '#10B981' },
-  { label: 'CV Scans', value: '48', desc: 'Viewed this week', color: '#0051FF' },
-  { label: 'Profile Strength', value: '92%', desc: 'Strong', color: '#0051FF' },
-  { label: 'Endorsements', value: '24', desc: 'From recruiters', color: '#8B5CF6' },
-];
-
-const skills = [
-  { name: 'React', level: 95, verified: true },
-  { name: 'TypeScript', level: 90, verified: true },
-  { name: 'Next.js', level: 88, verified: true },
-  { name: 'Node.js', level: 82, verified: false },
-  { name: 'PostgreSQL', level: 75, verified: false },
-  { name: 'Tailwind CSS', level: 92, verified: true },
-  { name: 'GraphQL', level: 70, verified: false },
-  { name: 'Docker', level: 65, verified: false },
-];
-
-const experiences = [
-  { title: 'Senior Frontend Developer', company: 'Tech Corp', period: '2022 - Present', description: 'Built scalable web applications serving 100k+ users' },
-  { title: 'Fullstack Developer', company: 'StartupXYZ', period: '2020 - 2022', description: 'Developed microservices architecture' },
-  { title: 'Junior Developer', company: 'WebStudio', period: '2018 - 2020', description: 'Frontend development with React' },
-];
+interface UserProfile {
+  id: string;
+  email: string;
+  fullName: string;
+  bio?: string;
+  skills?: string;
+  experience?: string;
+  portfolio?: string;
+}
 
 export default function ProfilePage() {
+  const router = useRouter();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: '',
+    bio: '',
+    skills: '',
+    experience: '',
+    portfolio: '',
+  });
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  useEffect(() => {
+    const checkAuthAndFetchProfile = async () => {
+      const token = localStorage.getItem('instajob_token');
+      const userData = localStorage.getItem('instajob_user');
+
+      if (!token || !userData) {
+        router.push('/login');
+        return;
+      }
+
+      const user = JSON.parse(userData);
+      setProfile(user);
+      setFormData({
+        fullName: user.fullName || '',
+        bio: user.bio || '',
+        skills: user.skills || '',
+        experience: user.experience || '',
+        portfolio: user.portfolio || '',
+      });
+      setLoading(false);
+    };
+
+    checkAuthAndFetchProfile();
+  }, [router]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSaveProfile = async () => {
+    const token = localStorage.getItem('instajob_token');
+    if (!token || !profile) {
+      setError('Not authenticated');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://127.0.0.1:3001/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          bio: formData.bio,
+          skills: formData.skills,
+          experience: formData.experience,
+          portfolio: formData.portfolio,
+        }),
+      });
+
+      if (response.ok) {
+        const updated = await response.json();
+        setProfile(updated);
+        localStorage.setItem('instajob_user', JSON.stringify(updated));
+        setSuccess('Profile updated successfully!');
+        setEditing(false);
+        setTimeout(() => setSuccess(''), 3000);
+      } else {
+        setError('Failed to update profile');
+      }
+    } catch (err) {
+      setError('Error updating profile');
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('instajob_token');
+    localStorage.removeItem('instajob_user');
+    router.push('/');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl font-bold text-indigo-600 mb-4">InstaJob</div>
+          <div className="text-lg text-gray-600">Loading profile...</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', height: '100vh', overflow: 'hidden', background: '#FFFFFF' }}>
-      <Sidebar />
-      
-      <main style={{ overflowY: 'auto', position: 'relative', padding: '48px' }}>
-        <div style={{ marginBottom: '40px' }}>
-          <p style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#64748B', marginBottom: '8px' }}>Profile & Resume</p>
-          <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#1E293B', margin: 0 }}>My Profile</h1>
-        </div>
-
-        {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '40px' }}>
-          {stats.map((s, i) => (
-            <div key={i} style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '20px' }}>
-              <p style={{ fontSize: '13px', fontWeight: 600, color: '#64748B', margin: '0 0 8px 0' }}>{s.label}</p>
-              <p style={{ fontSize: '28px', fontWeight: 800, color: s.color, margin: '0 0 4px 0' }}>{s.value}</p>
-              <p style={{ fontSize: '12px', color: '#64748B', margin: 0 }}>{s.desc}</p>
-            </div>
-          ))}
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
-          {/* Skills Section */}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Header */}
+      <header className="bg-white shadow-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-              <Target size={20} color="#0051FF" />
-              <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1E293B', margin: 0 }}>Skills</h2>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {skills.map((skill, i) => (
-                <div key={i} style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '14px', fontWeight: 600, color: '#1E293B' }}>{skill.name}</span>
-                      {skill.verified && <CheckCircle2 size={14} color="#10B981" />}
-                    </div>
-                    <span style={{ fontSize: '14px', fontWeight: 800, color: '#0051FF' }}>{skill.level}%</span>
-                  </div>
-                  <div style={{ height: '6px', background: '#F1F5F9', borderRadius: '99px', overflow: 'hidden' }}>
-                    <div style={{ width: `${skill.level}%`, height: '100%', background: `linear-gradient(90deg, #0051FF, #0051FF)`, borderRadius: '99px' }}></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <button style={{ marginTop: '16px', padding: '10px 16px', background: '#F1F5F9', border: '1px solid #E2E8F0', borderRadius: '8px', color: '#64748B', fontWeight: 600, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Plus size={14} />
-              Add Skill
-            </button>
+            <h1 className="text-3xl font-bold text-indigo-600">Your Profile</h1>
+            <p className="text-gray-600 text-sm mt-1">Manage your career information</p>
           </div>
-
-          {/* Experience Section */}
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-              <Award size={20} color="#0051FF" />
-              <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1E293B', margin: 0 }}>Experience</h2>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {experiences.map((exp, i) => (
-                <div key={i} style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '16px' }}>
-                  <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#1E293B', margin: '0 0 4px 0' }}>{exp.title}</h3>
-                  <p style={{ fontSize: '13px', color: '#0051FF', fontWeight: 600, margin: '0 0 4px 0' }}>{exp.company} • {exp.period}</p>
-                  <p style={{ fontSize: '13px', color: '#64748B', margin: 0 }}>{exp.description}</p>
-                </div>
-              ))}
-            </div>
-            <button style={{ marginTop: '16px', padding: '10px 16px', background: '#F1F5F9', border: '1px solid #E2E8F0', borderRadius: '8px', color: '#64748B', fontWeight: 600, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Plus size={14} />
-              Add Experience
+          <div className="flex gap-4">
+            <Link
+              href="/dashboard"
+              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+            >
+              Dashboard
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            >
+              Logout
             </button>
           </div>
         </div>
+      </header>
 
-        {/* CV Upload */}
-        <div style={{ marginTop: '40px' }}>
-          <div style={{ background: '#F8FAFC', border: '2px dashed #CBD5E1', borderRadius: '16px', padding: '48px', textAlign: 'center' }}>
-            <FileText size={40} color="#0051FF" style={{ marginBottom: '16px' }} />
-            <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#1E293B', margin: '0 0 8px 0' }}>Upload Your CV</h3>
-            <p style={{ fontSize: '14px', color: '#64748B', marginBottom: '20px', margin: '0 0 20px 0' }}>PDF, DOCX or TXT files. Max 10MB.</p>
-            <button style={{ background: '#0051FF', color: '#FFFFFF', fontWeight: 700, padding: '12px 32px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '14px' }}>
-              Choose File
-            </button>
+      {/* Main Content */}
+      <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+            {error}
           </div>
+        )}
+
+        {success && (
+          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
+            {success}
+          </div>
+        )}
+
+        {/* Profile Card */}
+        <div className="bg-white rounded-lg shadow-md p-8">
+          <div className="flex items-center gap-6 mb-8">
+            <div className="w-24 h-24 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-full flex items-center justify-center text-white text-4xl font-bold">
+              {profile?.fullName?.charAt(0)?.toUpperCase()}
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800">{profile?.fullName}</h2>
+              <p className="text-gray-600">{profile?.email}</p>
+            </div>
+          </div>
+
+          {!editing ? (
+            // View Mode
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Bio</label>
+                <p className="text-gray-600">{profile?.bio || 'No bio added yet'}</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Skills</label>
+                <p className="text-gray-600">{profile?.skills || 'No skills added yet'}</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Experience</label>
+                <p className="text-gray-600">{profile?.experience || 'No experience added yet'}</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Portfolio</label>
+                <p className="text-gray-600">{profile?.portfolio || 'No portfolio link added yet'}</p>
+              </div>
+
+              <button
+                onClick={() => setEditing(true)}
+                className="w-full px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold transition"
+              >
+                Edit Profile
+              </button>
+            </div>
+          ) : (
+            // Edit Mode
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                <input
+                  type="text"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Bio</label>
+                <textarea
+                  name="bio"
+                  value={formData.bio}
+                  onChange={handleInputChange}
+                  placeholder="Tell us about yourself..."
+                  rows={4}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Skills</label>
+                <textarea
+                  name="skills"
+                  value={formData.skills}
+                  onChange={handleInputChange}
+                  placeholder="e.g., JavaScript, React, Node.js"
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Experience</label>
+                <textarea
+                  name="experience"
+                  value={formData.experience}
+                  onChange={handleInputChange}
+                  placeholder="e.g., 3 years as Senior Developer at Company X"
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Portfolio URL</label>
+                <input
+                  type="url"
+                  name="portfolio"
+                  value={formData.portfolio}
+                  onChange={handleInputChange}
+                  placeholder="https://yourportfolio.com"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div className="flex gap-4 pt-4">
+                <button
+                  onClick={handleSaveProfile}
+                  className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold transition"
+                >
+                  Save Changes
+                </button>
+                <button
+                  onClick={() => setEditing(false)}
+                  className="flex-1 px-6 py-3 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 font-semibold transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </main>
     </div>

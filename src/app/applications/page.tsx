@@ -1,154 +1,226 @@
-"use client";
+'use client';
 
-import React from 'react';
-import Sidebar from '@/components/Sidebar';
-import { Calendar, MessageSquare, FileText, ExternalLink, Clock, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
-const applicationData = [
-  {
-    id: 1,
-    jobTitle: 'Senior Frontend Engineer',
-    company: 'Stripe',
-    appliedDate: '2 days ago',
-    status: 'interview',
-    stage: 'Technical Interview',
-    nextStep: 'System Design Round',
-    nextDate: 'Tomorrow, 10:00 AM',
-    progress: 60,
-    notes: 'Completed phone screen with hiring manager',
-  },
-  {
-    id: 2,
-    jobTitle: 'Product Designer',
-    company: 'Linear',
-    appliedDate: '5 days ago',
-    status: 'applied',
-    stage: 'Application Submitted',
-    nextStep: 'Waiting for response',
-    nextDate: null,
-    progress: 20,
-    notes: 'Resume reviewed by recruiter',
-  },
-  {
-    id: 3,
-    jobTitle: 'Fullstack Developer',
-    company: 'Vercel',
-    appliedDate: '1 week ago',
-    status: 'offer',
-    stage: 'Offer Received',
-    nextStep: 'Decision deadline',
-    nextDate: 'June 25, 2026',
-    progress: 100,
-    notes: '$185k base + equity',
-  },
-  {
-    id: 4,
-    jobTitle: 'Backend Engineer',
-    company: 'Supabase',
-    appliedDate: '2 weeks ago',
-    status: 'rejected',
-    stage: 'Not Selected',
-    nextStep: null,
-    nextDate: null,
-    progress: 40,
-    notes: 'Position filled internally',
-  },
-];
-
-const statusConfig = {
-  applied: { color: '#64748B', bg: '#F1F5F9', icon: Clock, label: 'Applied' },
-  interview: { color: '#0051FF', bg: 'rgba(0, 81, 255, 0.1)', icon: MessageSquare, label: 'Interview' },
-  offer: { color: '#10B981', bg: '#ECFDF5', icon: CheckCircle2, label: 'Offer' },
-  rejected: { color: '#EF4444', bg: '#FEF2F2', icon: XCircle, label: 'Rejected' },
-};
+interface Application {
+  id: string;
+  jobId: string;
+  status: string;
+  notes?: string;
+  appliedAt: string;
+  createdAt: string;
+  jobTitle?: string;
+  company?: string;
+  location?: string;
+}
 
 export default function ApplicationsPage() {
-  const stats = [
-    { label: 'Total Applications', value: '86', change: '+8 this week' },
-    { label: 'Active Interviews', value: '12', change: '3 scheduled' },
-    { label: 'Pending Response', value: '45', change: 'Avg 3 days' },
-    { label: 'Offer Received', value: '3', change: '2 pending decision' },
-  ];
+  const router = useRouter();
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [filter, setFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    const fetchApplications = async () => {
+      const token = localStorage.getItem('instajob_token');
+      if (!token) {
+        router.push('/login');
+        return;
+      }
+
+      try {
+        const response = await fetch('http://127.0.0.1:3001/api/applications', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setApplications(data.applications || []);
+        } else {
+          setError('Failed to load applications');
+        }
+      } catch (err) {
+        setError('Error loading applications');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchApplications();
+  }, [router]);
+
+  const filteredApps = applications.filter(app => {
+    const matchesFilter = filter === 'all' || app.status === filter;
+    const matchesSearch = !searchQuery ||
+      app.jobTitle?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      app.company?.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesFilter && matchesSearch;
+  });
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      case 'accepted': return 'bg-green-100 text-green-800';
+      case 'rejected': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('instajob_token');
+    localStorage.removeItem('instajob_user');
+    router.push('/');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl font-bold text-indigo-600 mb-4">InstaJob</div>
+          <div className="text-lg text-gray-600">Loading applications...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', height: '100vh', overflow: 'hidden', background: '#FFFFFF' }}>
-      <Sidebar />
-      
-      <main style={{ overflowY: 'auto', position: 'relative', padding: '48px' }}>
-        <div style={{ marginBottom: '48px' }}>
-          <p style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#64748B', marginBottom: '8px' }}>Application Tracking</p>
-          <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#1E293B', margin: 0 }}>Live Status</h1>
-          <p style={{ fontSize: '16px', color: '#64748B', marginTop: '8px', margin: '8px 0 0 0' }}>Track your job applications in real-time</p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Sidebar */}
+      <aside className="fixed left-0 top-0 bottom-0 w-64 bg-white shadow-md z-50 flex flex-col">
+        <div className="p-6">
+          <h1 className="text-2xl font-bold text-indigo-600">InstaJob</h1>
+          <p className="text-sm text-gray-500 mt-1">AI Job Hunting</p>
         </div>
+        <nav className="flex-1 px-4 space-y-2">
+          <Link href="/dashboard" className="block px-4 py-3 text-gray-700 hover:bg-indigo-50 rounded-lg transition">
+            📊 Dashboard
+          </Link>
+          <Link href="/jobs" className="block px-4 py-3 text-gray-700 hover:bg-indigo-50 rounded-lg transition">
+            💼 Jobs
+          </Link>
+          <Link href="/applications" className="block px-4 py-3 bg-indigo-50 text-indigo-700 font-semibold rounded-lg">
+            📝 Applications
+          </Link>
+          <Link href="/profile" className="block px-4 py-3 text-gray-700 hover:bg-indigo-50 rounded-lg transition">
+            👤 Profile
+          </Link>
+          <Link href="/settings" className="block px-4 py-3 text-gray-700 hover:bg-indigo-50 rounded-lg transition">
+            ⚙️ Settings
+          </Link>
+        </nav>
+        <div className="p-4 border-t">
+          <button onClick={handleLogout} className="w-full px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition">
+            Logout
+          </button>
+        </div>
+      </aside>
 
-        {/* Stats Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '40px' }}>
-          {stats.map((stat, idx) => (
-            <div key={idx} style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '20px' }}>
-              <p style={{ fontSize: '13px', fontWeight: 600, color: '#64748B', marginBottom: '8px', margin: '0 0 8px 0' }}>{stat.label}</p>
-              <p style={{ fontSize: '28px', fontWeight: 800, color: '#1E293B', marginBottom: '4px', margin: '0 0 4px 0' }}>{stat.value}</p>
-              <p style={{ fontSize: '12px', color: '#64748B', margin: 0 }}>{stat.change}</p>
-            </div>
-          ))}
+      {/* Main Content */}
+      <main className="ml-64 p-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">Applications</h1>
+        <p className="text-gray-600 mb-6">Track your job applications and their status</p>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+            {error}
+          </div>
+        )}
+
+        {/* Search & Filter */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6 flex gap-4 items-center">
+          <input
+            type="text"
+            placeholder="Search applications..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+          <div className="flex gap-2">
+            {['all', 'pending', 'accepted', 'rejected'].map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`px-4 py-2 rounded-lg font-semibold transition ${
+                  filter === f
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {f.charAt(0).toUpperCase() + f.slice(1)}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Applications List */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {applicationData.map((app) => {
-            const config = statusConfig[app.status as keyof typeof statusConfig];
-            const StatusIcon = config.icon;
-            
-            return (
-              <div key={app.id} style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '24px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                      <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#1E293B', margin: 0 }}>{app.jobTitle}</h3>
-                      <span style={{ fontSize: '12px', fontWeight: 700, padding: '4px 10px', borderRadius: '6px', background: config.bg, color: config.color, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <StatusIcon size={12} />
-                        {config.label}
-                      </span>
-                    </div>
-                    <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>{app.company} • Applied {app.appliedDate}</p>
-                  </div>
-                  <button style={{ background: 'transparent', border: '1px solid #E2E8F0', color: '#64748B', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 600 }}>
-                    <ExternalLink size={14} />
-                    View Job
-                  </button>
-                </div>
-
-                {/* Progress Bar */}
-                <div style={{ marginBottom: '20px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '12px', fontWeight: 600, color: '#64748B' }}>Current Stage: {app.stage}</span>
-                    <span style={{ fontSize: '12px', fontWeight: 700, color: '#0051FF' }}>{app.progress}%</span>
-                  </div>
-                  <div style={{ height: '6px', background: '#F1F5F9', borderRadius: '99px', overflow: 'hidden' }}>
-                    <div style={{ width: `${app.progress}%`, height: '100%', background: 'linear-gradient(90deg, #0051FF, #0051FF)', transition: 'width 0.3s' }}></div>
-                  </div>
-                </div>
-
-                {/* Next Step & Notes */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+        {filteredApps.length === 0 ? (
+          <div className="bg-white rounded-lg shadow-md p-12 text-center">
+            <div className="text-6xl mb-4">📋</div>
+            <h2 className="text-xl font-bold text-gray-800 mb-2">No applications yet</h2>
+            <p className="text-gray-600 mb-6">Start applying to jobs to see them here</p>
+            <Link
+              href="/jobs"
+              className="inline-block px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold transition"
+            >
+              Browse Jobs
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {filteredApps.map((app) => (
+              <div key={app.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+                <div className="flex justify-between items-start">
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-                      <AlertCircle size={14} color="#0051FF" />
-                      <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#64748B' }}>Next Step</span>
-                    </div>
-                    <p style={{ fontSize: '14px', fontWeight: 600, color: '#1E293B', margin: '0 0 2px 0' }}>{app.nextStep || 'N/A'}</p>
-                    {app.nextDate && <p style={{ fontSize: '13px', color: '#64748B', margin: 0 }}>{app.nextDate}</p>}
+                    <h3 className="text-lg font-bold text-gray-800">{app.jobTitle || 'Unknown Position'}</h3>
+                    <p className="text-indigo-600 font-semibold text-sm">{app.company || 'Unknown Company'}</p>
+                    {app.location && (
+                      <p className="text-gray-500 text-sm mt-1">📍 {app.location}</p>
+                    )}
                   </div>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-                      <FileText size={14} color="#0051FF" />
-                      <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#64748B' }}>Notes</span>
-                    </div>
-                    <p style={{ fontSize: '14px', color: '#475569', margin: 0 }}>{app.notes}</p>
-                  </div>
+                  <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(app.status)}`}>
+                    {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
+                  </span>
+                </div>
+                <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center text-sm text-gray-500">
+                  <span>Applied: {new Date(app.appliedAt || app.createdAt).toLocaleDateString()}</span>
+                  {app.notes && <span className="text-gray-400 italic">"{app.notes}"</span>}
                 </div>
               </div>
-            );
-          })}
+            ))}
+          </div>
+        )}
+
+        {/* Summary */}
+        <div className="mt-6 bg-white rounded-lg shadow-md p-6">
+          <h3 className="font-bold text-gray-800 mb-3">Summary</h3>
+          <div className="grid grid-cols-4 gap-4 text-center">
+            <div>
+              <div className="text-2xl font-bold text-gray-800">{applications.length}</div>
+              <div className="text-sm text-gray-500">Total</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-yellow-600">
+                {applications.filter(a => a.status === 'pending').length}
+              </div>
+              <div className="text-sm text-gray-500">Pending</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-green-600">
+                {applications.filter(a => a.status === 'accepted').length}
+              </div>
+              <div className="text-sm text-gray-500">Accepted</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-red-600">
+                {applications.filter(a => a.status === 'rejected').length}
+              </div>
+              <div className="text-sm text-gray-500">Rejected</div>
+            </div>
+          </div>
         </div>
       </main>
     </div>
