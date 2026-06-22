@@ -25,8 +25,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
-      const response = await fetch(`${apiBase}/api/auth/login`, {
+      const response = await fetch(`/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),

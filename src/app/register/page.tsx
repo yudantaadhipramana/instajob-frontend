@@ -66,11 +66,10 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
-      const response = await fetch(`${apiBase}/api/auth/google`, {
+      const response = await fetch(`/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: credentialResponse.credential }),
+        body: JSON.stringify(formData),
       });
 
       const data = await response.json();
