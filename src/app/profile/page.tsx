@@ -67,7 +67,7 @@ export default function ProfilePage() {
     }
 
     try {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3001';
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
       const response = await fetch(`${apiBase}/api/user/profile`, {
         method: 'PUT',
         headers: {

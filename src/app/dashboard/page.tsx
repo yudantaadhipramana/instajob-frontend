@@ -40,7 +40,7 @@ export default function DashboardPage() {
         setUser(JSON.parse(userData));
         
         // Fetch dashboard stats
-        const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3001';
+        const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
         const response = await fetch(`${apiBase}/api/dashboard/stats`, {
           method: 'GET',
           headers: {
