@@ -1,7 +1,6 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 
 interface User {
   id: string;
@@ -26,10 +25,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
   useEffect(() => {
-    // Check for token on mount
     const storedToken = localStorage.getItem('instajob_token');
     const storedUser = localStorage.getItem('instajob_user');
     
@@ -50,19 +47,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Login failed');
+        throw new Error('Login failed');
       }
 
       const data = await response.json();
-      
-      localStorage.setItem('instajob_token', data.token);
-      localStorage.setItem('instajob_user', JSON.stringify(data.user));
-      
       setToken(data.token);
       setUser(data.user);
-      
-      router.push('/dashboard');
+      localStorage.setItem('instajob_token', data.token);
+      localStorage.setItem('instajob_user', JSON.stringify(data.user));
     } catch (error: any) {
       throw new Error(error.message || 'Login failed');
     }
@@ -77,19 +69,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Google login failed');
+        throw new Error('Google login failed');
       }
 
       const data = await response.json();
-      
-      localStorage.setItem('instajob_token', data.token);
-      localStorage.setItem('instajob_user', JSON.stringify(data.user));
-      
       setToken(data.token);
       setUser(data.user);
-      
-      router.push('/dashboard');
+      localStorage.setItem('instajob_token', data.token);
+      localStorage.setItem('instajob_user', JSON.stringify(data.user));
     } catch (error: any) {
       throw new Error(error.message || 'Google login failed');
     }
@@ -104,45 +91,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Registration failed');
+        throw new Error('Registration failed');
       }
 
       const data = await response.json();
-      
-      localStorage.setItem('instajob_token', data.token);
-      localStorage.setItem('instajob_user', JSON.stringify(data.user));
-      
       setToken(data.token);
       setUser(data.user);
-      
-      router.push('/dashboard');
+      localStorage.setItem('instajob_token', data.token);
+      localStorage.setItem('instajob_user', JSON.stringify(data.user));
     } catch (error: any) {
       throw new Error(error.message || 'Registration failed');
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('instajob_token');
-    localStorage.removeItem('instajob_user');
     setToken(null);
     setUser(null);
-    router.push('/login');
+    localStorage.removeItem('instajob_token');
+    localStorage.removeItem('instajob_user');
+  };
+
+  const value: AuthContextType = {
+    user,
+    token,
+    loading,
+    login,
+    loginWithGoogle,
+    register,
+    logout,
+    isAuthenticated: !!token,
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        token,
-        loading,
-        login,
-        loginWithGoogle,
-        register,
-        logout,
-        isAuthenticated: !!token,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
@@ -151,7 +132,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error('useAuth must be used within AuthProvider');
   }
   return context;
 }

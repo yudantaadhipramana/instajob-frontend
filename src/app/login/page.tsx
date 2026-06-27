@@ -32,14 +32,22 @@ export default function LoginPage() {
       });
 
       const data = await response.json();
+      console.log('Login response:', { status: response.ok, data });
 
       if (!response.ok) {
         setError(data.message || 'Login failed');
         return;
       }
 
+      if (!data.token || !data.user) {
+        console.error('Missing token or user in response:', data);
+        setError('Invalid response from server');
+        return;
+      }
+
       localStorage.setItem('instajob_token', data.token);
       localStorage.setItem('instajob_user', JSON.stringify(data.user));
+      console.log('Tokens saved to localStorage');
       router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
