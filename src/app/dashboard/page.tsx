@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Logo } from '@/components/Logo';
 import { JobsIcon, ApplicationsIcon, ProfileIcon, SearchIcon, MonitorIcon, CheckCircleIcon } from '@/components/DashboardIcons';
+import { Home, Settings } from 'lucide-react';
 import ProfileDropdown from '@/components/ProfileDropdown';
 
 interface User {
@@ -169,7 +170,7 @@ export default function DashboardPage() {
             gap: '8px',
           }}
         >
-          <JobsIcon size={18} color="#0051FF" />
+          <Home size={18} color="#0051FF" />
           Dashboard
         </Link>
         <Link
@@ -223,7 +224,7 @@ export default function DashboardPage() {
           Applications
         </Link>
         <Link
-          href="/profile"
+          href="/preferences"
           style={{
             padding: '16px 24px',
             textDecoration: 'none',
@@ -244,8 +245,8 @@ export default function DashboardPage() {
             e.currentTarget.style.color = '#64748B';
           }}
         >
-          <ProfileIcon size={18} color="currentColor" />
-          Profile
+          <Settings size={18} color="currentColor" />
+          Preferences
         </Link>
       </div>
 

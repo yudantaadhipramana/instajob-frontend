@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Logo } from '@/components/Logo';
 import { JobsIcon, ApplicationsIcon, ProfileIcon } from '@/components/DashboardIcons';
 import ProfileDropdown from '@/components/ProfileDropdown';
-import { Lock, Bell, Eye, Trash2, LogOut, Settings, Mail, Shield, Database, ArrowLeft, Save, Loader, CheckCircle, AlertCircle } from 'lucide-react';
+import { Lock, Bell, Eye, Trash2, LogOut, Settings, Mail, Shield, Database, ArrowLeft, Save, Loader, CheckCircle, AlertCircle, Home } from 'lucide-react';
 
 interface User {
   id: string;
@@ -188,7 +188,7 @@ export default function SettingsPage() {
             e.currentTarget.style.color = '#64748B';
           }}
         >
-          <JobsIcon size={18} color="currentColor" />
+          <Home size={18} color="currentColor" />
           Dashboard
         </Link>
         <Link
@@ -242,7 +242,7 @@ export default function SettingsPage() {
           Applications
         </Link>
         <Link
-          href="/profile"
+          href="/preferences"
           style={{
             padding: '16px 24px',
             textDecoration: 'none',
