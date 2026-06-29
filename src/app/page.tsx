@@ -29,14 +29,14 @@ export default function Home() {
       </ScrollAnimation>
       
       {/* How It Works - Step by Step */}
-      <ScrollAnimation delay={200}>
+      <ScrollAnimationOnce delay={200}>
         <HowItWorks />
-      </ScrollAnimation>
+      </ScrollAnimationOnce>
       
       {/* Features Grid */}
-      <ScrollAnimation delay={300}>
+      <ScrollAnimationOnce delay={300}>
         <FeaturesSection />
-      </ScrollAnimation>
+      </ScrollAnimationOnce>
       
       {/* Testimonials */}
       <ScrollAnimationOnce delay={400}>
