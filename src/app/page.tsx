@@ -2,6 +2,7 @@
 
 // Landing Page Sections
 import Navigation from '@/components/landing/Navigation';
+import HeroSection from '@/components/landing/HeroSection';
 import SocialProofBar from '@/components/landing/SocialProofBar';
 import StatsCounter from '@/components/landing/StatsCounter';
 import HowItWorks from '@/components/landing/HowItWorks';
@@ -14,8 +15,13 @@ import { ScrollAnimation } from '@/components/Animations';
 export default function Home() {
   return (
     <div style={{ background: '#FFFFFF', overflowX: 'hidden' }}>
-      {/* Main Navigation & Hero */}
+      {/* Navigation Bar (Fixed) */}
       <Navigation />
+      
+      {/* New Hero Section with 3D Animation */}
+      <ScrollAnimation delay={0}>
+        <HeroSection />
+      </ScrollAnimation>
       
       {/* Social Proof - Company Logos */}
       <ScrollAnimation delay={0}>
