@@ -10,6 +10,7 @@ import TestimonialsSection from '@/components/landing/TestimonialsSection';
 import CTASection from '@/components/landing/CTASection';
 import Footer from '@/components/landing/Footer';
 import { ScrollAnimation } from '@/components/Animations';
+import { ScrollAnimationOnce } from '@/components/Animations';
 
 export default function Home() {
   return (
@@ -38,19 +39,19 @@ export default function Home() {
       </ScrollAnimation>
       
       {/* Testimonials */}
-      <ScrollAnimation delay={400}>
+      <ScrollAnimationOnce delay={400}>
         <TestimonialsSection />
-      </ScrollAnimation>
+      </ScrollAnimationOnce>
       
       {/* CTA Section */}
-      <ScrollAnimation delay={500}>
+      <ScrollAnimationOnce delay={500}>
         <CTASection />
-      </ScrollAnimation>
+      </ScrollAnimationOnce>
       
       {/* Footer */}
-      <ScrollAnimation delay={600}>
+      <ScrollAnimationOnce delay={600}>
         <Footer />
-      </ScrollAnimation>
+      </ScrollAnimationOnce>
     </div>
   );
 }

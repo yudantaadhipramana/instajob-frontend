@@ -202,3 +202,69 @@ export function GradientText({
     </span>
   );
 }
+
+// Scroll-triggered ONE-TIME animation (NO REPEAT)
+// Animates ONLY on first scroll into viewport, then stays visible
+// Perfect for: Testimonials, CTA Section, Footer
+export function ScrollAnimationOnce({ 
+  children, 
+  delay = 0 
+}: { 
+  children: React.ReactNode;
+  delay?: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
+  const [hasAnimated, setHasAnimated] = useState(false); // Track if animation already occurred
+  const timerRef = useRef<number | null>(null);
+
+  const handleVisibilityChange = useCallback((isIntersecting: boolean) => {
+    if (isIntersecting && !hasAnimated) {
+      // Only animate ONCE (first time entering viewport)
+      if (timerRef.current) clearTimeout(timerRef.current);
+      // Animate in with delay
+      timerRef.current = window.setTimeout(() => {
+        setIsVisible(true);
+        setHasAnimated(true); // Mark as animated so it won't repeat
+      }, delay);
+    }
+    // NOTE: Do NOT reset isVisible when leaving viewport (stays visible)
+  }, [delay, hasAnimated]);
+
+  useEffect(() => {
+    setHasMounted(true);
+    
+    const observer = new IntersectionObserver(
+      ([entry]) => handleVisibilityChange(entry.isIntersecting),
+      { 
+        threshold: 0.1, // Trigger when 10% visible
+        rootMargin: '0px 0px -50px 0px' // Trigger slightly before viewport
+      }
+    );
+
+    if (ref.current) observer.observe(ref.current);
+    
+    return () => {
+      observer.disconnect();
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [handleVisibilityChange]);
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        // Safe Render: If JS hasn't mounted, keep visible
+        opacity: !hasMounted ? 1 : (isVisible ? 1 : 0),
+        transform: !hasMounted ? 'translateY(0)' : (isVisible ? 'translateY(0)' : 'translateY(30px)'),
+        transition: isVisible 
+          ? 'opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)' 
+          : 'none', // No transition on reset (stays hidden until animated)
+        willChange: 'opacity, transform',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
