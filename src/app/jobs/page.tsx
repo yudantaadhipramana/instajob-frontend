@@ -280,7 +280,7 @@ export default function JobsPage() {
           Dashboard
         </Link>
         <Link
-          href="/preferences"
+          href="/jobs"
           style={{
             padding: '16px 24px',
             textDecoration: 'none',
@@ -294,8 +294,8 @@ export default function JobsPage() {
             gap: '8px',
           }}
         >
-          <Settings size={18} color="#0051FF" />
-          Preferences
+          <JobsIcon size={18} color="#0051FF" />
+          Browse Jobs
         </Link>
         <Link
           href="/applications"
@@ -323,7 +323,7 @@ export default function JobsPage() {
           Applications
         </Link>
         <Link
-          href="/profile"
+          href="/preferences"
           style={{
             padding: '16px 24px',
             textDecoration: 'none',
@@ -344,8 +344,8 @@ export default function JobsPage() {
             e.currentTarget.style.color = '#64748B';
           }}
         >
-          <ProfileIcon size={18} color="currentColor" />
-          Profile
+          <Settings size={18} color="currentColor" />
+          Preferences
         </Link>
       </div>
 

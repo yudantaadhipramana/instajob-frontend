@@ -6,137 +6,184 @@ import Link from 'next/link';
 import { Logo } from '@/components/Logo';
 import { JobsIcon, ApplicationsIcon, ProfileIcon } from '@/components/DashboardIcons';
 import ProfileDropdown from '@/components/ProfileDropdown';
-import { Home, Settings } from 'lucide-react';
 
 interface Application {
   id: string;
-  jobTitle: string;
-  company: string;
-  location: string;
-  status: 'applied' | 'interviewing' | 'accepted' | 'rejected';
+  jobId: string;
+  status: string;
+  notes?: string;
   appliedAt: string;
   createdAt: string;
-  notes?: string;
+  jobTitle?: string;
+  company?: string;
+  location?: string;
+}
+
+interface User {
+  id: string;
+  email: string;
+  fullName: string;
 }
 
 export default function ApplicationsPage() {
   const router = useRouter();
-  const [applications, setApplications] = useState<Application[]>([
-    {
-      id: '1',
-      jobTitle: 'Senior Frontend Developer',
-      company: 'Tech Corp',
-      location: 'Jakarta, Indonesia',
-      status: 'interviewing',
-      appliedAt: '2026-06-25',
-      createdAt: '2026-06-25',
-      notes: 'Round 2 scheduled for next week',
-    },
-    {
-      id: '2',
-      jobTitle: 'Full Stack Engineer',
-      company: 'Startup XYZ',
-      location: 'Remote',
-      status: 'applied',
-      appliedAt: '2026-06-24',
-      createdAt: '2026-06-24',
-    },
-    {
-      id: '3',
-      jobTitle: 'Product Manager',
-      company: 'Digital Agency',
-      location: 'Surabaya, Indonesia',
-      status: 'accepted',
-      appliedAt: '2026-06-20',
-      createdAt: '2026-06-20',
-      notes: 'Start date: July 15, 2026',
-    },
-    {
-      id: '4',
-      jobTitle: 'UI/UX Designer',
-      company: 'Creative Studio',
-      location: 'Bandung, Indonesia',
-      status: 'rejected',
-      appliedAt: '2026-06-18',
-      createdAt: '2026-06-18',
-    },
-    {
-      id: '5',
-      jobTitle: 'Data Analyst',
-      company: 'Finance Corp',
-      location: 'Jakarta, Indonesia',
-      status: 'interviewing',
-      appliedAt: '2026-06-22',
-      createdAt: '2026-06-22',
-      notes: 'Technical assessment completed',
-    },
-  ]);
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [filteredApplications, setFilteredApplications] = useState<Application[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [user, setUser] = useState<User | null>(null);
 
-  const [filteredApplications, setFilteredApplications] = useState<Application[]>(applications);
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-
+  // Auth & Fetch Applications
   useEffect(() => {
-    if (statusFilter === 'all') {
-      setFilteredApplications(applications);
-    } else {
-      setFilteredApplications(applications.filter((app) => app.status === statusFilter));
-    }
-  }, [statusFilter, applications]);
+    const checkAuthAndFetchApplications = async () => {
+      const token = localStorage.getItem('instajob_token');
+      const userData = localStorage.getItem('instajob_user');
 
-  const getStatusConfig = (status: string) => {
-    const configs: Record<string, { label: string; bg: string; text: string }> = {
-      applied: { label: '📬 Applied', bg: '#F3F4F6', text: '#6B7280' },
-      interviewing: { label: '🗣️ Interviewing', bg: '#DBEAFE', text: '#1E40AF' },
-      accepted: { label: '✅ Accepted', bg: '#DCFCE7', text: '#15803D' },
-      rejected: { label: '❌ Rejected', bg: '#FEE2E2', text: '#DC2626' },
+      if (!token || !userData) {
+        router.push('/login');
+        return;
+      }
+
+      setUser(JSON.parse(userData));
+
+      try {
+        const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
+        const response = await fetch(`${apiBase}/api/applications`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const appsList = data.applications || data;
+          setApplications(appsList);
+          setFilteredApplications(appsList);
+        } else {
+          setError('Failed to load applications');
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load applications');
+      } finally {
+        setLoading(false);
+      }
     };
-    return configs[status] || configs.applied;
+
+    checkAuthAndFetchApplications();
+  }, [router]);
+
+  // Apply Filters
+  useEffect(() => {
+    let filtered = applications;
+
+    if (filterStatus !== 'all') {
+      filtered = filtered.filter(app => app.status === filterStatus);
+    }
+
+    if (searchQuery) {
+      filtered = filtered.filter(app =>
+        app.jobTitle?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        app.company?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    setFilteredApplications(filtered);
+  }, [applications, filterStatus, searchQuery]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('instajob_token');
+    localStorage.removeItem('instajob_user');
+    router.push('/');
   };
+
+  // Get Status Badge Config
+  const getStatusConfig = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return { bg: '#FEF3C7', text: '#92400E', label: '⏳ Pending', icon: '⏳' };
+      case 'accepted':
+        return { bg: '#DCFCE7', text: '#166534', label: '✅ Accepted', icon: '✅' };
+      case 'rejected':
+        return { bg: '#FEE2E2', text: '#991B1B', label: '❌ Rejected', icon: '❌' };
+      default:
+        return { bg: '#F1F5F9', text: '#64748B', label: '❓ Unknown', icon: '❓' };
+    }
+  };
+
+  // Stats
+  const stats = {
+    total: applications.length,
+    pending: applications.filter(a => a.status === 'pending').length,
+    accepted: applications.filter(a => a.status === 'accepted').length,
+    rejected: applications.filter(a => a.status === 'rejected').length,
+  };
+
+  // Loading State
+  if (loading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #FFFFFF 0%, #F5F8FF 50%, #EEF2FF 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'Inter, system-ui, sans-serif',
+      }}>
+        <div style={{ textAlign: 'center', animation: 'fadeIn 0.6s ease-out' }}>
+          <Logo size={48} showText={true} />
+          <div style={{ marginTop: '20px', color: '#64748B', fontSize: '16px', fontWeight: '500' }}>
+            Loading your applications...
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{
-      background: 'linear-gradient(135deg, #FFFFFF 0%, #F5F8FF 50%, #EEF2FF 100%)',
       minHeight: '100vh',
+      background: 'linear-gradient(135deg, #FFFFFF 0%, #F5F8FF 50%, #EEF2FF 100%)',
+      fontFamily: 'Inter, system-ui, sans-serif',
       position: 'relative',
       overflow: 'hidden',
     }}>
-      {/* Animated Gradient Background */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        background: 'radial-gradient(circle at 20% 50%, rgba(0, 81, 255, 0.08) 0%, transparent 50%)',
-        pointerEvents: 'none',
-      }} />
-      <div style={{
-        position: 'fixed',
-        bottom: 0,
-        right: 0,
-        width: '500px',
-        height: '500px',
-        background: 'radial-gradient(circle, rgba(0, 81, 255, 0.05) 0%, transparent 70%)',
-        borderRadius: '50%',
-        filter: 'blur(120px)',
-        pointerEvents: 'none',
-      }} />
+      {/* Premium Background Glow Effects */}
+      <div style={{ 
+        position: 'fixed', 
+        width: '1000px', 
+        height: '1000px', 
+        borderRadius: '50%', 
+        top: '-300px', 
+        right: '-200px', 
+        background: 'radial-gradient(circle, rgba(0, 81, 255, 0.08) 0%, transparent 70%)', 
+        filter: 'blur(80px)', 
+        pointerEvents: 'none', 
+        zIndex: 0 
+      }}></div>
 
-      {/* Header */}
+      {/* Top Navigation Bar */}
       <header style={{
         background: 'rgba(255, 255, 255, 0.7)',
-        backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.3)',
-        padding: '20px 40px',
+        backdropFilter: 'blur(16px)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.5)',
+        padding: '0 40px',
+        height: '72px',
         display: 'flex',
-        justifyContent: 'space-between',
         alignItems: 'center',
+        justifyContent: 'space-between',
         position: 'sticky',
         top: 0,
         zIndex: 100,
       }}>
-        <Logo />
-        <ProfileDropdown />
+        <Logo size={32} showText={true} />
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <ProfileDropdown user={user || undefined} />
+        </div>
       </header>
 
       {/* Navigation Tabs — CONSISTENT WITH /dashboard */}
@@ -170,7 +217,7 @@ export default function ApplicationsPage() {
             e.currentTarget.style.color = '#64748B';
           }}
         >
-          <Home size={18} color="currentColor" />
+          <JobsIcon size={18} color="currentColor" />
           Dashboard
         </Link>
         <Link
@@ -211,13 +258,14 @@ export default function ApplicationsPage() {
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
+            cursor: 'pointer',
           }}
         >
           <ApplicationsIcon size={18} color="#0051FF" />
           Applications
         </Link>
         <Link
-          href="/preferences"
+          href="/profile"
           style={{
             padding: '16px 24px',
             textDecoration: 'none',
@@ -238,12 +286,12 @@ export default function ApplicationsPage() {
             e.currentTarget.style.color = '#64748B';
           }}
         >
-          <Settings size={18} color="currentColor" />
-          Preferences
+          <ProfileIcon size={18} color="currentColor" />
+          Profile
         </Link>
       </div>
 
-      {/* Main Content */}
+      {/* Main Content Area */}
       <main style={{
         maxWidth: '1200px',
         margin: '0 auto',
@@ -252,14 +300,14 @@ export default function ApplicationsPage() {
         zIndex: 1,
       }}>
         {/* Page Title */}
-        <div style={{ marginBottom: '32px' }}>
+        <div style={{ marginBottom: '40px' }}>
           <h1 style={{
             fontSize: '32px',
             fontWeight: '800',
             margin: '0 0 12px 0',
             color: '#1E293B',
           }}>
-            Your Applications
+            My Applications
           </h1>
           <p style={{
             fontSize: '14px',
@@ -270,47 +318,114 @@ export default function ApplicationsPage() {
           </p>
         </div>
 
-        {/* Filter Section */}
+        {/* Error Message */}
+        {error && (
+          <div style={{
+            marginBottom: '24px',
+            padding: '16px',
+            background: '#FEE2E2',
+            border: '1px solid #FECACA',
+            borderRadius: '8px',
+            color: '#991B1B',
+            fontSize: '14px',
+            fontWeight: '500',
+          }}>
+            {error}
+          </div>
+        )}
+
+        {/* Stats Cards */}
         <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: '16px',
           marginBottom: '32px',
-          padding: '20px',
+        }}>
+          {[
+            { label: 'Total', value: stats.total, color: '#0051FF' },
+            { label: 'Pending', value: stats.pending, color: '#F59E0B' },
+            { label: 'Accepted', value: stats.accepted, color: '#10B981' },
+            { label: 'Rejected', value: stats.rejected, color: '#EF4444' },
+          ].map((stat) => (
+            <div key={stat.label} style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
+              backdropFilter: 'blur(12px)',
+              borderRadius: '12px',
+              padding: '20px',
+              boxShadow: '0 2px 8px rgba(0, 81, 255, 0.06)',
+              border: '1px solid rgba(255, 255, 255, 0.6)',
+              textAlign: 'center',
+            }}>
+              <p style={{
+                fontSize: '12px',
+                color: '#64748B',
+                margin: '0 0 8px 0',
+                fontWeight: '500',
+              }}>
+                {stat.label}
+              </p>
+              <p style={{
+                fontSize: '28px',
+                fontWeight: '800',
+                margin: 0,
+                color: stat.color,
+              }}>
+                {stat.value}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Filter & Search Section */}
+        <div style={{
           background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
           backdropFilter: 'blur(12px)',
           borderRadius: '12px',
+          padding: '20px',
           boxShadow: '0 2px 8px rgba(0, 81, 255, 0.06)',
           border: '1px solid rgba(255, 255, 255, 0.6)',
+          marginBottom: '24px',
+          display: 'flex',
+          gap: '12px',
+          flexWrap: 'wrap',
         }}>
-          <label style={{
-            display: 'block',
-            fontSize: '13px',
-            fontWeight: '600',
-            color: '#1E293B',
-            marginBottom: '8px',
-          }}>
-            Filter by Status
-          </label>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+          <input
+            type="text"
+            placeholder="Search by job title or company..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             style={{
-              width: '100%',
-              maxWidth: '300px',
-              padding: '12px 14px',
-              fontSize: '14px',
+              flex: 1,
+              minWidth: '200px',
+              padding: '10px 12px',
+              fontSize: '13px',
               border: '1px solid #E2E8F0',
-              borderRadius: '8px',
+              borderRadius: '6px',
+              outline: 'none',
+              transition: 'border-color 0.2s',
+            }}
+            onFocus={(e) => e.target.style.borderColor = '#0051FF'}
+            onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
+          />
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            style={{
+              padding: '10px 12px',
+              fontSize: '13px',
+              border: '1px solid #E2E8F0',
+              borderRadius: '6px',
               outline: 'none',
               transition: 'border-color 0.2s',
               backgroundColor: '#FFFFFF',
               color: '#1E293B',
               cursor: 'pointer',
             }}
-            onFocus={(e) => e.currentTarget.style.borderColor = '#0051FF'}
-            onBlur={(e) => e.currentTarget.style.borderColor = '#E2E8F0'}
+            onFocus={(e) => e.target.style.borderColor = '#0051FF'}
+            onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
           >
-            <option value="all">All Applications</option>
-            <option value="applied">Applied</option>
-            <option value="interviewing">Interviewing</option>
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
             <option value="accepted">Accepted</option>
             <option value="rejected">Rejected</option>
           </select>
