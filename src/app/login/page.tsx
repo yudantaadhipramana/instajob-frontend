@@ -1,18 +1,19 @@
+export const dynamic = 'force-dynamic';
+
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
-  const router = useRouter();
+  const { login, isLoading, error: authError } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -22,67 +23,18 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
 
     try {
-      const response = await fetch(`/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-      console.log('Login response:', { status: response.ok, data });
-
-      if (!response.ok) {
-        setError(data.message || 'Login failed');
-        return;
-      }
-
-      if (!data.token || !data.user) {
-        console.error('Missing token or user in response:', data);
-        setError('Invalid response from server');
-        return;
-      }
-
-      localStorage.setItem('instajob_token', data.token);
-      localStorage.setItem('instajob_user', JSON.stringify(data.user));
-      console.log('Tokens saved to localStorage');
-      router.push('/dashboard');
+      await login(formData.email, formData.password);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
     setError('');
-    setLoading(true);
-
-    try {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
-      const response = await fetch(`${apiBase}/api/auth/google`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: credentialResponse.credential }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.message || 'Google login failed');
-        return;
-      }
-
-      localStorage.setItem('instajob_token', data.token);
-      localStorage.setItem('instajob_user', JSON.stringify(data.user));
-      router.push('/dashboard');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Google login failed');
-    } finally {
-      setLoading(false);
-    }
+    // TODO: Implement Google OAuth backend integration
+    console.log('Google login not yet implemented');
   };
 
   return (
@@ -276,22 +228,22 @@ export default function LoginPage() {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={loading}
+              disabled={isLoading}
               className="login-button"
               style={{
                 width: '100%',
                 padding: '12px',
-                background: loading ? '#94A3B8' : '#0051FF',
+                background: isLoading ? '#94A3B8' : '#0051FF',
                 color: '#FFFFFF',
                 border: 'none',
                 borderRadius: '8px',
                 fontSize: '14px',
                 fontWeight: '700',
-                cursor: loading ? 'not-allowed' : 'pointer',
+                cursor: isLoading ? 'not-allowed' : 'pointer',
                 transition: 'all 0.3s ease',
               }}
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {isLoading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
 

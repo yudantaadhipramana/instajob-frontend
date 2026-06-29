@@ -1,12 +1,14 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function RegisterPage() {
-  const router = useRouter();
+  const { register, isLoading, error: authError } = useAuth();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -14,7 +16,6 @@ export default function RegisterPage() {
     confirmPassword: '',
   });
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -24,68 +25,22 @@ export default function RegisterPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
 
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
-      setLoading(false);
       return;
     }
 
     try {
-      const response = await fetch(`/api/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fullName: formData.fullName,
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.message || 'Registration failed');
-        return;
-      }
-
-      localStorage.setItem('instajob_token', data.token);
-      localStorage.setItem('instajob_user', JSON.stringify(data.user));
-      router.push('/dashboard');
+      await register(formData.email, formData.password, formData.fullName);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
-    } finally {
-      setLoading(false);
     }
   };
-
   const handleGoogleSuccess = async (credentialResponse: any) => {
     setError('');
-    setLoading(true);
-
-    try {
-      const response = await fetch(`/api/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.message || 'Google login failed');
-        return;
-      }
-
-      localStorage.setItem('instajob_token', data.token);
-      localStorage.setItem('instajob_user', JSON.stringify(data.user));
-      router.push('/dashboard');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Google login failed');
-    } finally {
-      setLoading(false);
-    }
+    // TODO: Implement Google OAuth backend integration
+    console.log('Google login not yet implemented');
   };
 
   return (
@@ -328,22 +283,22 @@ export default function RegisterPage() {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={loading}
+              disabled={isLoading}
               className="register-button"
               style={{
                 width: '100%',
                 padding: '12px',
-                background: loading ? '#94A3B8' : '#0051FF',
+                background: isLoading ? '#94A3B8' : '#0051FF',
                 color: '#FFFFFF',
                 border: 'none',
                 borderRadius: '8px',
                 fontSize: '14px',
                 fontWeight: '700',
-                cursor: loading ? 'not-allowed' : 'pointer',
+                cursor: isLoading ? 'not-allowed' : 'pointer',
                 transition: 'all 0.3s ease',
               }}
             >
-              {loading ? 'Creating account...' : 'Create Account'}
+              {isLoading ? 'Creating account...' : 'Create Account'}
             </button>
           </form>
 
