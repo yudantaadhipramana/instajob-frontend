@@ -7,6 +7,7 @@ import { ScrollAnimation } from '@/components/Animations';
 import { Logo } from '@/components/Logo';
 import { JobsIcon, ApplicationsIcon, ProfileIcon } from '@/components/DashboardIcons';
 import ProfileDropdown from '@/components/ProfileDropdown';
+import { Home, Settings } from 'lucide-react';
 
 interface Job {
   id: string;
@@ -275,11 +276,11 @@ export default function JobsPage() {
             e.currentTarget.style.color = '#64748B';
           }}
         >
-          <JobsIcon size={18} color="#64748B" />
+          <Home size={18} color="currentColor" />
           Dashboard
         </Link>
         <Link
-          href="/jobs"
+          href="/preferences"
           style={{
             padding: '16px 24px',
             textDecoration: 'none',
@@ -293,8 +294,8 @@ export default function JobsPage() {
             gap: '8px',
           }}
         >
-          <JobsIcon size={18} color="#0051FF" />
-          Browse Jobs
+          <Settings size={18} color="#0051FF" />
+          Preferences
         </Link>
         <Link
           href="/applications"
