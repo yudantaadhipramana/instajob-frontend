@@ -354,15 +354,6 @@ export default function DashboardPage() {
                     <JobsIcon size={28} color="#0051FF" />
                   </div>
                 </div>
-                <div style={{
-                  marginTop: '16px',
-                  paddingTop: '16px',
-                  borderTop: '1px solid rgba(0, 81, 255, 0.1)',
-                  fontSize: '12px',
-                  color: '#64748B',
-                }}>
-                  📈 Job market update
-                </div>
               </div>
 
               {/* Applied Today Card */}
@@ -414,15 +405,6 @@ export default function DashboardPage() {
                   }}>
                     <ApplicationsIcon size={28} color="#10B981" />
                   </div>
-                </div>
-                <div style={{
-                  marginTop: '16px',
-                  paddingTop: '16px',
-                  borderTop: '1px solid rgba(16, 185, 129, 0.1)',
-                  fontSize: '12px',
-                  color: '#64748B',
-                }}>
-                  🚀 AI auto-applied
                 </div>
               </div>
 
@@ -476,15 +458,6 @@ export default function DashboardPage() {
                     <MonitorIcon size={28} color="#F59E0B" />
                   </div>
                 </div>
-                <div style={{
-                  marginTop: '16px',
-                  paddingTop: '16px',
-                  borderTop: '1px solid rgba(251, 191, 36, 0.1)',
-                  fontSize: '12px',
-                  color: '#64748B',
-                }}>
-                  ⏳ Under review
-                </div>
               </div>
 
               {/* Accepted Card */}
@@ -536,15 +509,6 @@ export default function DashboardPage() {
                   }}>
                     <CheckCircleIcon size={28} color="#7C3AED" />
                   </div>
-                </div>
-                <div style={{
-                  marginTop: '16px',
-                  paddingTop: '16px',
-                  borderTop: '1px solid rgba(124, 58, 237, 0.1)',
-                  fontSize: '12px',
-                  color: '#64748B',
-                }}>
-                  🎉 Success rate
                 </div>
               </div>
             </div>

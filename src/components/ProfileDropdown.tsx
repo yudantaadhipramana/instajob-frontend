@@ -161,7 +161,7 @@ export default function ProfileDropdown({ user }: ProfileDropdownProps) {
             {/* Subscriptions */}
             <div
               onClick={() => {
-                router.push('/subscriptions');
+                router.push('/subscription');
                 setIsOpen(false);
               }}
               style={{

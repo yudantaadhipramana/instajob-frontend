@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ScrollAnimation } from '@/components/Animations';
 import { Logo } from '@/components/Logo';
 import { JobsIcon, ApplicationsIcon, ProfileIcon } from '@/components/DashboardIcons';
+import ProfileDropdown from '@/components/ProfileDropdown';
 
 interface AutoApplyStats {
   isActive: boolean;
@@ -211,57 +212,13 @@ export default function MonitorPage() {
         zIndex: 100,
       }}>
         <Logo size={32} showText={true} />
+        
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            padding: '8px 14px',
-            background: 'rgba(0, 81, 255, 0.05)',
-            border: '1px solid rgba(0, 81, 255, 0.1)',
-            borderRadius: '10px',
-            fontSize: '14px',
-            color: '#64748B',
-            fontWeight: '500',
-          }}>
-            <span style={{
-              width: '8px',
-              height: '8px',
-              borderRadius: '50%',
-              background: '#10B981',
-              boxShadow: '0 0 8px rgba(16, 185, 129, 0.4)'
-            }}></span>
-            {user?.email}
-          </div>
-          <button
-            onClick={handleLogout}
-            style={{
-              padding: '10px 24px',
-              background: 'linear-gradient(135deg, #EF4444, #DC2626)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '10px',
-              cursor: 'pointer',
-              fontWeight: '600',
-              fontSize: '14px',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 4px 12px rgba(239, 68, 68, 0.2)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(239, 68, 68, 0.3)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.2)';
-            }}
-          >
-            Sign Out
-          </button>
+          <ProfileDropdown user={user || undefined} />
         </div>
       </header>
 
-      {/* Navigation Tabs */}
+      {/* Navigation Tabs — CONSISTENT WITH /dashboard AND /applications */}
       <div style={{
         background: 'rgba(255, 255, 255, 0.5)',
         backdropFilter: 'blur(12px)',
@@ -270,67 +227,103 @@ export default function MonitorPage() {
         display: 'flex',
         gap: '8px',
       }}>
-        <Link href="/dashboard" style={{
-          padding: '16px 24px',
-          textDecoration: 'none',
-          color: '#64748B',
-          fontWeight: '500',
-          fontSize: '14px',
-          borderBottom: '2px solid transparent',
-          transition: 'all 0.3s ease',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-        }} onMouseEnter={(e) => { e.currentTarget.style.color = '#0051FF'; }} onMouseLeave={(e) => { e.currentTarget.style.color = '#64748B'; }}>
+        <Link
+          href="/dashboard"
+          style={{
+            padding: '16px 24px',
+            textDecoration: 'none',
+            color: '#64748B',
+            fontWeight: '500',
+            fontSize: '14px',
+            borderBottom: '2px solid transparent',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            cursor: 'pointer',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = '#0051FF';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = '#64748B';
+          }}
+        >
           <JobsIcon size={18} color="currentColor" />
           Dashboard
         </Link>
-        <Link href="/jobs" style={{
-          padding: '16px 24px',
-          textDecoration: 'none',
-          color: '#64748B',
-          fontWeight: '500',
-          fontSize: '14px',
-          borderBottom: '2px solid transparent',
-          transition: 'all 0.3s ease',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-        }} onMouseEnter={(e) => { e.currentTarget.style.color = '#0051FF'; }} onMouseLeave={(e) => { e.currentTarget.style.color = '#64748B'; }}>
+        <Link
+          href="/jobs"
+          style={{
+            padding: '16px 24px',
+            textDecoration: 'none',
+            color: '#64748B',
+            fontWeight: '500',
+            fontSize: '14px',
+            borderBottom: '2px solid transparent',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            cursor: 'pointer',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = '#0051FF';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = '#64748B';
+          }}
+        >
           <JobsIcon size={18} color="currentColor" />
           Browse Jobs
         </Link>
-        <Link href="/applications" style={{
-          padding: '16px 24px',
-          textDecoration: 'none',
-          color: '#64748B',
-          fontWeight: '500',
-          fontSize: '14px',
-          borderBottom: '2px solid transparent',
-          transition: 'all 0.3s ease',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-        }} onMouseEnter={(e) => { e.currentTarget.style.color = '#0051FF'; }} onMouseLeave={(e) => { e.currentTarget.style.color = '#64748B'; }}>
+        <Link
+          href="/applications"
+          style={{
+            padding: '16px 24px',
+            textDecoration: 'none',
+            color: '#64748B',
+            fontWeight: '500',
+            fontSize: '14px',
+            borderBottom: '2px solid transparent',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            cursor: 'pointer',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = '#0051FF';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = '#64748B';
+          }}
+        >
           <ApplicationsIcon size={18} color="currentColor" />
           Applications
         </Link>
-        <Link href="/profile" style={{
-          padding: '16px 24px',
-          textDecoration: 'none',
-          color: '#64748B',
-          fontWeight: '500',
-          fontSize: '14px',
-          borderBottom: '2px solid transparent',
-          transition: 'all 0.3s ease',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-        }} onMouseEnter={(e) => { e.currentTarget.style.color = '#0051FF'; }} onMouseLeave={(e) => { e.currentTarget.style.color = '#64748B'; }}>
+        <Link
+          href="/profile"
+          style={{
+            padding: '16px 24px',
+            textDecoration: 'none',
+            color: '#64748B',
+            fontWeight: '500',
+            fontSize: '14px',
+            borderBottom: '2px solid transparent',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            cursor: 'pointer',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = '#0051FF';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = '#64748B';
+          }}
+        >
           <ProfileIcon size={18} color="currentColor" />
           Profile
         </Link>
