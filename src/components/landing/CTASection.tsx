@@ -3,9 +3,21 @@
 import { ScrollAnimation } from '@/components/Animations';
 import Icons from '@/components/Icons';
 import { useI18n } from '@/context/I18nContext';
+import { useRouter } from 'next/navigation';
+import { useCallback } from 'react';
 
 export default function CTASection() {
   const { t } = useI18n();
+  const router = useRouter();
+
+  const handleRegister = useCallback(() => {
+    router.push('/register');
+  }, [router]);
+
+  const handleLogin = useCallback(() => {
+    router.push('/login');
+  }, [router]);
+
   return (
     <section
       style={{
@@ -112,6 +124,7 @@ export default function CTASection() {
             }}
           >
             <button
+              onClick={handleRegister}
               style={{
                 padding: '18px 48px',
                 background: '#FFFFFF',
@@ -140,6 +153,7 @@ export default function CTASection() {
               {t('cta.primaryBtn')}
             </button>
             <button
+              onClick={handleLogin}
               style={{
                 padding: '14px 32px',
                 background: 'transparent',

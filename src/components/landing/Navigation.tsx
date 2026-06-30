@@ -4,11 +4,21 @@ import { useI18n } from '@/context/I18nContext';
 import { Logo } from './Logo';
 import { HighlightText, GradientText } from './Animations';
 import Icons from '@/components/Icons';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Navigation() {
   const { t, lang, setLang } = useI18n();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const router = useRouter();
+
+  const handleLogin = useCallback(() => {
+    router.push('/login');
+  }, [router]);
+
+  const handleRegister = useCallback(() => {
+    router.push('/register');
+  }, [router]);
 
   return (
     <>
@@ -85,6 +95,7 @@ export default function Navigation() {
 
           {/* Auth Buttons */}
           <button
+            onClick={handleLogin}
             style={{
               padding: '10px 24px',
               background: 'transparent',
@@ -99,6 +110,7 @@ export default function Navigation() {
             {t('nav.login')}
           </button>
           <button
+            onClick={handleRegister}
             style={{
               padding: '10px 24px',
               background: '#0051FF',
@@ -241,12 +253,14 @@ export default function Navigation() {
           <div
             style={{
               display: 'flex',
-              gap: '16px',
+              gap: '24px',
               justifyContent: 'center',
               marginBottom: '48px',
+              alignItems: 'center',
             }}
           >
             <button
+              onClick={handleRegister}
               style={{
                 padding: '16px 40px',
                 background: '#0051FF',
@@ -256,24 +270,19 @@ export default function Navigation() {
                 fontSize: '16px',
                 fontWeight: '700',
                 cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
                 transition: 'all 0.3s ease',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow =
-                  '0 10px 30px rgba(0,81,255,0.3)';
+                e.currentTarget.style.background = '#003DAA';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.background = '#0051FF';
               }}
             >
               {t('hero.cta')} →
             </button>
             <button
+              onClick={handleLogin}
               style={{
                 padding: '16px 40px',
                 background: 'transparent',
@@ -292,7 +301,7 @@ export default function Navigation() {
                 e.currentTarget.style.background = 'transparent';
               }}
             >
-              {t('hero.demo')}
+              Sign In
             </button>
           </div>
 

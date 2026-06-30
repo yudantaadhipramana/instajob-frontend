@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ArrowRight, Sparkles, Zap, Shield, TrendingUp, Check, ChevronDown, Star, Building2, Users, Briefcase, Globe } from 'lucide-react';
 
 const companies = [
@@ -109,6 +110,7 @@ const faqs = [
 ];
 
 export default function HomePage() {
+  const router = useRouter();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   return (
@@ -134,9 +136,9 @@ export default function HomePage() {
             <a href="#features" style={{ fontSize: '14px', color: '#334155', textDecoration: 'none', transition: 'color 0.2s' }}>Features</a>
             <a href="#testimonials" style={{ fontSize: '14px', color: '#334155', textDecoration: 'none', transition: 'color 0.2s' }}>Testimonials</a>
             <a href="#pricing" style={{ fontSize: '14px', color: '#334155', textDecoration: 'none', transition: 'color 0.2s' }}>Pricing</a>
-            <Link href="/" style={{ padding: '10px 20px', background: 'linear-gradient(135deg, #0051FF, #0051FF)', color: '#1E293B', borderRadius: '10px', fontSize: '14px', fontWeight: 600, textDecoration: 'none', boxShadow: '0 8px 32px rgba(0, 81, 255, 0.3)' }}>
-              Dashboard
-            </Link>
+            <Link href="/dashboard" style={{ padding: '10px 20px', background: 'linear-gradient(135deg, #0051FF, #0051FF)', color: '#1E293B', borderRadius: '10px', fontSize: '14px', fontWeight: 600, textDecoration: 'none', boxShadow: '0 8px 32px rgba(0, 81, 255, 0.3)' }}>
+                          Dashboard
+                        </Link>
           </div>
         </div>
       </nav>
@@ -164,12 +166,12 @@ export default function HomePage() {
           </p>
 
           <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginBottom: '80px' }}>
-            <button style={{ padding: '16px 32px', background: 'linear-gradient(135deg, #0051FF, #0051FF)', color: '#1E293B', borderRadius: '12px', fontSize: '16px', fontWeight: 700, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 8px 32px rgba(0, 81, 255, 0.4)', transition: 'transform 0.2s' }}>
+            <button onClick={() => router.push('/register')} style={{ padding: '16px 32px', background: 'linear-gradient(135deg, #0051FF, #0051FF)', color: '#1E293B', borderRadius: '12px', fontSize: '16px', fontWeight: 700, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 8px 32px rgba(0, 81, 255, 0.4)', transition: 'transform 0.2s' }}>
               Start Free Trial
               <ArrowRight size={18} />
             </button>
-            <button style={{ padding: '16px 32px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: '#1E293B', borderRadius: '12px', fontSize: '16px', fontWeight: 600, cursor: 'pointer' }}>
-              Watch Demo
+            <button onClick={() => router.push('/login')} style={{ padding: '16px 32px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: '#1E293B', borderRadius: '12px', fontSize: '16px', fontWeight: 600, cursor: 'pointer' }}>
+              Sign In
             </button>
           </div>
 
@@ -304,7 +306,7 @@ export default function HomePage() {
                     </div>
                   ))}
                 </div>
-                <button style={{ width: '100%', padding: '14px', background: plan.popular ? 'linear-gradient(135deg, #0051FF, #0051FF)' : 'rgba(255,255,255,0.03)', border: plan.popular ? 'none' : '1px solid rgba(255,255,255,0.1)', color: '#1E293B', borderRadius: '12px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', boxShadow: plan.popular ? '0 8px 32px rgba(0, 81, 255, 0.3)' : 'none' }}>
+                <button onClick={() => router.push('/register')} style={{ width: '100%', padding: '14px', background: plan.popular ? 'linear-gradient(135deg, #0051FF, #0051FF)' : 'rgba(255,255,255,0.03)', border: plan.popular ? 'none' : '1px solid rgba(255,255,255,0.1)', color: '#1E293B', borderRadius: '12px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', boxShadow: plan.popular ? '0 8px 32px rgba(0, 81, 255, 0.3)' : 'none' }}>
                   {plan.cta}
                 </button>
               </div>
@@ -357,11 +359,11 @@ export default function HomePage() {
             Join 10,000+ job seekers who found their dream role with InstaJob.
           </p>
           <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
-            <button style={{ padding: '16px 32px', background: 'linear-gradient(135deg, #0051FF, #0051FF)', color: '#1E293B', borderRadius: '12px', fontSize: '16px', fontWeight: 700, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 8px 32px rgba(0, 81, 255, 0.4)' }}>
+            <button onClick={() => router.push('/register')} style={{ padding: '16px 32px', background: 'linear-gradient(135deg, #0051FF, #0051FF)', color: '#1E293B', borderRadius: '12px', fontSize: '16px', fontWeight: 700, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 8px 32px rgba(0, 81, 255, 0.4)' }}>
               Get Started Free
               <ArrowRight size={18} />
             </button>
-            <Link href="/" style={{ padding: '16px 32px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: '#1E293B', borderRadius: '12px', fontSize: '16px', fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            <Link href="/dashboard" style={{ padding: '16px 32px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: '#1E293B', borderRadius: '12px', fontSize: '16px', fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
               <Zap size={18} />
               Go to Dashboard
             </Link>

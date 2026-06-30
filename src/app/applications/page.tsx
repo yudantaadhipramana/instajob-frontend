@@ -3,35 +3,48 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Sidebar from '@/components/Sidebar';
+import { useAuth } from '@/context/AuthContext';
+import AutoApplyQueuePanel from '@/components/AutoApplyQueuePanel';
 
 interface Application {
   id: string;
   jobId: string;
   status: string;
-  notes?: string;
   appliedAt: string;
-  createdAt: string;
-  jobTitle?: string;
-  company?: string;
-  location?: string;
+  job: {
+    title: string;
+    company: string;
+    location: string;
+  };
 }
+
+type ColumnType = 'applied' | 'interview' | 'offer' | 'rejected';
+
+const COLUMNS: { id: ColumnType; title: string; color: string }[] = [
+  { id: 'applied', title: 'Applied', color: '#3B82F6' },
+  { id: 'interview', title: 'Interviewing', color: '#F59E0B' },
+  { id: 'offer', title: 'Offers', color: '#10B981' },
+  { id: 'rejected', title: 'Rejected', color: '#EF4444' },
+];
 
 export default function ApplicationsPage() {
   const router = useRouter();
+  const { user, token } = useAuth();
+
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [filter, setFilter] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [draggedItem, setDraggedItem] = useState<Application | null>(null);
+  const [activeTab, setActiveTab] = useState<'kanban' | 'queue'>('kanban');
 
   useEffect(() => {
-    const fetchApplications = async () => {
-      const token = localStorage.getItem('instajob_token');
-      if (!token) {
-        router.push('/login');
-        return;
-      }
+    if (!token) {
+      router.push('/login');
+      return;
+    }
 
+    const fetchApplications = async () => {
       try {
         const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
         const response = await fetch(`${apiBase}/api/applications`, {
@@ -45,6 +58,7 @@ export default function ApplicationsPage() {
           setError('Failed to load applications');
         }
       } catch (err) {
+        console.error(err);
         setError('Error loading applications');
       } finally {
         setLoading(false);
@@ -52,177 +66,191 @@ export default function ApplicationsPage() {
     };
 
     fetchApplications();
-  }, [router]);
+  }, [token, router]);
 
-  const filteredApps = applications.filter(app => {
-    const matchesFilter = filter === 'all' || app.status === filter;
-    const matchesSearch = !searchQuery ||
-      app.jobTitle?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      app.company?.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesFilter && matchesSearch;
-  });
+  const handleDragStart = (app: Application) => {
+    setDraggedItem(app);
+  };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'accepted': return 'bg-green-100 text-green-800';
-      case 'rejected': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+  const handleDrop = async (newStatus: ColumnType) => {
+    if (!draggedItem || draggedItem.status === newStatus) {
+      setDraggedItem(null);
+      return;
     }
+
+    // Optimistic update
+    const updated = applications.map(app =>
+      app.id === draggedItem.id ? { ...app, status: newStatus } : app
+    );
+    setApplications(updated);
+
+    // Call API to update status
+    try {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
+      const response = await fetch(`${apiBase}/api/applications/${draggedItem.id}/status`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      if (!response.ok) {
+        // Rollback on failure
+        setApplications(applications);
+        setError('Failed to update status on server');
+      }
+    } catch (err) {
+      console.error(err);
+      setApplications(applications);
+      setError('Connection error updating status');
+    }
+    setDraggedItem(null);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('instajob_token');
-    localStorage.removeItem('instajob_user');
-    router.push('/');
-  };
+  const getApplicationsByStatus = (status: ColumnType) =>
+    applications.filter(app => app.status === status);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-4xl font-bold text-indigo-600 mb-4">InstaJob</div>
-          <div className="text-lg text-gray-600">Loading applications...</div>
+      <div style={{ minHeight: '100vh', backgroundColor: '#0B1120', color: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '28px', fontWeight: 'bold' }}>Loading applications...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Sidebar */}
-      <aside className="fixed left-0 top-0 bottom-0 w-64 bg-white shadow-md z-50 flex flex-col">
-        <div className="p-6">
-          <h1 className="text-2xl font-bold text-indigo-600">InstaJob</h1>
-          <p className="text-sm text-gray-500 mt-1">AI Job Hunting</p>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#0B1120', color: '#F8FAFC' }}>
+      <Sidebar />
+
+      <main style={{ flex: 1, padding: '24px', overflowX: 'auto' }}>
+        <div style={{ marginBottom: '32px' }}>
+          <h1 style={{ fontSize: '32px', fontWeight: '800', marginBottom: '8px' }}>Application Tracker</h1>
+          <p style={{ color: '#94A3B8' }}>Track your job applications across all stages</p>
         </div>
-        <nav className="flex-1 px-4 space-y-2">
-          <Link href="/dashboard" className="block px-4 py-3 text-gray-700 hover:bg-indigo-50 rounded-lg transition">
-            📊 Dashboard
-          </Link>
-          <Link href="/jobs" className="block px-4 py-3 text-gray-700 hover:bg-indigo-50 rounded-lg transition">
-            💼 Jobs
-          </Link>
-          <Link href="/applications" className="block px-4 py-3 bg-indigo-50 text-indigo-700 font-semibold rounded-lg">
-            📝 Applications
-          </Link>
-          <Link href="/profile" className="block px-4 py-3 text-gray-700 hover:bg-indigo-50 rounded-lg transition">
-            👤 Profile
-          </Link>
-          <Link href="/settings" className="block px-4 py-3 text-gray-700 hover:bg-indigo-50 rounded-lg transition">
-            ⚙️ Settings
-          </Link>
-        </nav>
-        <div className="p-4 border-t">
-          <button onClick={handleLogout} className="w-full px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition">
-            Logout
+
+        {/* Tab Navigation */}
+        <div style={{ marginBottom: '24px', display: 'flex', gap: '12px' }}>
+          <button
+            onClick={() => setActiveTab('kanban')}
+            style={{
+              padding: '10px 16px',
+              backgroundColor: activeTab === 'kanban' ? '#3B82F6' : 'rgba(255,255,255,0.1)',
+              color: activeTab === 'kanban' ? '#FFFFFF' : '#94A3B8',
+              border: 'none',
+              borderRadius: '8px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}
+          >
+            Kanban Board
+          </button>
+          <button
+            onClick={() => setActiveTab('queue')}
+            style={{
+              padding: '10px 16px',
+              backgroundColor: activeTab === 'queue' ? '#3B82F6' : 'rgba(255,255,255,0.1)',
+              color: activeTab === 'queue' ? '#FFFFFF' : '#94A3B8',
+              border: 'none',
+              borderRadius: '8px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}
+          >
+            Auto-Apply Queue
           </button>
         </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="ml-64 p-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Applications</h1>
-        <p className="text-gray-600 mb-6">Track your job applications and their status</p>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div style={{ padding: '16px', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#F87171', borderRadius: '8px', marginBottom: '24px' }}>
             {error}
           </div>
         )}
 
-        {/* Search & Filter */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6 flex gap-4 items-center">
-          <input
-            type="text"
-            placeholder="Search applications..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-          <div className="flex gap-2">
-            {['all', 'pending', 'accepted', 'rejected'].map((f) => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`px-4 py-2 rounded-lg font-semibold transition ${
-                  filter === f
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                {f.charAt(0).toUpperCase() + f.slice(1)}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Applications List */}
-        {filteredApps.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
-            <div className="text-6xl mb-4">📋</div>
-            <h2 className="text-xl font-bold text-gray-800 mb-2">No applications yet</h2>
-            <p className="text-gray-600 mb-6">Start applying to jobs to see them here</p>
-            <Link
-              href="/jobs"
-              className="inline-block px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold transition"
-            >
-              Browse Jobs
-            </Link>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {filteredApps.map((app) => (
-              <div key={app.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-800">{app.jobTitle || 'Unknown Position'}</h3>
-                    <p className="text-indigo-600 font-semibold text-sm">{app.company || 'Unknown Company'}</p>
-                    {app.location && (
-                      <p className="text-gray-500 text-sm mt-1">📍 {app.location}</p>
-                    )}
+        {/* Kanban Board Tab */}
+        {activeTab === 'kanban' && (
+          <>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', minWidth: '100%' }} role="main" aria-label="Application tracking kanban board">
+              {COLUMNS.map(column => (
+                <div
+                  key={column.id}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={() => handleDrop(column.id)}
+                  style={{
+                    backgroundColor: 'rgba(255,255,255,0.02)',
+                    border: `2px solid ${column.color}33`,
+                    borderRadius: '12px',
+                    padding: '16px',
+                    minHeight: '600px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                  role="region"
+                  aria-label={`${column.title} column with ${getApplicationsByStatus(column.id).length} applications`}
+                >
+                  <div style={{ marginBottom: '16px', paddingBottom: '12px', borderBottom: `2px solid ${column.color}` }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: '700', color: column.color }}>{column.title}</h3>
+                    <p style={{ fontSize: '12px', color: '#64748B', marginTop: '4px' }} aria-live="polite">
+                      {getApplicationsByStatus(column.id).length} applications
+                    </p>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(app.status)}`}>
-                    {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
-                  </span>
+
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {getApplicationsByStatus(column.id).map(app => (
+                      <div
+                        key={app.id}
+                        draggable
+                        onDragStart={() => handleDragStart(app)}
+                        style={{
+                          backgroundColor: 'rgba(255,255,255,0.03)',
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          borderRadius: '8px',
+                          padding: '12px',
+                          cursor: 'grab',
+                          transition: 'all 0.2s',
+                          borderLeft: `4px solid ${column.color}`,
+                        }}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`${app.job.title} at ${app.job.company}, applied on ${new Date(app.appliedAt).toLocaleDateString()}`}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            handleDragStart(app);
+                          }
+                        }}
+                      >
+                        <p style={{ fontWeight: '600', fontSize: '14px', marginBottom: '4px' }}>{app.job.title}</p>
+                        <p style={{ fontSize: '12px', color: '#64748B' }}>{app.job.company}</p>
+                        <p style={{ fontSize: '11px', color: '#475569', marginTop: '8px' }}>
+                          {new Date(app.appliedAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center text-sm text-gray-500">
-                  <span>Applied: {new Date(app.appliedAt || app.createdAt).toLocaleDateString()}</span>
-                  {app.notes && <span className="text-gray-400 italic">"{app.notes}"</span>}
-                </div>
+              ))}
+            </div>
+
+            {applications.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '60px 20px', color: '#94A3B8' }}>
+                <p style={{ fontSize: '18px', marginBottom: '16px' }}>No applications yet</p>
+                <Link href="/jobs" style={{ color: '#2563EB', textDecoration: 'none', fontWeight: '600' }}>
+                  Browse jobs and start applying →
+                </Link>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
 
-        {/* Summary */}
-        <div className="mt-6 bg-white rounded-lg shadow-md p-6">
-          <h3 className="font-bold text-gray-800 mb-3">Summary</h3>
-          <div className="grid grid-cols-4 gap-4 text-center">
-            <div>
-              <div className="text-2xl font-bold text-gray-800">{applications.length}</div>
-              <div className="text-sm text-gray-500">Total</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-yellow-600">
-                {applications.filter(a => a.status === 'pending').length}
-              </div>
-              <div className="text-sm text-gray-500">Pending</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-green-600">
-                {applications.filter(a => a.status === 'accepted').length}
-              </div>
-              <div className="text-sm text-gray-500">Accepted</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-red-600">
-                {applications.filter(a => a.status === 'rejected').length}
-              </div>
-              <div className="text-sm text-gray-500">Rejected</div>
-            </div>
-          </div>
-        </div>
+        {/* Auto-Apply Queue Tab */}
+        {activeTab === 'queue' && (
+          <AutoApplyQueuePanel />
+        )}
       </main>
     </div>
   );

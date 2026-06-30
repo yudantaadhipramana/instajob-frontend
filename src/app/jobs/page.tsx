@@ -20,14 +20,16 @@ export default function JobsPage() {
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [applyingJobId, setApplyingJobId] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterLocation, setFilterLocation] = useState('all');
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     const checkAuthAndFetchJobs = async () => {
-      const token = localStorage.getItem('instajob_token');
-      const userData = localStorage.getItem('instajob_user');
+      const token = sessionStorage.getItem('instajob_token');
+      const userData = sessionStorage.getItem('instajob_user');
 
       if (!token || !userData) {
         router.push('/login');
@@ -84,19 +86,21 @@ export default function JobsPage() {
   }, [searchQuery, filterLocation, jobs]);
 
   const handleApply = async (jobId: string) => {
-    console.log('[DEBUG] handleApply called with jobId:', jobId, 'type:', typeof jobId);
-    const token = localStorage.getItem('instajob_token');
-    const userData = localStorage.getItem('instajob_user');
+    const token = sessionStorage.getItem('instajob_token');
+    const userData = sessionStorage.getItem('instajob_user');
     
     if (!token || !userData) {
+      setError('Session expired. Please login again.');
       router.push('/login');
       return;
     }
 
-    const user = JSON.parse(userData);
+    setApplyingJobId(jobId);
+    setError('');
+    setSuccessMessage('');
 
     try {
-      console.log('[DEBUG] Sending application:', { userId: user.id, jobId });
+      const user = JSON.parse(userData);
       const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
       const response = await fetch(`${apiBase}/api/applications`, {
         method: 'POST',
@@ -107,28 +111,28 @@ export default function JobsPage() {
         body: JSON.stringify({
           userId: user.id,
           jobId: jobId,
-          status: 'pending',
+          status: 'applied',
         }),
       });
 
-      const responseText = await response.text();
-      console.log('[DEBUG] Response status:', response.status, 'body:', responseText);
-
       if (response.ok) {
-        alert('Application submitted successfully!');
+        setSuccessMessage(`✓ Successfully applied to job! Redirecting to applications...`);
+        setTimeout(() => router.push('/applications'), 2000);
       } else {
-        alert('Failed to submit application: ' + responseText);
+        const errorData = await response.json().catch(() => ({}));
+        setError(errorData.message || 'Failed to submit application. Please try again.');
       }
     } catch (err) {
-      console.error('[DEBUG] Error:', err);
-      alert('Error submitting application');
+      setError(err instanceof Error ? err.message : 'Network error. Please check your connection.');
+    } finally {
+      setApplyingJobId(null);
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('instajob_token');
-    localStorage.removeItem('instajob_user');
-    router.push('/');
+    sessionStorage.removeItem('instajob_token');
+    sessionStorage.removeItem('instajob_user');
+    router.push('/login');
   };
 
   const uniqueLocations = Array.from(new Set(jobs.map(job => job.location)));
@@ -173,33 +177,45 @@ export default function JobsPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-            {error}
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 flex justify-between items-center">
+            <span>{error}</span>
+            <button onClick={() => setError('')} className="text-red-700 hover:text-red-900 font-bold">✕</button>
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6 flex justify-between items-center">
+            <span>{successMessage}</span>
+            <button onClick={() => setSuccessMessage('')} className="text-green-700 hover:text-green-900 font-bold">✕</button>
           </div>
         )}
 
         {/* Filters Section */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8" role="search" aria-label="Job search and filters">
           <h2 className="text-xl font-bold text-gray-800 mb-4">Search & Filter</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search Box */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Search Jobs</label>
+              <label htmlFor="job-search" className="block text-sm font-medium text-gray-700 mb-2">Search Jobs</label>
               <input
+                id="job-search"
                 type="text"
                 placeholder="Job title, company..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="Search jobs by title or company"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
 
             {/* Location Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+              <label htmlFor="location-filter" className="block text-sm font-medium text-gray-700 mb-2">Location</label>
               <select
+                id="location-filter"
                 value={filterLocation}
                 onChange={(e) => setFilterLocation(e.target.value)}
+                aria-label="Filter jobs by location"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="all">All Locations</option>
@@ -212,7 +228,7 @@ export default function JobsPage() {
             {/* Results Count */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Results</label>
-              <div className="px-4 py-2 bg-indigo-50 rounded-lg text-indigo-700 font-semibold">
+              <div className="px-4 py-2 bg-indigo-50 rounded-lg text-indigo-700 font-semibold" role="status" aria-live="polite">
                 {filteredJobs.length} / {jobs.length} jobs
               </div>
             </div>
@@ -263,9 +279,24 @@ export default function JobsPage() {
                   {/* Action Button */}
                   <button
                     onClick={() => handleApply(job.id)}
-                    className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold transition"
+                    disabled={applyingJobId === job.id}
+                    className={`w-full px-4 py-2 rounded-lg font-semibold transition ${
+                      applyingJobId === job.id
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                    }`}
                   >
-                    Apply Now
+                    {applyingJobId === job.id ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Applying...
+                      </span>
+                    ) : (
+                      'Apply Now'
+                    )}
                   </button>
                 </div>
               </div>

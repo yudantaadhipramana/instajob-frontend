@@ -26,8 +26,8 @@ export default function SettingsPage() {
 
   useEffect(() => {
     const checkAuth = () => {
-      const token = localStorage.getItem('instajob_token');
-      const userData = localStorage.getItem('instajob_user');
+      const token = sessionStorage.getItem('instajob_token');
+      const userData = sessionStorage.getItem('instajob_user');
 
       if (!token || !userData) {
         router.push('/login');
@@ -46,7 +46,7 @@ export default function SettingsPage() {
   };
 
   const handleSaveSettings = async () => {
-    const token = localStorage.getItem('instajob_token');
+    const token = sessionStorage.getItem('instajob_token');
     if (!token) {
       setError('Not authenticated');
       return;
@@ -75,9 +75,9 @@ export default function SettingsPage() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('instajob_token');
-    localStorage.removeItem('instajob_user');
-    router.push('/');
+    sessionStorage.removeItem('instajob_token');
+    sessionStorage.removeItem('instajob_user');
+    router.push('/login');
   };
 
   if (loading) {
@@ -251,7 +251,14 @@ export default function SettingsPage() {
           <p className="text-gray-600 mb-4">
             Once you delete your account, there is no going back. Please be certain.
           </p>
-          <button className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-semibold transition">
+          <button 
+            onClick={() => {
+              if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                alert('Account deletion feature coming soon. Please contact support.');
+              }
+            }}
+            className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-semibold transition"
+          >
             Delete Account
           </button>
         </div>

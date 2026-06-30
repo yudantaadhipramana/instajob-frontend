@@ -38,8 +38,8 @@ export default function LoginPage() {
         return;
       }
 
-      localStorage.setItem('instajob_token', data.token);
-      localStorage.setItem('instajob_user', JSON.stringify(data.user));
+      sessionStorage.setItem('instajob_token', data.token);
+      sessionStorage.setItem('instajob_user', JSON.stringify(data.user));
       router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
@@ -67,8 +67,8 @@ export default function LoginPage() {
         return;
       }
 
-      localStorage.setItem('instajob_token', data.token);
-      localStorage.setItem('instajob_user', JSON.stringify(data.user));
+      sessionStorage.setItem('instajob_token', data.token);
+      sessionStorage.setItem('instajob_user', JSON.stringify(data.user));
       router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Google login failed');
@@ -252,7 +252,7 @@ export default function LoginPage() {
             {/* Forgot Password */}
             <div style={{ textAlign: 'right', marginBottom: '24px' }}>
               <Link
-                href="/forgot-password"
+                href="#"
                 className="login-forgot"
                 style={{
                   fontSize: '13px',

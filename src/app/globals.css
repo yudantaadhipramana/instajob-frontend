@@ -9,7 +9,7 @@
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --border-subtle: rgba(255, 255, 255, 0.05);
-  
+
   /* Gradient combinations */
   --gradient-brand: linear-gradient(135deg, #2563EB, #7C3AED);
   --gradient-glow: radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, transparent 70%);
@@ -137,3 +137,94 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+
+/* ===== RESPONSIVE UTILITIES ===== */
+.responsive-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.responsive-quick-actions {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+.responsive-action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.responsive-jobs-filters {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.responsive-jobs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.responsive-padding {
+  padding: 32px;
+}
+
+.responsive-header-padding {
+  padding: 0 32px;
+}
+
+/* Tablet breakpoint */
+@media (max-width: 768px) {
+  .responsive-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .responsive-quick-actions {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .responsive-action-buttons {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .responsive-jobs-filters {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .responsive-jobs-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .responsive-padding {
+    padding: 20px;
+  }
+
+  .responsive-header-padding {
+    padding: 0 20px;
+  }
+}
+
+/* Mobile breakpoint */
+@media (max-width: 480px) {
+  .responsive-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .responsive-padding {
+    padding: 16px;
+  }
+
+  .responsive-header-padding {
+    padding: 0 16px;
+  }
+}

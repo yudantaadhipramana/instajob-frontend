@@ -51,8 +51,8 @@ export default function RegisterPage() {
         return;
       }
 
-      localStorage.setItem('instajob_token', data.token);
-      localStorage.setItem('instajob_user', JSON.stringify(data.user));
+      sessionStorage.setItem('instajob_token', data.token);
+      sessionStorage.setItem('instajob_user', JSON.stringify(data.user));
       router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
@@ -66,10 +66,10 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const response = await fetch(`/api/auth/register`, {
+      const response = await fetch(`/api/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ token: credentialResponse.credential }),
       });
 
       const data = await response.json();
@@ -79,8 +79,8 @@ export default function RegisterPage() {
         return;
       }
 
-      localStorage.setItem('instajob_token', data.token);
-      localStorage.setItem('instajob_user', JSON.stringify(data.user));
+      sessionStorage.setItem('instajob_token', data.token);
+      sessionStorage.setItem('instajob_user', JSON.stringify(data.user));
       router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Google login failed');
