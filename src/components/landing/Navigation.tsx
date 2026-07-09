@@ -253,10 +253,9 @@ export default function Navigation() {
           <div
             style={{
               display: 'flex',
-              gap: '24px',
+              gap: '16px',
               justifyContent: 'center',
               marginBottom: '48px',
-              alignItems: 'center',
             }}
           >
             <button
@@ -270,13 +269,19 @@ export default function Navigation() {
                 fontSize: '16px',
                 fontWeight: '700',
                 cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
                 transition: 'all 0.3s ease',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#003DAA';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow =
+                  '0 10px 30px rgba(0,81,255,0.3)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#0051FF';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
               }}
             >
               {t('hero.cta')} →
@@ -301,7 +306,7 @@ export default function Navigation() {
                 e.currentTarget.style.background = 'transparent';
               }}
             >
-              Sign In
+              {t('hero.demo')}
             </button>
           </div>
 

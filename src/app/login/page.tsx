@@ -25,21 +25,29 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch(`/api/auth/login`, {
+      const response = await fetch(`http://localhost:3000/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
       const data = await response.json();
+      console.log('Login response:', { status: response.ok, data });
 
       if (!response.ok) {
         setError(data.message || 'Login failed');
         return;
       }
 
-      sessionStorage.setItem('instajob_token', data.token);
-      sessionStorage.setItem('instajob_user', JSON.stringify(data.user));
+      if (!data.token || !data.user) {
+        console.error('Missing token or user in response:', data);
+        setError('Invalid response from server');
+        return;
+      }
+
+      localStorage.setItem('instajob_token', data.token);
+      localStorage.setItem('instajob_user', JSON.stringify(data.user));
+      console.log('Tokens saved to localStorage');
       router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
@@ -67,8 +75,8 @@ export default function LoginPage() {
         return;
       }
 
-      sessionStorage.setItem('instajob_token', data.token);
-      sessionStorage.setItem('instajob_user', JSON.stringify(data.user));
+      localStorage.setItem('instajob_token', data.token);
+      localStorage.setItem('instajob_user', JSON.stringify(data.user));
       router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Google login failed');
@@ -252,7 +260,7 @@ export default function LoginPage() {
             {/* Forgot Password */}
             <div style={{ textAlign: 'right', marginBottom: '24px' }}>
               <Link
-                href="#"
+                href="/forgot-password"
                 className="login-forgot"
                 style={{
                   fontSize: '13px',

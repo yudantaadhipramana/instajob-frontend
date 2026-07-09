@@ -7,9 +7,8 @@ import { useAuth } from '@/context/AuthContext';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: '📊' },
-  { href: '/jobs', label: 'Browse Jobs', icon: '💼' },
-  { href: '/applications', label: 'Applications', icon: '📋' },
-  { href: '/auto-apply', label: 'Auto-Apply Queue', icon: '🚀' },
+  { href: '/jobs', label: 'Jobs', icon: '💼' },
+  { href: '/applications', label: 'Applications', icon: '📝' },
   { href: '/profile', label: 'Profile', icon: '👤' },
   { href: '/settings', label: 'Settings', icon: '⚙️' },
 ];
@@ -147,7 +146,6 @@ export default function Sidebar() {
               color: '#EF4444',
               fontSize: '14px',
               cursor: 'pointer',
-              fontWeight: '600',
             }}
           >
             Logout

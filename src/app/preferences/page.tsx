@@ -14,6 +14,7 @@ interface PreferencesData {
   notificationsEnabled: boolean;
   emailNotifications: boolean;
   telegramNotifications: boolean;
+  emailTemplate: string;
 }
 
 export default function PreferencesPage() {
@@ -28,6 +29,7 @@ export default function PreferencesPage() {
     notificationsEnabled: true,
     emailNotifications: true,
     telegramNotifications: false,
+    emailTemplate: '',
   };
 
   const [preferences, setPreferences] = useState<PreferencesData>(defaultPrefs);
@@ -69,6 +71,7 @@ export default function PreferencesPage() {
             notificationsEnabled: data.notificationsEnabled ?? defaultPrefs.notificationsEnabled,
             emailNotifications: data.emailNotifications ?? defaultPrefs.emailNotifications,
             telegramNotifications: data.telegramNotifications ?? defaultPrefs.telegramNotifications,
+            emailTemplate: data.emailTemplate ?? defaultPrefs.emailTemplate,
           };
           setPreferences(loaded);
           setFormData(loaded);
@@ -930,6 +933,79 @@ export default function PreferencesPage() {
                 </span>
               </label>
             </div>
+          </div>
+
+          {/* Email Template */}
+          <div style={{
+            background: '#FFFFFF',
+            border: '1px solid #E2E8F0',
+            borderRadius: '12px',
+            padding: '24px',
+            marginTop: '24px',
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              marginBottom: '8px',
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '36px',
+                height: '36px',
+                background: 'rgba(0, 81, 255, 0.1)',
+                borderRadius: '8px',
+              }}>
+                <Save size={20} color="#0051FF" />
+              </div>
+              <h2 style={{
+                fontSize: '18px',
+                fontWeight: '700',
+                margin: 0,
+              }}>
+                Email Template
+              </h2>
+            </div>
+            <p style={{
+              fontSize: '14px',
+              color: '#64748B',
+              margin: '0 0 20px 0',
+            }}>
+              Custom template untuk email lamaran otomatis. AI akan mengisi placeholder berikut: {'{role}'}, {'{company}'}, {'{recruiter}'}. Kosongkan untuk pakai template default AI.
+            </p>
+            <textarea
+              value={formData.emailTemplate}
+              onChange={(e) => setFormData(prev => ({
+                ...prev,
+                emailTemplate: e.target.value,
+              }))}
+              placeholder={"Contoh:\nDear {recruiter},\n\nSaya tertarik dengan posisi {role} di {company}...\n\nHormat saya,"}
+              rows={6}
+              maxLength={2000}
+              style={{
+                width: '100%',
+                padding: '12px',
+                fontSize: '14px',
+                fontFamily: 'inherit',
+                border: '1px solid #E2E8F0',
+                borderRadius: '8px',
+                outline: 'none',
+                resize: 'vertical',
+                transition: 'border-color 0.2s',
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#0051FF'}
+              onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
+            />
+            <p style={{
+              marginTop: '8px',
+              fontSize: '12px',
+              color: '#94A3B8',
+              textAlign: 'right',
+            }}>
+              {formData.emailTemplate.length}/2000
+            </p>
           </div>
 
         </div>

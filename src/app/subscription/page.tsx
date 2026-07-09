@@ -1,357 +1,360 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { ArrowLeft, Check } from 'lucide-react';
+import { Logo } from '@/components/Logo';
+import ProfileDropdown from '@/components/ProfileDropdown';
 import { useRouter } from 'next/navigation';
-import AppNavigation from '@/components/shared/AppNavigation';
-
-interface Subscription {
-  plan: string;
-  features: string;
-  expiresAt: string | null;
-}
 
 export default function SubscriptionPage() {
   const router = useRouter();
-  const [currentPlan, setCurrentPlan] = useState<Subscription | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [upgrading, setUpgrading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedPlan, setSelectedPlan] = useState('monthly');
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const token = sessionStorage.getItem('instajob_token');
-      if (!token) {
-        router.push('/login');
-        return;
-      }
-
-      try {
-        const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
-        const response = await fetch(`${apiBase}/api/subscription`, {
-          headers: { 'Authorization': `Bearer ${token}` },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setCurrentPlan(data);
-        }
-      } catch (err) {
-        console.error('Failed to fetch subscription:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkAuth();
-  }, [router]);
+    const userData = localStorage.getItem('instajob_user');
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+    setIsLoading(false);
+  }, []);
 
   const handleUpgrade = async () => {
-    setError('');
-    setSuccess('');
-    setUpgrading(true);
-
-    try {
-      const token = sessionStorage.getItem('instajob_token');
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
-
-      // Call payment gateway to create checkout session
-      const response = await fetch(`${apiBase}/api/payment/create-checkout`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ planId: 'premium' }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setSuccess('Mengarahkan ke payment gateway...');
-
-        // Simulate payment success callback
-        const processResponse = await fetch(`${apiBase}/api/payment/mock-process`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ sessionId: data.sessionId, success: true }),
-        });
-
-        if (processResponse.ok) {
-          // Re-fetch current plan after webhook processes
-          const planResponse = await fetch(`${apiBase}/api/subscription`, {
-            headers: { 'Authorization': `Bearer ${token}` },
-          });
-          if (planResponse.ok) {
-            setCurrentPlan(await planResponse.json());
-          }
-          setSuccess('Pembayaran berhasil! Akun Anda telah diupgrade ke Pro Plan.');
-        } else {
-          setError('Pembayaran gagal diproses.');
-        }
-      } else {
-        setError('Gagal membuat sesi pembayaran. Silakan coba lagi.');
-      }
-    } catch (err) {
-      setError('Terjadi kesalahan jaringan. Silakan coba lagi.');
-    } finally {
-      setUpgrading(false);
-    }
+    setIsProcessing(true);
+    setTimeout(() => {
+      setIsProcessing(false);
+    }, 1000);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
-      </div>
-    );
-  }
+  const plans = [
+    {
+      id: 'free',
+      name: 'Free',
+      price: 0,
+      originalPrice: null,
+      period: '',
+      description: 'Get started',
+      recommended: false,
+      features: [
+        'AI Job Scouting (max 10)',
+        'AI Job Matching',
+        'AI Email Auto Apply (max 5/7d)',
+        'AI LinkedIn Auto Apply (max 5/7d)',
+        'Job Tracking System'
+      ]
+    },
+    {
+      id: 'twoweeks',
+      name: '2 Weeks',
+      price: 120000,
+      originalPrice: null,
+      period: 'per 2 weeks',
+      description: 'Short-term trial',
+      recommended: false,
+      features: [
+        'AI Job Scouting (unlimited)',
+        'AI Job Matching (unlimited)',
+        'AI Email Auto Apply (unlimited)',
+        'AI LinkedIn Auto Apply (unlimited)',
+        'Job Tracking System (unlimited)',
+        'Telegram Bot Automation',
+        'Priority Support',
+        'Advanced Analytics'
+      ]
+    },
+    {
+      id: 'monthly',
+      name: 'Monthly',
+      price: 179000,
+      originalPrice: 279000,
+      period: 'per month',
+      description: 'Most popular',
+      recommended: true,
+      features: [
+        'AI Job Scouting (unlimited)',
+        'AI Job Matching (unlimited)',
+        'AI Email Auto Apply (unlimited)',
+        'AI LinkedIn Auto Apply (unlimited)',
+        'Job Tracking System (unlimited)',
+        'Telegram Bot Automation',
+        'Priority Support',
+        'Advanced Analytics'
+      ]
+    },
+    {
+      id: 'quarterly',
+      name: 'Quarterly',
+      price: 650000,
+      originalPrice: 897000,
+      period: 'per 3 months',
+      description: 'Best value',
+      recommended: false,
+      features: [
+        'AI Job Scouting (unlimited)',
+        'AI Job Matching (unlimited)',
+        'AI Email Auto Apply (unlimited)',
+        'AI LinkedIn Auto Apply (unlimited)',
+        'Job Tracking System (unlimited)',
+        'Telegram Bot Automation',
+        'Priority Support',
+        'Advanced Analytics'
+      ]
+    }
+  ];
 
-  const isPro = currentPlan?.plan === 'premium';
+  const formatPrice = (price) => {
+    if (price === 0) return 'Gratis';
+    return `Rp ${price.toLocaleString('id-ID')}`;
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <AppNavigation />
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #FFFFFF 0%, #F5F8FF 50%, #EEF2FF 100%)',
+      position: 'relative',
+      overflow: 'hidden',
+    }}>
+      {/* Background Glow Effects */}
+      <div style={{
+        position: 'absolute',
+        top: '-200px',
+        right: '-200px',
+        width: '600px',
+        height: '600px',
+        background: 'radial-gradient(circle, rgba(0, 81, 255, 0.15) 0%, rgba(0, 81, 255, 0) 70%)',
+        borderRadius: '50%',
+        filter: 'blur(80px)',
+        zIndex: 0,
+      }} />
+      <div style={{
+        position: 'absolute',
+        bottom: '-300px',
+        left: '-300px',
+        width: '700px',
+        height: '700px',
+        background: 'radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0) 70%)',
+        borderRadius: '50%',
+        filter: 'blur(100px)',
+        zIndex: 0,
+      }} />
 
-      <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '64px 32px' }}>
-        <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+      {/* Header */}
+      <header style={{
+        padding: '20px 40px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        position: 'relative',
+        zIndex: 10,
+        borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
+        background: 'rgba(255, 255, 255, 0.7)',
+        backdropFilter: 'blur(10px)',
+      }}>
+        <Link href="/dashboard" style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          color: '#0051FF',
+          textDecoration: 'none',
+          fontSize: '14px',
+          fontWeight: '600',
+          transition: 'all 0.3s ease',
+        }}>
+          <ArrowLeft size={18} />
+          Back to Dashboard
+        </Link>
+
+        <Logo />
+
+        <ProfileDropdown />
+      </header>
+
+      {/* Main Content */}
+      <main style={{ padding: '32px 40px', maxWidth: '1400px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
+        {/* Header Section */}
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
           <h1 style={{
-            fontSize: '48px',
-            fontWeight: '800',
-            background: 'linear-gradient(135deg, #0051FF 0%, #7C3AED 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            margin: '0 0 16px 0',
+            fontSize: '28px',
+            fontWeight: '900',
+            color: '#0F172A',
+            margin: '0 0 8px 0',
+            letterSpacing: '-0.02em',
+            lineHeight: '1.1',
           }}>
-            Pilih Paket Anda
+            Pilih Paket Terbaik Untuk Anda
           </h1>
-          <p style={{ fontSize: '18px', color: '#6B7280', maxWidth: '600px', margin: '0 auto' }}>
-            Upgrade ke Pro Plan untuk fitur unlimited dan prioritas support
+          <p style={{
+            fontSize: '12px',
+            color: '#64748B',
+            margin: '0',
+            fontWeight: '500',
+            lineHeight: '1.4',
+            maxWidth: '500px',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+          }}>
+            Mulai gratis atau upgrade ke paket premium untuk akses unlimited.
           </p>
         </div>
 
-        {error && (
-          <div style={{
-            maxWidth: '800px',
-            margin: '0 auto 32px',
-            padding: '16px',
-            background: '#FEE2E2',
-            border: '1px solid #FECACA',
-            color: '#DC2626',
-            borderRadius: '12px',
-            fontSize: '14px',
-            textAlign: 'center',
-          }}>
-            {error}
-          </div>
-        )}
-
-        {success && (
-          <div style={{
-            maxWidth: '800px',
-            margin: '0 auto 32px',
-            padding: '16px',
-            background: '#D1FAE5',
-            border: '1px solid #A7F3D0',
-            color: '#065F46',
-            borderRadius: '12px',
-            fontSize: '14px',
-            textAlign: 'center',
-          }}>
-            {success}
-          </div>
-        )}
-
+        {/* Pricing Cards Container — 4-Column Layout */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-          gap: '32px',
-          maxWidth: '900px',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: '14px',
+          maxWidth: '1200px',
           margin: '0 auto',
         }}>
-          <div style={{
-            background: '#fff',
-            borderRadius: '20px',
-            padding: '40px 32px',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
-            border: '2px solid #E5E7EB',
-            position: 'relative',
-          }}>
-            <div style={{
-              fontSize: '14px',
-              fontWeight: '700',
-              color: '#6B7280',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              marginBottom: '16px',
+          {plans.map((plan) => (
+            <div key={plan.id} style={{
+              background: plan.recommended 
+                ? 'linear-gradient(135deg, #0051FF 0%, #003AA3 100%)' 
+                : 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
+              backdropFilter: 'blur(12px)',
+              borderRadius: '16px',
+              padding: '20px 16px',
+              boxShadow: plan.recommended 
+                ? '0 20px 50px rgba(0, 81, 255, 0.3)' 
+                : '0 2px 12px rgba(0, 81, 255, 0.06)',
+              border: plan.recommended 
+                ? '2px solid rgba(255, 255, 255, 0.25)' 
+                : '1px solid rgba(255, 255, 255, 0.6)',
+              transition: 'all 0.3s ease',
+              cursor: 'pointer',
+              position: 'relative',
+              transform: plan.recommended ? 'scale(1.01)' : 'scale(1)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = plan.recommended ? 'scale(1.03)' : 'scale(1.02)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = plan.recommended ? 'scale(1.01)' : 'scale(1)';
             }}>
-              FREE
-            </div>
-            <div style={{ marginBottom: '24px' }}>
-              <span style={{ fontSize: '48px', fontWeight: '800', color: '#111827' }}>Rp 0</span>
-              <span style={{ fontSize: '16px', color: '#6B7280', fontWeight: '600' }}>/bulan</span>
-            </div>
-
-            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 32px 0' }}>
-              {[
-                '10 lamaran per hari',
-                'AI job matching dasar',
-                'Browse lowongan',
-                'Track aplikasi',
-              ].map((feature, idx) => (
-                <li key={idx} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px 0',
-                  borderBottom: '1px solid #F3F4F6',
-                  fontSize: '14px',
-                  color: '#374151',
-                }}>
-                  <span style={{ color: '#10B981', fontSize: '18px' }}>✓</span>
-                  {feature}
-                </li>
-              ))}
-            </ul>
-
-            {!isPro && (
-              <div style={{
-                padding: '12px 24px',
-                background: '#F3F4F6',
-                color: '#6B7280',
-                borderRadius: '8px',
-                textAlign: 'center',
-                fontWeight: '600',
-                fontSize: '14px',
-              }}>
-                Paket Saat Ini
-              </div>
-            )}
-          </div>
-
-          <div style={{
-            background: 'linear-gradient(135deg, #0051FF 0%, #7C3AED 100%)',
-            borderRadius: '20px',
-            padding: '40px 32px',
-            boxShadow: '0 8px 32px rgba(0, 81, 255, 0.3)',
-            position: 'relative',
-            border: '2px solid rgba(255,255,255,0.2)',
-          }}>
-            <div style={{
-              position: 'absolute',
-              top: '-12px',
-              right: '24px',
-              background: '#10B981',
-              color: '#fff',
-              padding: '6px 16px',
-              borderRadius: '20px',
-              fontSize: '12px',
-              fontWeight: '700',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-            }}>
-              RECOMMENDED
-            </div>
-
-            <div style={{
-              fontSize: '14px',
-              fontWeight: '700',
-              color: 'rgba(255,255,255,0.9)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              marginBottom: '16px',
-            }}>
-              PRO PLAN
-            </div>
-            <div style={{ marginBottom: '24px' }}>
-              <span style={{ fontSize: '48px', fontWeight: '800', color: '#fff' }}>Rp 99K</span>
-              <span style={{ fontSize: '16px', color: 'rgba(255,255,255,0.8)', fontWeight: '600' }}>/bulan</span>
-            </div>
-
-            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 32px 0' }}>
-              {[
-                'Unlimited lamaran per hari',
-                'AI job matching advanced',
-                'Auto-apply ke puluhan jobs',
-                'Priority support 24/7',
-                'Email scout automation',
-                'Analytics & insights',
-              ].map((feature, idx) => (
-                <li key={idx} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px 0',
-                  borderBottom: '1px solid rgba(255,255,255,0.15)',
-                  fontSize: '14px',
-                  color: '#fff',
-                }}>
-                  <span style={{ color: '#34D399', fontSize: '18px' }}>✓</span>
-                  {feature}
-                </li>
-              ))}
-            </ul>
-
-            {isPro ? (
-              <div style={{
-                padding: '12px 24px',
-                background: 'rgba(255,255,255,0.2)',
-                color: '#fff',
-                borderRadius: '8px',
-                textAlign: 'center',
-                fontWeight: '600',
-                fontSize: '14px',
-              }}>
-                Paket Aktif
-              </div>
-            ) : (
-              <button
-                onClick={handleUpgrade}
-                disabled={upgrading}
-                style={{
-                  width: '100%',
-                  padding: '14px 24px',
-                  background: '#fff',
+              {plan.recommended && (
+                <div style={{
+                  position: 'absolute',
+                  top: '-11px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  background: '#FFFFFF',
                   color: '#0051FF',
-                  border: 'none',
-                  borderRadius: '8px',
+                  padding: '3px 10px',
+                  borderRadius: '20px',
+                  fontSize: '9px',
                   fontWeight: '700',
-                  fontSize: '16px',
-                  cursor: upgrading ? 'not-allowed' : 'pointer',
-                  transition: 'all 0.2s',
-                  opacity: upgrading ? 0.6 : 1,
-                }}
-              >
-                {upgrading ? 'Processing...' : 'Upgrade Sekarang'}
+                  letterSpacing: '0.08em',
+                  whiteSpace: 'nowrap',
+                }}>
+                  RECOMMENDED
+                </div>
+              )}
+              <h3 style={{
+                fontSize: plan.recommended ? '16px' : '15px',
+                fontWeight: '800',
+                color: plan.recommended ? '#FFFFFF' : '#0F172A',
+                margin: plan.recommended ? '10px 0 3px 0' : '0 0 3px 0',
+                letterSpacing: '-0.2px',
+              }}>
+                {plan.name}
+              </h3>
+              <p style={{
+                fontSize: '10px',
+                color: plan.recommended ? 'rgba(255, 255, 255, 0.7)' : '#64748B',
+                margin: '0 0 10px 0',
+                fontWeight: '500',
+              }}>
+                {plan.description}
+              </p>
+              <div style={{
+                marginBottom: '12px',
+                paddingBottom: '12px',
+                borderBottom: `1px solid ${plan.recommended ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 81, 255, 0.06)'}`,
+              }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: '4px',
+                  flexWrap: 'wrap',
+                }}>
+                  {plan.originalPrice && (
+                    <span style={{
+                      fontSize: '9px',
+                      color: plan.recommended ? 'rgba(255, 255, 255, 0.5)' : '#94A3B8',
+                      textDecoration: 'line-through',
+                      fontWeight: '600',
+                    }}>
+                      {formatPrice(plan.originalPrice)}
+                    </span>
+                  )}
+                  <span style={{
+                    fontSize: plan.recommended ? '18px' : '16px',
+                    fontWeight: '900',
+                    color: plan.recommended ? '#FFFFFF' : '#0051FF',
+                    letterSpacing: '-0.4px',
+                  }}>
+                    {formatPrice(plan.price)}
+                  </span>
+                </div>
+                {plan.period && (
+                  <p style={{
+                    fontSize: '9px',
+                    color: plan.recommended ? 'rgba(255, 255, 255, 0.65)' : '#64748B',
+                    margin: '3px 0 0 0',
+                    fontWeight: '500',
+                  }}>
+                    {plan.period}
+                  </p>
+                )}
+              </div>
+              <div style={{ marginBottom: '8px' }}>
+                {plan.features.map((feature, idx) => (
+                  <div key={idx} style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '5px',
+                    marginBottom: '5px',
+                    paddingBottom: '5px',
+                    borderBottom: idx !== plan.features.length - 1 
+                      ? `1px solid ${plan.recommended ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 81, 255, 0.04)'}` 
+                      : 'none',
+                  }}>
+                    <Check size={11} color={plan.recommended ? '#34D399' : '#10B981'} strokeWidth={3} style={{ marginTop: '0.5px', flexShrink: 0 }} />
+                    <span style={{
+                      fontSize: '9px',
+                      fontWeight: '500',
+                      color: plan.recommended ? '#FFFFFF' : '#1E293B',
+                      lineHeight: '1.2',
+                    }}>
+                      {feature}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <button onClick={handleUpgrade} disabled={isProcessing} style={{
+                width: '100%',
+                padding: '8px 12px',
+                fontSize: '10px',
+                fontWeight: '700',
+                color: plan.recommended ? '#0051FF' : '#FFFFFF',
+                background: plan.recommended ? '#FFFFFF' : '#0051FF',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: isProcessing ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease',
+                opacity: isProcessing ? 0.9 : 1,
+                letterSpacing: '-0.15px',
+                marginTop: '12px',
+              }}
+              onMouseEnter={(e) => !isProcessing && (e.currentTarget.style.opacity = '0.85')}
+              onMouseLeave={(e) => !isProcessing && (e.currentTarget.style.opacity = '1')}>
+                {isProcessing ? 'Processing...' : plan.id === 'free' ? 'Get Started' : 'Upgrade Now'}
               </button>
-            )}
-          </div>
+            </div>
+          ))}
         </div>
-
-        {isPro && currentPlan?.expiresAt && (
-          <div style={{
-            maxWidth: '600px',
-            margin: '48px auto 0',
-            padding: '20px 24px',
-            background: '#fff',
-            borderRadius: '12px',
-            border: '1px solid #E5E7EB',
-            textAlign: 'center',
-          }}>
-            <p style={{ fontSize: '14px', color: '#6B7280', margin: 0 }}>
-              Paket Pro Anda aktif hingga{' '}
-              <strong style={{ color: '#111827' }}>
-                {new Date(currentPlan.expiresAt).toLocaleDateString('id-ID', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </strong>
-            </p>
-          </div>
-        )}
       </main>
     </div>
   );

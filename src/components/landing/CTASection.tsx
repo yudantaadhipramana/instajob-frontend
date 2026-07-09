@@ -13,11 +13,6 @@ export default function CTASection() {
   const handleRegister = useCallback(() => {
     router.push('/register');
   }, [router]);
-
-  const handleLogin = useCallback(() => {
-    router.push('/login');
-  }, [router]);
-
   return (
     <section
       style={{
@@ -153,7 +148,6 @@ export default function CTASection() {
               {t('cta.primaryBtn')}
             </button>
             <button
-              onClick={handleLogin}
               style={{
                 padding: '14px 32px',
                 background: 'transparent',

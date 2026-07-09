@@ -33,8 +33,7 @@ export default function RegisterPage() {
     }
 
     try {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
-      const response = await fetch(`${apiBase}/api/auth/register`, {
+      const response = await fetch(`http://localhost:3000/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -51,8 +50,8 @@ export default function RegisterPage() {
         return;
       }
 
-      sessionStorage.setItem('instajob_token', data.token);
-      sessionStorage.setItem('instajob_user', JSON.stringify(data.user));
+      localStorage.setItem('instajob_token', data.token);
+      localStorage.setItem('instajob_user', JSON.stringify(data.user));
       router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed');
@@ -66,10 +65,10 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const response = await fetch(`/api/auth/google`, {
+      const response = await fetch(`http://localhost:3000/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: credentialResponse.credential }),
+        body: JSON.stringify(formData),
       });
 
       const data = await response.json();
@@ -79,8 +78,8 @@ export default function RegisterPage() {
         return;
       }
 
-      sessionStorage.setItem('instajob_token', data.token);
-      sessionStorage.setItem('instajob_user', JSON.stringify(data.user));
+      localStorage.setItem('instajob_token', data.token);
+      localStorage.setItem('instajob_user', JSON.stringify(data.user));
       router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Google login failed');
