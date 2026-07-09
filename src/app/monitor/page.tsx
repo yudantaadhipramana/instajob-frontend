@@ -616,6 +616,7 @@ export default function MonitorPage() {
                   {runStatus === 'idle' && (
                     <button
                       onClick={handleStart}
+                      disabled={actionLoading}
                       style={{
                         padding: '10px 20px',
                         background: 'linear-gradient(135deg, #10B981, #059669)',
@@ -623,12 +624,13 @@ export default function MonitorPage() {
                         border: 'none',
                         borderRadius: '8px',
                         fontWeight: '600',
-                        cursor: 'pointer',
+                        cursor: actionLoading ? 'not-allowed' : 'pointer',
+                        opacity: actionLoading ? 0.6 : 1,
                         fontSize: '0.875rem',
                         transition: 'all 0.2s ease',
                       }}
                     >
-                      ▶ Start
+                      {actionLoading ? '⋯ Starting...' : '▶ Start'}
                     </button>
                   )}
 
@@ -637,6 +639,7 @@ export default function MonitorPage() {
                     <>
                       <button
                         onClick={handlePause}
+                        disabled={actionLoading}
                         style={{
                           padding: '10px 20px',
                           background: 'linear-gradient(135deg, #F59E0B, #D97706)',
@@ -644,15 +647,17 @@ export default function MonitorPage() {
                           border: 'none',
                           borderRadius: '8px',
                           fontWeight: '600',
-                          cursor: 'pointer',
+                          cursor: actionLoading ? 'not-allowed' : 'pointer',
+                          opacity: actionLoading ? 0.6 : 1,
                           fontSize: '0.875rem',
                           transition: 'all 0.2s ease',
                         }}
                       >
-                        ⏸ Pause
+                        {actionLoading ? '⋯ Pausing...' : '⏸ Pause'}
                       </button>
                       <button
                         onClick={handleStop}
+                        disabled={actionLoading}
                         style={{
                           padding: '10px 20px',
                           background: 'linear-gradient(135deg, #EF4444, #DC2626)',
@@ -660,12 +665,13 @@ export default function MonitorPage() {
                           border: 'none',
                           borderRadius: '8px',
                           fontWeight: '600',
-                          cursor: 'pointer',
+                          cursor: actionLoading ? 'not-allowed' : 'pointer',
+                          opacity: actionLoading ? 0.6 : 1,
                           fontSize: '0.875rem',
                           transition: 'all 0.2s ease',
                         }}
                       >
-                        ⏹ Stop
+                        {actionLoading ? '⋯ Stopping...' : '⏹ Stop'}
                       </button>
                     </>
                   )}
@@ -675,6 +681,7 @@ export default function MonitorPage() {
                     <>
                       <button
                         onClick={handleStart}
+                        disabled={actionLoading}
                         style={{
                           padding: '10px 20px',
                           background: 'linear-gradient(135deg, #10B981, #059669)',
@@ -682,15 +689,17 @@ export default function MonitorPage() {
                           border: 'none',
                           borderRadius: '8px',
                           fontWeight: '600',
-                          cursor: 'pointer',
+                          cursor: actionLoading ? 'not-allowed' : 'pointer',
+                          opacity: actionLoading ? 0.6 : 1,
                           fontSize: '0.875rem',
                           transition: 'all 0.2s ease',
                         }}
                       >
-                        ▶ Resume
+                        {actionLoading ? '⋯ Resuming...' : '▶ Resume'}
                       </button>
                       <button
                         onClick={handleStop}
+                        disabled={actionLoading}
                         style={{
                           padding: '10px 20px',
                           background: 'linear-gradient(135deg, #EF4444, #DC2626)',
@@ -698,16 +707,31 @@ export default function MonitorPage() {
                           border: 'none',
                           borderRadius: '8px',
                           fontWeight: '600',
-                          cursor: 'pointer',
+                          cursor: actionLoading ? 'not-allowed' : 'pointer',
+                          opacity: actionLoading ? 0.6 : 1,
                           fontSize: '0.875rem',
                           transition: 'all 0.2s ease',
                         }}
                       >
-                        ⏹ Stop
+                        {actionLoading ? '⋯ Stopping...' : '⏹ Stop'}
                       </button>
                     </>
                   )}
                 </div>
+
+                {/* Action error banner */}
+                {actionError && (
+                  <div style={{
+                    padding: '10px 16px',
+                    background: '#FEE2E2',
+                    color: '#991B1B',
+                    borderRadius: '8px',
+                    fontSize: '0.8125rem',
+                    fontWeight: '500',
+                  }}>
+                    ⚠ {actionError}
+                  </div>
+                )}
 
                 {/* Status badge */}
                 <div style={{
