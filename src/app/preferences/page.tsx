@@ -1,584 +1,984 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sliders, Briefcase, Ban, Plus, X, ArrowRight } from 'lucide-react';
-import AppNavigation from '@/components/shared/AppNavigation';
+import Link from 'next/link';
+import { ArrowLeft, Save, Loader, CheckCircle, AlertCircle, MapPin, Briefcase, DollarSign, Clock, Bell, Plus, X } from 'lucide-react';
 
-interface JobPreferences {
-  id: number;
-  jobTypes: string[];
+interface PreferencesData {
+  jobTitles: string[];
   locations: string[];
-  salaryMin: number | null;
-  salaryMax: number | null;
-  skills: string[];
-  experienceLevel: string | null;
-  customJobTitles: string[];
-  blockedCompanies: string[];
-  autoApply: boolean;
-  maxApplicationsPerDay: number;
+  salaryMin: number;
+  salaryMax: number;
+  workTypes: string[];
+  notificationsEnabled: boolean;
+  emailNotifications: boolean;
+  telegramNotifications: boolean;
 }
-
-const styles = {
-  container: {
-    minHeight: '100vh',
-    background: '#FFFFFF',
-    color: '#1E293B',
-  },
-  mainContent: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    padding: '80px 24px',
-    position: 'relative' as const,
-    zIndex: 1,
-  },
-  backgroundGlow1: {
-    position: 'fixed' as const,
-    width: '800px',
-    height: '800px',
-    borderRadius: '50%',
-    top: '100px',
-    right: '-200px',
-    background: 'radial-gradient(circle, rgba(0, 81, 255, 0.1) 0%, transparent 70%)',
-    filter: 'blur(120px)',
-    pointerEvents: 'none' as const,
-    zIndex: 0,
-  },
-  backgroundGlow2: {
-    position: 'fixed' as const,
-    width: '600px',
-    height: '600px',
-    borderRadius: '50%',
-    bottom: '200px',
-    left: '-100px',
-    background: 'radial-gradient(circle, rgba(0, 81, 255, 0.08) 0%, transparent 70%)',
-    filter: 'blur(100px)',
-    pointerEvents: 'none' as const,
-    zIndex: 0,
-  },
-  header: {
-    marginBottom: '80px',
-    textAlign: 'center' as const,
-  },
-  headerBadge: {
-    display: 'inline-flex' as const,
-    alignItems: 'center',
-    gap: '8px',
-    background: 'rgba(0, 81, 255, 0.08)',
-    border: '1px solid rgba(0, 81, 255, 0.2)',
-    borderRadius: '99px',
-    padding: '8px 20px',
-    marginBottom: '24px',
-    backdropFilter: 'blur(12px)',
-    fontSize: '12px',
-    fontWeight: 600,
-    color: '#0051FF',
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.1em',
-  },
-  title: {
-    fontSize: '56px',
-    fontWeight: 900,
-    letterSpacing: '-0.02em',
-    lineHeight: 1.2,
-    marginBottom: '16px',
-    color: '#1E293B',
-  },
-  subtitle: {
-    fontSize: '18px',
-    color: '#475569',
-    lineHeight: 1.6,
-    maxWidth: '600px',
-    margin: '0 auto',
-  },
-  alertBox: {
-    marginBottom: '32px',
-    padding: '16px 20px',
-    borderRadius: '12px',
-    fontSize: '14px',
-    fontWeight: 500,
-    border: '1px solid',
-    backdropFilter: 'blur(12px)',
-  },
-  errorAlert: {
-    background: 'rgba(239, 68, 68, 0.08)',
-    borderColor: 'rgba(239, 68, 68, 0.2)',
-    color: '#DC2626',
-  },
-  successAlert: {
-    background: 'rgba(16, 185, 129, 0.08)',
-    borderColor: 'rgba(16, 185, 129, 0.2)',
-    color: '#059669',
-  },
-  card: {
-    background: 'rgba(255, 255, 255, 0.02)',
-    border: '1px solid rgba(0, 81, 255, 0.1)',
-    borderRadius: '20px',
-    padding: '40px',
-    marginBottom: '32px',
-    backdropFilter: 'blur(24px)',
-    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  },
-  cardTitle: {
-    fontSize: '24px',
-    fontWeight: 700,
-    color: '#1E293B',
-    marginBottom: '12px',
-    display: 'flex' as const,
-    alignItems: 'center',
-    gap: '12px',
-  },
-  cardDescription: {
-    fontSize: '14px',
-    color: '#64748B',
-    lineHeight: 1.6,
-    marginBottom: '32px',
-  },
-  inputGroup: {
-    display: 'flex' as const,
-    gap: '12px',
-    marginBottom: '24px',
-  },
-  input: {
-    flex: 1,
-    padding: '14px 18px',
-    background: 'rgba(255, 255, 255, 0.02)',
-    border: '1px solid rgba(0, 81, 255, 0.2)',
-    borderRadius: '12px',
-    fontSize: '14px',
-    color: '#1E293B',
-    transition: 'all 0.2s',
-    fontFamily: 'inherit',
-  },
-  button: {
-    display: 'inline-flex' as const,
-    alignItems: 'center',
-    gap: '8px',
-    padding: '14px 24px',
-    borderRadius: '12px',
-    border: 'none',
-    fontWeight: 600,
-    fontSize: '14px',
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-    fontFamily: 'inherit',
-  },
-  buttonPrimary: {
-    background: 'linear-gradient(135deg, #0051FF, #0051FF)',
-    color: '#FFFFFF',
-    boxShadow: '0 4px 16px rgba(0, 81, 255, 0.3)',
-  },
-  tagContainer: {
-    display: 'flex' as const,
-    flexWrap: 'wrap' as const,
-    gap: '12px',
-    alignItems: 'center',
-  },
-  tag: {
-    display: 'inline-flex' as const,
-    alignItems: 'center',
-    gap: '8px',
-    paddingLeft: '14px',
-    paddingRight: '10px',
-    paddingTop: '8px',
-    paddingBottom: '8px',
-    borderRadius: '99px',
-    background: 'rgba(0, 81, 255, 0.12)',
-    border: '1px solid rgba(0, 81, 255, 0.25)',
-    color: '#0051FF',
-    fontSize: '14px',
-    fontWeight: 500,
-  },
-  removeButton: {
-    background: 'none',
-    border: 'none',
-    color: 'inherit',
-    cursor: 'pointer',
-    fontSize: '18px',
-    padding: '0',
-    display: 'flex' as const,
-    alignItems: 'center',
-    justifyContent: 'center',
-    transition: 'opacity 0.2s',
-  },
-  emptyState: {
-    color: '#94A3B8',
-    fontSize: '14px',
-    fontStyle: 'italic' as const,
-  },
-  actionContainer: {
-    display: 'flex' as const,
-    justifyContent: 'flex-end',
-    gap: '16px',
-    marginTop: '48px',
-    paddingTop: '32px',
-    borderTop: '1px solid rgba(0, 81, 255, 0.1)',
-  },
-  saveButton: {
-    display: 'inline-flex' as const,
-    alignItems: 'center',
-    gap: '8px',
-    padding: '16px 40px',
-    background: 'linear-gradient(135deg, #0051FF, #0051FF)',
-    color: '#FFFFFF',
-    fontWeight: 700,
-    borderRadius: '12px',
-    border: 'none',
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-    boxShadow: '0 8px 24px rgba(0, 81, 255, 0.3)',
-    fontSize: '15px',
-  },
-  iconBox: {
-    width: '48px',
-    height: '48px',
-    borderRadius: '12px',
-    background: 'rgba(0, 81, 255, 0.12)',
-    border: '1px solid rgba(0, 81, 255, 0.2)',
-    display: 'flex' as const,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-};
 
 export default function PreferencesPage() {
   const router = useRouter();
-  const [preferences, setPreferences] = useState<JobPreferences | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
-  const [newJobTitle, setNewJobTitle] = useState('');
-  const [newBlockedCompany, setNewBlockedCompany] = useState('');
+  const defaultPrefs: PreferencesData = {
+    jobTitles: ['Software Engineer', 'Full Stack Developer'],
+    locations: ['Jakarta, Indonesia', 'Bandung, West Java, Indonesia'],
+    salaryMin: 5000000,
+    salaryMax: 15000000,
+    workTypes: ['Full-time', 'Contract'],
+    notificationsEnabled: true,
+    emailNotifications: true,
+    telegramNotifications: false,
+  };
 
+  const [preferences, setPreferences] = useState<PreferencesData>(defaultPrefs);
+  const [formData, setFormData] = useState<PreferencesData>(defaultPrefs);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState(false);
+  const [locationInput, setLocationInput] = useState('');
+  const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
+
+  // Auth check + load prefs from real API
   useEffect(() => {
-    const checkAuth = async () => {
-      const token = sessionStorage.getItem('instajob_token');
+    const loadPreferences = async () => {
+      const token = localStorage.getItem('instajob_token');
       if (!token) {
         router.push('/login');
         return;
       }
 
-      await fetchPreferences();
+      try {
+        const res = await fetch('http://localhost:3001/api/user/preferences', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+
+        if (res.status === 401) {
+          router.push('/login');
+          return;
+        }
+
+        if (res.ok) {
+          const data = await res.json();
+          const loaded: PreferencesData = {
+            jobTitles: data.jobTitles?.length ? data.jobTitles : defaultPrefs.jobTitles,
+            locations: data.locations?.length ? data.locations : defaultPrefs.locations,
+            salaryMin: data.salaryMin ?? defaultPrefs.salaryMin,
+            salaryMax: data.salaryMax ?? defaultPrefs.salaryMax,
+            workTypes: data.workTypes?.length ? data.workTypes : defaultPrefs.workTypes,
+            notificationsEnabled: data.notificationsEnabled ?? defaultPrefs.notificationsEnabled,
+            emailNotifications: data.emailNotifications ?? defaultPrefs.emailNotifications,
+            telegramNotifications: data.telegramNotifications ?? defaultPrefs.telegramNotifications,
+          };
+          setPreferences(loaded);
+          setFormData(loaded);
+        }
+        // ponytail: if GET fails (non-401), fallback to defaultPrefs — acceptable for dev
+      } catch {
+        // network error → keep defaults
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    checkAuth();
+    loadPreferences();
   }, [router]);
 
-  const fetchPreferences = async () => {
-    const token = sessionStorage.getItem('instajob_token');
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
+  const availableWorkTypes = [
+    'Full-time',
+    'Part-time',
+    'Contract',
+    'Freelance',
+    'Internship',
+  ];
 
-    try {
-      const response = await fetch(`${apiBase}/api/preferences`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
+  const handleJobTitleChange = (index: number, value: string) => {
+    const newTitles = [...formData.jobTitles];
+    newTitles[index] = value;
+    setFormData(prev => ({
+      ...prev,
+      jobTitles: newTitles,
+    }));
+  };
 
-      if (response.ok) {
-        const data = await response.json();
-        setPreferences(data);
-      }
-    } catch (err) {
-      console.error('Failed to fetch preferences:', err);
-      setError('Failed to load preferences');
-    } finally {
-      setLoading(false);
+  const addJobTitle = () => {
+    setFormData(prev => ({
+      ...prev,
+      jobTitles: [...prev.jobTitles, ''],
+    }));
+  };
+
+  const removeJobTitle = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      jobTitles: prev.jobTitles.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocationInput(e.target.value);
+    setShowLocationSuggestions(e.target.value.length > 0);
+  };
+
+  const addLocation = (location: string) => {
+    if (location.trim() && !formData.locations.includes(location)) {
+      setFormData(prev => ({
+        ...prev,
+        locations: [...prev.locations, location],
+      }));
+      setLocationInput('');
+      setShowLocationSuggestions(false);
     }
+  };
+
+  const removeLocation = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      locations: prev.locations.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleWorkTypeToggle = (type: string) => {
+    setFormData(prev => ({
+      ...prev,
+      workTypes: prev.workTypes.includes(type)
+        ? prev.workTypes.filter(t => t !== type)
+        : [...prev.workTypes, type],
+    }));
   };
 
   const handleSave = async () => {
-    setError('');
-    setSuccess('');
-    setSaving(true);
+    const token = localStorage.getItem('instajob_token');
+    if (!token) {
+      router.push('/login');
+      return;
+    }
+
+    setIsSaving(true);
+    setSaveSuccess(false);
+    setSaveError(false);
 
     try {
-      const token = sessionStorage.getItem('instajob_token');
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
-
-      const response = await fetch(`${apiBase}/api/preferences`, {
+      const res = await fetch('http://localhost:3001/api/user/preferences', {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(preferences),
+        body: JSON.stringify({
+          jobTitles: formData.jobTitles.filter(t => t.trim()),
+          locations: formData.locations,
+          salaryMin: formData.salaryMin,
+          salaryMax: formData.salaryMax,
+          workTypes: formData.workTypes,
+          notificationsEnabled: formData.notificationsEnabled,
+          emailNotifications: formData.emailNotifications,
+          telegramNotifications: formData.telegramNotifications,
+        }),
       });
 
-      if (response.ok) {
-        setSuccess('✓ Preferences saved successfully!');
-        setTimeout(() => setSuccess(''), 3000);
-      } else {
-        setError('Failed to save preferences');
+      if (res.status === 401) {
+        router.push('/login');
+        return;
       }
-    } catch (err) {
-      setError('Failed to save preferences');
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to save preferences');
+      }
+
+      setPreferences(formData);
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (err: any) {
+      console.error('Save preferences error:', err);
+      setSaveError(true);
+      setTimeout(() => setSaveError(false), 3000);
     } finally {
-      setSaving(false);
+      setIsSaving(false);
     }
   };
-
-  const handleAddJobTitle = async () => {
-    if (!newJobTitle.trim()) return;
-
-    setError('');
-    try {
-      const token = sessionStorage.getItem('instajob_token');
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
-
-      const response = await fetch(`${apiBase}/api/preferences/custom-titles`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ title: newJobTitle.trim() }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setPreferences(data);
-        setNewJobTitle('');
-        setSuccess('✓ Job title added!');
-        setTimeout(() => setSuccess(''), 2000);
-      } else {
-        setError('Failed to add job title');
-      }
-    } catch (err) {
-      setError('Failed to add job title');
-    }
-  };
-
-  const handleRemoveJobTitle = async (title: string) => {
-    setError('');
-    try {
-      const token = sessionStorage.getItem('instajob_token');
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
-
-      const response = await fetch(`${apiBase}/api/preferences/custom-titles/${encodeURIComponent(title)}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setPreferences(data);
-      }
-    } catch (err) {
-      console.error('Failed to remove job title:', err);
-    }
-  };
-
-  const handleAddBlockedCompany = async () => {
-    if (!newBlockedCompany.trim()) return;
-
-    setError('');
-    try {
-      const token = sessionStorage.getItem('instajob_token');
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
-
-      const response = await fetch(`${apiBase}/api/preferences/blocked-companies`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ company: newBlockedCompany.trim() }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setPreferences(data);
-        setNewBlockedCompany('');
-        setSuccess('✓ Company blocked!');
-        setTimeout(() => setSuccess(''), 2000);
-      } else {
-        setError('Failed to block company');
-      }
-    } catch (err) {
-      setError('Failed to block company');
-    }
-  };
-
-  const handleRemoveBlockedCompany = async (company: string) => {
-    setError('');
-    try {
-      const token = sessionStorage.getItem('instajob_token');
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
-
-      const response = await fetch(`${apiBase}/api/preferences/blocked-companies/${encodeURIComponent(company)}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setPreferences(data);
-      }
-    } catch (err) {
-      console.error('Failed to remove blocked company:', err);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div style={styles.container}>
-        <div style={styles.backgroundGlow1}></div>
-        <div style={styles.backgroundGlow2}></div>
-        <AppNavigation />
-        <div style={{ ...styles.mainContent, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 200px)' }}>
-          <div style={{ color: '#64748B', fontSize: '16px' }}>Loading preferences...</div>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div style={styles.container}>
-      {/* Background Glows */}
-      <div style={styles.backgroundGlow1}></div>
-      <div style={styles.backgroundGlow2}></div>
-
-      <AppNavigation />
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #FFFFFF 0%, #F5F8FF 50%, #EEF2FF 100%)',
+      position: 'relative',
+      overflow: 'hidden',
+    }}>
+      {/* Background Glow Effects */}
+      <div style={{
+        position: 'fixed',
+        width: '800px',
+        height: '800px',
+        borderRadius: '50%',
+        top: '-200px',
+        right: '-100px',
+        background: 'radial-gradient(circle, rgba(0, 81, 255, 0.15) 0%, transparent 70%)',
+        filter: 'blur(120px)',
+        pointerEvents: 'none',
+        zIndex: 0,
+      }} />
+      <div style={{
+        position: 'fixed',
+        width: '800px',
+        height: '800px',
+        borderRadius: '50%',
+        bottom: '-200px',
+        left: '-100px',
+        background: 'radial-gradient(circle, rgba(0, 81, 255, 0.15) 0%, transparent 70%)',
+        filter: 'blur(120px)',
+        pointerEvents: 'none',
+        zIndex: 0,
+      }} />
 
       {/* Main Content */}
-      <div style={styles.mainContent}>
-        {/* Header */}
-        <div style={styles.header}>
-          <div style={styles.headerBadge}>
-            <Sliders size={14} />
-            Customize Your Search
-          </div>
-          <h1 style={styles.title}>Job Search Preferences</h1>
-          <p style={styles.subtitle}>
-            Fine-tune your job search with custom titles and company filters. Our AI will use these preferences to find better matches.
-          </p>
+      <div style={{
+        position: 'relative',
+        zIndex: 1,
+        maxWidth: '900px',
+        margin: '0 auto',
+        padding: '40px 24px',
+      }}>
+        {/* Header with Back Link */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '40px',
+        }}>
+          <Link href="/dashboard" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            color: '#0051FF',
+            textDecoration: 'none',
+            fontSize: '15px',
+            fontWeight: '500',
+            transition: 'color 0.2s',
+          }}>
+            <ArrowLeft size={18} />
+            Back to Dashboard
+          </Link>
+          <h1 style={{
+            fontSize: '32px',
+            fontWeight: '800',
+            margin: 0,
+          }}>
+            Job Preferences
+          </h1>
+          <div style={{ width: '140px' }} />
         </div>
 
-        {/* Alerts */}
-        {error && <div style={{ ...styles.alertBox, ...styles.errorAlert }}>{error}</div>}
-        {success && <div style={{ ...styles.alertBox, ...styles.successAlert }}>{success}</div>}
-
-        {preferences && (
-          <div>
-            {/* Custom Job Titles Card */}
-            <div style={styles.card}>
-              <div style={styles.cardTitle}>
-                <div style={styles.iconBox}>
-                  <Briefcase size={24} color="#0051FF" />
-                </div>
-                Custom Job Titles
-              </div>
-              <p style={styles.cardDescription}>
-                Add specific job titles you want to target. The scout will generate queries based on these titles to find the best matches for you.
-              </p>
-
-              <div style={styles.inputGroup}>
-                <input
-                  type="text"
-                  value={newJobTitle}
-                  onChange={(e) => setNewJobTitle(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleAddJobTitle()}
-                  placeholder="e.g., Senior Data Engineer, Product Manager"
-                  style={{ ...styles.input }}
-                />
-                <button
-                  onClick={handleAddJobTitle}
-                  style={{ ...styles.button, ...styles.buttonPrimary }}
-                >
-                  <Plus size={18} />
-                  Add
-                </button>
-              </div>
-
-              <div style={styles.tagContainer}>
-                {preferences.customJobTitles.map((title) => (
-                  <div key={title} style={styles.tag}>
-                    <span>{title}</span>
-                    <button
-                      onClick={() => handleRemoveJobTitle(title)}
-                      style={styles.removeButton}
-                      onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.7')}
-                      onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
-                    >
-                      <X size={16} />
-                    </button>
-                  </div>
-                ))}
-                {preferences.customJobTitles.length === 0 && (
-                  <p style={styles.emptyState}>No custom job titles yet. Add one to get started!</p>
-                )}
-              </div>
-            </div>
-
-            {/* Blocked Companies Card */}
-            <div style={styles.card}>
-              <div style={styles.cardTitle}>
-                <div style={styles.iconBox}>
-                  <Ban size={24} color="#0051FF" />
-                </div>
-                Blocked Companies
-              </div>
-              <p style={styles.cardDescription}>
-                Companies you want to exclude from job discovery. They won't appear in your search results or auto-apply recommendations.
-              </p>
-
-              <div style={styles.inputGroup}>
-                <input
-                  type="text"
-                  value={newBlockedCompany}
-                  onChange={(e) => setNewBlockedCompany(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleAddBlockedCompany()}
-                  placeholder="e.g., Amazon, Google, Meta"
-                  style={{ ...styles.input }}
-                />
-                <button
-                  onClick={handleAddBlockedCompany}
-                  style={{ ...styles.button, ...styles.buttonPrimary }}
-                >
-                  <Plus size={18} />
-                  Block
-                </button>
-              </div>
-
-              <div style={styles.tagContainer}>
-                {preferences.blockedCompanies.map((company) => (
-                  <div key={company} style={styles.tag}>
-                    <span>{company}</span>
-                    <button
-                      onClick={() => handleRemoveBlockedCompany(company)}
-                      style={styles.removeButton}
-                      onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.7')}
-                      onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
-                    >
-                      <X size={16} />
-                    </button>
-                  </div>
-                ))}
-                {preferences.blockedCompanies.length === 0 && (
-                  <p style={styles.emptyState}>No blocked companies yet. Add one to exclude companies from results!</p>
-                )}
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div style={styles.actionContainer}>
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                style={{
-                  ...styles.saveButton,
-                  opacity: saving ? 0.7 : 1,
-                  cursor: saving ? 'not-allowed' : 'pointer',
-                }}
-              >
-                <ArrowRight size={18} />
-                {saving ? 'Saving...' : 'Save Preferences'}
-              </button>
-            </div>
+        {/* Success Message */}
+        {saveSuccess && (
+          <div style={{
+            marginBottom: '24px',
+            padding: '12px 16px',
+            background: 'rgba(16, 185, 129, 0.1)',
+            border: '1px solid rgba(16, 185, 129, 0.3)',
+            borderRadius: '8px',
+            color: '#059669',
+            fontSize: '14px',
+            fontWeight: '500',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}>
+            <CheckCircle size={18} />
+            Preferences saved successfully
           </div>
         )}
+
+        {/* Error Message */}
+        {saveError && (
+          <div style={{
+            marginBottom: '24px',
+            padding: '12px 16px',
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: '8px',
+            color: '#DC2626',
+            fontSize: '14px',
+            fontWeight: '500',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}>
+            <AlertCircle size={18} />
+            Failed to save preferences. Please try again.
+          </div>
+        )}
+
+        {/* Preferences Form */}
+        <div style={{
+          display: 'grid',
+          gap: '32px',
+        }}>
+
+          {/* Job Titles Section — FREE TEXT INPUTS */}
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
+            backdropFilter: 'blur(12px)',
+            borderRadius: '16px',
+            padding: '32px',
+            boxShadow: '0 2px 12px rgba(0, 81, 255, 0.06)',
+            border: '1px solid rgba(255, 255, 255, 0.6)',
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              marginBottom: '20px',
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '36px',
+                height: '36px',
+                background: 'rgba(0, 81, 255, 0.1)',
+                borderRadius: '8px',
+              }}>
+                <Briefcase size={20} color="#0051FF" />
+              </div>
+              <h2 style={{
+                fontSize: '18px',
+                fontWeight: '700',
+                margin: 0,
+              }}>
+                Job Titles
+              </h2>
+            </div>
+            <p style={{
+              fontSize: '14px',
+              color: '#64748B',
+              margin: '0 0 20px 0',
+            }}>
+              Add job titles you're interested in applying for
+            </p>
+            <div style={{
+              display: 'grid',
+              gap: '12px',
+            }}>
+              {formData.jobTitles.map((title, index) => (
+                <div key={index} style={{
+                  display: 'flex',
+                  gap: '8px',
+                  alignItems: 'center',
+                }}>
+                  <input
+                    type="text"
+                    placeholder="e.g., Senior Software Engineer"
+                    value={title}
+                    onChange={(e) => handleJobTitleChange(index, e.target.value)}
+                    style={{
+                      flex: 1,
+                      padding: '12px',
+                      fontSize: '14px',
+                      border: '1px solid #E2E8F0',
+                      borderRadius: '8px',
+                      outline: 'none',
+                      transition: 'border-color 0.2s',
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#0051FF'}
+                    onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
+                  />
+                  {formData.jobTitles.length > 1 && (
+                    <button onClick={() => removeJobTitle(index)} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '36px',
+                      height: '36px',
+                      background: '#FEE2E2',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                    }}>
+                      <X size={18} color="#DC2626" />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+            <button onClick={addJobTitle} style={{
+              marginTop: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '10px 16px',
+              fontSize: '13px',
+              fontWeight: '600',
+              color: '#0051FF',
+              background: 'rgba(0, 81, 255, 0.08)',
+              border: '1px solid #0051FF',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(0, 81, 255, 0.12)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(0, 81, 255, 0.08)';
+            }}>
+              <Plus size={16} />
+              Add another title
+            </button>
+          </div>
+
+          {/* Locations Section — GOOGLE MAPS STYLE AUTOCOMPLETE */}
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
+            backdropFilter: 'blur(12px)',
+            borderRadius: '16px',
+            padding: '32px',
+            boxShadow: '0 2px 12px rgba(0, 81, 255, 0.06)',
+            border: '1px solid rgba(255, 255, 255, 0.6)',
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              marginBottom: '20px',
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '36px',
+                height: '36px',
+                background: 'rgba(0, 81, 255, 0.1)',
+                borderRadius: '8px',
+              }}>
+                <MapPin size={20} color="#0051FF" />
+              </div>
+              <h2 style={{
+                fontSize: '18px',
+                fontWeight: '700',
+                margin: 0,
+              }}>
+                Work Locations
+              </h2>
+            </div>
+            <p style={{
+              fontSize: '14px',
+              color: '#64748B',
+              margin: '0 0 20px 0',
+            }}>
+              Search and add locations where you'd like to work (City, Province, Country)
+            </p>
+            
+            {/* Location Input with Autocomplete */}
+            <div style={{ position: 'relative', marginBottom: '16px' }}>
+              <input
+                type="text"
+                placeholder="Search location (e.g., Jakarta, Indonesia or Remote)"
+                value={locationInput}
+                onChange={handleLocationChange}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addLocation(locationInput);
+                  }
+                }}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  fontSize: '14px',
+                  border: '1px solid #E2E8F0',
+                  borderRadius: '8px',
+                  outline: 'none',
+                  transition: 'border-color 0.2s',
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#0051FF'}
+                onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
+              />
+              
+              {/* Autocomplete Suggestions (Mock Google Maps style) */}
+              {showLocationSuggestions && locationInput && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  right: 0,
+                  marginTop: '4px',
+                  background: '#FFFFFF',
+                  borderRadius: '8px',
+                  border: '1px solid #E2E8F0',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                  zIndex: 100,
+                }}>
+                  {['Jakarta, Indonesia', 'Bandung, West Java, Indonesia', 'Surabaya, East Java, Indonesia', 'Remote (Anywhere)']
+                    .filter(loc => loc.toLowerCase().includes(locationInput.toLowerCase()))
+                    .map((suggestion, idx) => (
+                      <div
+                        key={idx}
+                        onClick={() => addLocation(suggestion)}
+                        style={{
+                          padding: '12px',
+                          fontSize: '13px',
+                          color: '#1E293B',
+                          borderBottom: idx < 3 ? '1px solid #F1F5F9' : 'none',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          transition: 'background 0.2s',
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = '#F8FAFC'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                      >
+                        <MapPin size={14} color="#0051FF" />
+                        {suggestion}
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+
+            {/* Selected Locations as Tags/Chips */}
+            {formData.locations.length > 0 && (
+              <div style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '8px',
+                marginBottom: '12px',
+              }}>
+                {formData.locations.map((location, index) => (
+                  <div key={index} style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '8px 12px',
+                    background: 'rgba(0, 81, 255, 0.1)',
+                    border: '1px solid rgba(0, 81, 255, 0.3)',
+                    borderRadius: '20px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    color: '#0051FF',
+                  }}>
+                    <MapPin size={14} />
+                    {location}
+                    <button onClick={() => removeLocation(index)} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                      marginLeft: '4px',
+                    }}>
+                      <X size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Salary Range Section */}
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
+            backdropFilter: 'blur(12px)',
+            borderRadius: '16px',
+            padding: '32px',
+            boxShadow: '0 2px 12px rgba(0, 81, 255, 0.06)',
+            border: '1px solid rgba(255, 255, 255, 0.6)',
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              marginBottom: '20px',
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '36px',
+                height: '36px',
+                background: 'rgba(0, 81, 255, 0.1)',
+                borderRadius: '8px',
+              }}>
+                <DollarSign size={20} color="#0051FF" />
+              </div>
+              <h2 style={{
+                fontSize: '18px',
+                fontWeight: '700',
+                margin: 0,
+              }}>
+                Salary Range
+              </h2>
+            </div>
+            <p style={{
+              fontSize: '14px',
+              color: '#64748B',
+              margin: '0 0 20px 0',
+            }}>
+              Set your minimum and maximum salary expectations
+            </p>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '16px',
+            }}>
+              <div>
+                <label style={{
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: '#475569',
+                  display: 'block',
+                  marginBottom: '8px',
+                }}>
+                  Minimum Salary (Rp)
+                </label>
+                <input
+                  type="number"
+                  value={formData.salaryMin}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    salaryMin: parseInt(e.target.value) || 0,
+                  }))}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    fontSize: '14px',
+                    border: '1px solid #E2E8F0',
+                    borderRadius: '8px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s',
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#0051FF'}
+                  onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
+                />
+              </div>
+              <div>
+                <label style={{
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  color: '#475569',
+                  display: 'block',
+                  marginBottom: '8px',
+                }}>
+                  Maximum Salary (Rp)
+                </label>
+                <input
+                  type="number"
+                  value={formData.salaryMax}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    salaryMax: parseInt(e.target.value) || 0,
+                  }))}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    fontSize: '14px',
+                    border: '1px solid #E2E8F0',
+                    borderRadius: '8px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s',
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#0051FF'}
+                  onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
+                />
+              </div>
+            </div>
+            {formData.salaryMin > 0 && formData.salaryMax > 0 && (
+              <p style={{
+                marginTop: '12px',
+                fontSize: '13px',
+                color: '#0051FF',
+                fontWeight: '600',
+              }}>
+                Range: Rp {formData.salaryMin.toLocaleString('id-ID')} - Rp {formData.salaryMax.toLocaleString('id-ID')}
+              </p>
+            )}
+          </div>
+
+          {/* Work Types Section */}
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
+            backdropFilter: 'blur(12px)',
+            borderRadius: '16px',
+            padding: '32px',
+            boxShadow: '0 2px 12px rgba(0, 81, 255, 0.06)',
+            border: '1px solid rgba(255, 255, 255, 0.6)',
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              marginBottom: '20px',
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '36px',
+                height: '36px',
+                background: 'rgba(0, 81, 255, 0.1)',
+                borderRadius: '8px',
+              }}>
+                <Clock size={20} color="#0051FF" />
+              </div>
+              <h2 style={{
+                fontSize: '18px',
+                fontWeight: '700',
+                margin: 0,
+              }}>
+                Work Types
+              </h2>
+            </div>
+            <p style={{
+              fontSize: '14px',
+              color: '#64748B',
+              margin: '0 0 16px 0',
+            }}>
+              Select the types of work you're open to
+            </p>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '12px',
+            }}>
+              {availableWorkTypes.map((type) => (
+                <label key={type} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '12px',
+                  background: formData.workTypes.includes(type) ? 'rgba(0, 81, 255, 0.08)' : 'transparent',
+                  borderRadius: '8px',
+                  border: `1px solid ${formData.workTypes.includes(type) ? '#0051FF' : '#E2E8F0'}`,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={formData.workTypes.includes(type)}
+                    onChange={() => handleWorkTypeToggle(type)}
+                    style={{
+                      width: '18px',
+                      height: '18px',
+                      cursor: 'pointer',
+                      accentColor: '#0051FF',
+                    }}
+                  />
+                  <span style={{
+                    marginLeft: '8px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: '#1E293B',
+                  }}>
+                    {type}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Notification Preferences Section */}
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
+            backdropFilter: 'blur(12px)',
+            borderRadius: '16px',
+            padding: '32px',
+            boxShadow: '0 2px 12px rgba(0, 81, 255, 0.06)',
+            border: '1px solid rgba(255, 255, 255, 0.6)',
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              marginBottom: '20px',
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '36px',
+                height: '36px',
+                background: 'rgba(0, 81, 255, 0.1)',
+                borderRadius: '8px',
+              }}>
+                <Bell size={20} color="#0051FF" />
+              </div>
+              <h2 style={{
+                fontSize: '18px',
+                fontWeight: '700',
+                margin: 0,
+              }}>
+                Notification Preferences
+              </h2>
+            </div>
+            <p style={{
+              fontSize: '14px',
+              color: '#64748B',
+              margin: '0 0 20px 0',
+            }}>
+              Manage how you receive job alerts
+            </p>
+            <div style={{
+              display: 'grid',
+              gap: '16px',
+            }}>
+              <label style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '12px',
+                background: 'transparent',
+                borderRadius: '8px',
+                border: '1px solid #E2E8F0',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}>
+                <input
+                  type="checkbox"
+                  checked={formData.notificationsEnabled}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    notificationsEnabled: e.target.checked,
+                  }))}
+                  style={{
+                    width: '18px',
+                    height: '18px',
+                    cursor: 'pointer',
+                    accentColor: '#0051FF',
+                  }}
+                />
+                <span style={{
+                  marginLeft: '8px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#1E293B',
+                }}>
+                  Enable job notifications
+                </span>
+              </label>
+              <label style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '12px',
+                background: 'transparent',
+                borderRadius: '8px',
+                border: '1px solid #E2E8F0',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                opacity: formData.notificationsEnabled ? 1 : 0.5,
+                pointerEvents: formData.notificationsEnabled ? 'auto' : 'none',
+              }}>
+                <input
+                  type="checkbox"
+                  checked={formData.emailNotifications}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    emailNotifications: e.target.checked,
+                  }))}
+                  disabled={!formData.notificationsEnabled}
+                  style={{
+                    width: '18px',
+                    height: '18px',
+                    cursor: 'pointer',
+                    accentColor: '#0051FF',
+                  }}
+                />
+                <span style={{
+                  marginLeft: '8px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#1E293B',
+                }}>
+                  Email notifications
+                </span>
+              </label>
+              <label style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '12px',
+                background: 'transparent',
+                borderRadius: '8px',
+                border: '1px solid #E2E8F0',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                opacity: formData.notificationsEnabled ? 1 : 0.5,
+                pointerEvents: formData.notificationsEnabled ? 'auto' : 'none',
+              }}>
+                <input
+                  type="checkbox"
+                  checked={formData.telegramNotifications}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    telegramNotifications: e.target.checked,
+                  }))}
+                  disabled={!formData.notificationsEnabled}
+                  style={{
+                    width: '18px',
+                    height: '18px',
+                    cursor: 'pointer',
+                    accentColor: '#0051FF',
+                  }}
+                />
+                <span style={{
+                  marginLeft: '8px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#1E293B',
+                }}>
+                  Telegram notifications
+                </span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Save Button */}
+        <div style={{
+          marginTop: '40px',
+          display: 'flex',
+          gap: '12px',
+          justifyContent: 'flex-end',
+        }}>
+          <button onClick={handleSave} disabled={isSaving} style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '12px 24px',
+            fontSize: '14px',
+            fontWeight: '700',
+            color: '#FFFFFF',
+            background: '#0051FF',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: isSaving ? 'not-allowed' : 'pointer',
+            transition: 'all 0.2s ease',
+            opacity: isSaving ? 0.8 : 1,
+          }}
+          onMouseEnter={(e) => !isSaving && (e.currentTarget.style.opacity = '0.9')}
+          onMouseLeave={(e) => !isSaving && (e.currentTarget.style.opacity = '1')}>
+            {isSaving ? (
+              <>
+                <Loader size={16} style={{ animation: 'spin 0.8s linear infinite' }} />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save size={16} />
+                Save Preferences
+              </>
+            )}
+          </button>
+        </div>
       </div>
+
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }
