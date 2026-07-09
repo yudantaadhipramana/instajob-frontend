@@ -83,8 +83,10 @@ export default function MonitorPage() {
   const [loading, setLoading] = useState(true);
 
   // Run status state machine: idle | running | paused
-  // ponytail: hardcoded idle — fetch real status from GET /api/bot/status when endpoint ready
   const [runStatus, setRunStatus] = useState<'idle' | 'running' | 'paused'>('idle');
+  const [botMetrics, setBotMetrics] = useState({ pending: 0, sent: 0, failed: 0, jobsProcessed: 0, applicationsSent: 0 });
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   // Stats
   const [stats, setStats] = useState<AutoApplyStats>({
@@ -131,7 +133,7 @@ export default function MonitorPage() {
     },
   ]);
 
-  // Auth check
+  // Auth check + fetch bot status
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem('instajob_token');
@@ -143,11 +145,51 @@ export default function MonitorPage() {
       }
 
       setUser(JSON.parse(userData));
+      
+      // Fetch initial bot status
+      try {
+        const res = await fetch('http://localhost:3001/api/bot/status', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setRunStatus(data.status === 'stopped' ? 'idle' : data.status);
+          setBotMetrics(data.metrics || { pending: 0, sent: 0, failed: 0, jobsProcessed: 0, applicationsSent: 0 });
+        }
+      } catch (err) {
+        console.error('Failed to fetch bot status:', err);
+      }
+      
       setLoading(false);
     };
 
     checkAuth();
   }, [router]);
+
+  // Poll bot status every 5s when not idle
+  useEffect(() => {
+    if (runStatus === 'idle') return;
+
+    const interval = setInterval(async () => {
+      const token = localStorage.getItem('instajob_token');
+      if (!token) return;
+
+      try {
+        const res = await fetch('http://localhost:3001/api/bot/status', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setRunStatus(data.status === 'stopped' ? 'idle' : data.status);
+          setBotMetrics(data.metrics || { pending: 0, sent: 0, failed: 0, jobsProcessed: 0, applicationsSent: 0 });
+        }
+      } catch (err) {
+        console.error('Poll error:', err);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [runStatus]);
 
   const handleLogout = () => {
     localStorage.removeItem('instajob_token');
@@ -155,18 +197,84 @@ export default function MonitorPage() {
     router.push('/');
   };
 
-  const handleStart = () => {
-    setRunStatus('running');
-    setStats(prev => ({ ...prev, isActive: true }));
+  const handleStart = async () => {
+    setActionLoading(true);
+    setActionError(null);
+    const token = localStorage.getItem('instajob_token');
+    
+    try {
+      const endpoint = runStatus === 'paused' ? 'resume' : 'start';
+      const res = await fetch(`http://localhost:3001/api/bot/${endpoint}`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to start bot');
+      }
+      
+      const data = await res.json();
+      setRunStatus('running');
+      setStats(prev => ({ ...prev, isActive: true }));
+      
+      // Immediate status refresh
+      const statusRes = await fetch('http://localhost:3001/api/bot/status', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (statusRes.ok) {
+        const statusData = await statusRes.json();
+        setBotMetrics(statusData.metrics);
+      }
+    } catch (err: any) {
+      setActionError(err.message);
+    } finally {
+      setActionLoading(false);
+    }
   };
 
-  const handlePause = () => {
-    setRunStatus('paused');
+  const handlePause = async () => {
+    setActionLoading(true);
+    setActionError(null);
+    const token = localStorage.getItem('instajob_token');
+    
+    try {
+      const res = await fetch('http://localhost:3001/api/bot/pause', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (!res.ok) throw new Error('Failed to pause bot');
+      
+      setRunStatus('paused');
+    } catch (err: any) {
+      setActionError(err.message);
+    } finally {
+      setActionLoading(false);
+    }
   };
 
-  const handleStop = () => {
-    setRunStatus('idle');
-    setStats(prev => ({ ...prev, isActive: false }));
+  const handleStop = async () => {
+    setActionLoading(true);
+    setActionError(null);
+    const token = localStorage.getItem('instajob_token');
+    
+    try {
+      const res = await fetch('http://localhost:3001/api/bot/stop', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (!res.ok) throw new Error('Failed to stop bot');
+      
+      setRunStatus('idle');
+      setStats(prev => ({ ...prev, isActive: false }));
+      setBotMetrics({ pending: 0, sent: 0, failed: 0, jobsProcessed: 0, applicationsSent: 0 });
+    } catch (err: any) {
+      setActionError(err.message);
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   if (loading) {
