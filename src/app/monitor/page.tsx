@@ -622,28 +622,6 @@ export default function MonitorPage() {
                   }} />
                   {runStatus === 'running' ? 'Running' : runStatus === 'paused' ? 'Paused' : 'Idle'}
                 </div>
-
-                {/* Status badge */}
-                <div style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '4px 12px',
-                  borderRadius: '20px',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
-                  width: 'fit-content',
-                  background: runStatus === 'running' ? '#ECFDF5' : runStatus === 'paused' ? '#FEF3C7' : '#F1F5F9',
-                  color: runStatus === 'running' ? '#065F46' : runStatus === 'paused' ? '#92400E' : '#64748B',
-                }}>
-                  <span style={{
-                    width: '6px', height: '6px', borderRadius: '50%',
-                    background: runStatus === 'running' ? '#10B981' : runStatus === 'paused' ? '#F59E0B' : '#94A3B8',
-                    animation: runStatus === 'running' ? 'pulse 2s infinite' : 'none',
-                    display: 'inline-block',
-                  }} />
-                  {runStatus === 'running' ? 'Running' : runStatus === 'paused' ? 'Paused' : 'Idle'}
-                </div>
               </div>
 
               {/* Settings Info */}
