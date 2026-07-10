@@ -17,36 +17,13 @@ export default function CTASection() {
     <section
       style={{
         padding: '120px 48px',
-        background: 'var(--gradient-card)',
+        background: '#FFFFFF',
         position: 'relative',
         overflow: 'hidden',
+        borderTop: '1px solid var(--color-border)'
       }}
     >
-      {/* Background Decoration */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '-50%',
-          right: '-20%',
-          width: '800px',
-          height: '800px',
-          background: 'radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%)',
-          borderRadius: '50%',
-          pointerEvents: 'none',
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          bottom: '-30%',
-          left: '-10%',
-          width: '600px',
-          height: '600px',
-          background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
-          borderRadius: '50%',
-          pointerEvents: 'none',
-        }}
-      />
+      {/* Background Decoration Removed */}
 
       <div
         style={{
@@ -65,11 +42,11 @@ export default function CTASection() {
               alignItems: 'center',
               gap: '8px',
               padding: '8px 24px',
-              background: 'rgba(255,255,255,0.15)',
-              border: '1px solid rgba(255,255,255,0.2)',
+              background: 'var(--color-muted)',
+              border: '1px solid var(--color-border)',
               borderRadius: '100px',
               marginBottom: '32px',
-              color: '#fff',
+              color: 'var(--color-primary)',
               fontSize: '13px',
               fontWeight: '700',
               letterSpacing: '0.05em',
@@ -87,7 +64,7 @@ export default function CTASection() {
             style={{
               fontSize: '56px',
               fontWeight: '800',
-              color: '#FFFFFF',
+              color: 'var(--color-foreground)',
               margin: '0 0 24px 0',
               lineHeight: '1.15',
               fontFamily: 'var(--font-heading)',
@@ -103,7 +80,7 @@ export default function CTASection() {
           <p
             style={{
               fontSize: '18px',
-              color: 'rgba(255,255,255,0.85)',
+              color: 'var(--color-foreground-secondary)',
               marginBottom: '48px',
               maxWidth: '640px',
               margin: '0 auto 48px',
@@ -130,8 +107,8 @@ export default function CTASection() {
               onClick={handleRegister}
               style={{
                 padding: '18px 48px',
-                background: '#FFFFFF',
-                color: '#0051FF',
+                background: 'var(--color-primary)',
+                color: '#FFFFFF',
                 border: 'none',
                 borderRadius: '14px',
                 fontSize: '18px',
@@ -139,41 +116,43 @@ export default function CTASection() {
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '12px',
-                transition: 'all 0.3s ease',
-                boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                fontFamily: 'var(--font-heading)',
+                boxShadow: '0 8px 24px rgba(30, 64, 255, 0.25)',
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)';
-                e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.25)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
-              }}
-            >
-              {t('cta.primaryBtn')}
-            </button>
-            <button
-              style={{
-                padding: '14px 32px',
-                background: 'transparent',
-                color: '#fff',
-                border: '2px solid rgba(255,255,255,0.5)',
-                borderRadius: '12px',
-                fontSize: '16px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
-                e.currentTarget.style.borderColor = '#fff';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.5)';
-              }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)';
+              e.currentTarget.style.boxShadow = '0 12px 32px rgba(30, 64, 255, 0.35)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0) scale(1)';
+              e.currentTarget.style.boxShadow = '0 8px 24px rgba(30, 64, 255, 0.25)';
+            }}
+          >
+            {t('cta.primaryBtn')}
+          </button>
+          <button
+            style={{
+              padding: '14px 32px',
+              background: 'transparent',
+              color: 'var(--color-foreground)',
+              border: '1px solid var(--color-border)',
+              borderRadius: '12px',
+              fontSize: '16px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'var(--color-muted)';
+              e.currentTarget.style.borderColor = 'var(--color-border)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.borderColor = 'var(--color-border)';
+            }}
             >
               {t('cta.secondaryBtn')}
             </button>

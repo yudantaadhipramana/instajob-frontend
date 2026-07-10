@@ -9,28 +9,11 @@ export default function AffiliateSection() {
       id="affiliate"
       style={{
         padding: '100px 48px',
-        background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)',
+        background: '#FFFFFF',
         position: 'relative',
-        overflow: 'hidden',
+        borderTop: '1px solid var(--color-border)',
       }}
     >
-      {/* Background Pattern */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: `
-            linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
-          `,
-          backgroundSize: '50px 50px',
-          pointerEvents: 'none',
-        }}
-      />
-
       <div style={{ maxWidth: '1000px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -44,7 +27,7 @@ export default function AffiliateSection() {
               fontWeight: '700',
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
-              color: 'rgba(255, 255, 255, 0.8)',
+              color: 'var(--color-primary)',
               margin: '0 0 16px 0',
               fontFamily: 'var(--font-heading)',
             }}
@@ -55,7 +38,7 @@ export default function AffiliateSection() {
             style={{
               fontSize: '48px',
               fontWeight: '800',
-              color: '#fff',
+              color: 'var(--color-foreground)',
               margin: '0 0 24px 0',
               fontFamily: 'var(--font-heading)',
               lineHeight: '1.2',
@@ -68,7 +51,7 @@ export default function AffiliateSection() {
           <p
             style={{
               fontSize: '18px',
-              color: 'rgba(255, 255, 255, 0.9)',
+              color: 'var(--color-foreground-secondary)',
               maxWidth: '700px',
               margin: '0 auto 48px',
               fontFamily: 'var(--font-body)',
@@ -102,18 +85,17 @@ export default function AffiliateSection() {
                 transition={{ delay: i * 0.1 }}
                 style={{
                   padding: '32px 24px',
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  backdropFilter: 'blur(10px)',
+                  background: 'var(--color-muted)',
                   borderRadius: '16px',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  border: '1px solid var(--color-border)',
                 }}
               >
-                <div style={{ fontSize: '40px', marginBottom: '16px' }}>{benefit.icon}</div>
+                <div style={{ fontSize: '40px', marginBottom: '16px', color: 'var(--color-primary)' }}>{benefit.icon}</div>
                 <h3
                   style={{
                     fontSize: '18px',
                     fontWeight: '700',
-                    color: '#fff',
+                    color: 'var(--color-foreground)',
                     margin: '0 0 8px 0',
                     fontFamily: 'var(--font-heading)',
                   }}
@@ -123,7 +105,7 @@ export default function AffiliateSection() {
                 <p
                   style={{
                     fontSize: '14px',
-                    color: 'rgba(255, 255, 255, 0.8)',
+                    color: 'var(--color-foreground-secondary)',
                     margin: 0,
                     fontFamily: 'var(--font-body)',
                   }}

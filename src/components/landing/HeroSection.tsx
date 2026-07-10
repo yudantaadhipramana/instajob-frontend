@@ -32,28 +32,12 @@ export default function HeroSection() {
         paddingBottom: '80px',
         paddingLeft: '48px',
         paddingRight: '48px',
-        background: 'linear-gradient(135deg, var(--color-background) 0%, #FFFFFF 100%)',
+        background: '#FFFFFF',
         textAlign: 'center',
         position: 'relative',
-        overflow: 'hidden',
       }}
     >
-      {/* Background Grid */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: `
-            linear-gradient(rgba(3, 105, 161, 0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(3, 105, 161, 0.03) 1px, transparent 1px)
-          `,
-          backgroundSize: '50px 50px',
-          pointerEvents: 'none',
-        }}
-      />
+      {/* Removed background grid for cleaner look */}
 
       <div style={{ position: 'relative', zIndex: 1, maxWidth: '900px', margin: '0 auto' }}>
         {/* Trust Badge */}
@@ -250,9 +234,9 @@ export default function HeroSection() {
         >
           <div style={{ display: 'flex', gap: '-8px' }}>
             {[
-              { id: 1, seed: 'Budi' },
-              { id: 2, seed: 'Sari' },
-              { id: 3, seed: 'Andi' },
+              { id: 1, seed: 12 },
+              { id: 2, seed: 25 },
+              { id: 3, seed: 41 },
             ].map((user, i) => (
               <div
                 key={i}
@@ -270,7 +254,11 @@ export default function HeroSection() {
                   overflow: 'hidden',
                 }}
               >
-                <img src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${user.seed}&backgroundColor=e2e8f0`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img 
+                  src={`https://i.pravatar.cc/150?img=${user.seed}`} 
+                  alt="Avatar" 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                />
               </div>
             ))}
           </div>

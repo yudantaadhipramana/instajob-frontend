@@ -1,24 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  /* InstaJob Design System - Logo-Aligned Deep Navy */
+  /* InstaJob Design System - Clean TanggapAI-inspired */
   --color-primary: #1E40FF;
-  --color-primary-dark: #1E3A8A;
   --color-primary-light: #3B82F6;
   --color-on-primary: #FFFFFF;
   --color-secondary: #2563EB;
   --color-accent: #F59E0B;
   --color-background: #FFFFFF;
-  --color-surface: #F8FAFC;
-  --color-foreground: #0F172A;
-  --color-muted: #E2E8F0;
-  --color-border: #CBD5E1;
+  --color-surface: #FFFFFF;
+  --color-foreground: #111827;
+  --color-foreground-secondary: #6B7280;
+  --color-foreground-tertiary: #9CA3AF;
+  --color-muted: #F9FAFB;
+  --color-border: #E5E7EB;
   --color-destructive: #DC2626;
   --color-ring: #1E40FF;
   
-  /* Gradients */
-  --gradient-hero: linear-gradient(135deg, #1E3A8A 0%, #1E40FF 50%, #3B82F6 100%);
-  --gradient-card: linear-gradient(135deg, #1E40FF 0%, #2563EB 100%);
+  /* NO gradients for sections - clean white backgrounds only */
   
   /* Typography */
   --font-heading: var(--font-plus-jakarta);
