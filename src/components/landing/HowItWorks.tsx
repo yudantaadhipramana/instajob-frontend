@@ -90,10 +90,10 @@ export default function HowItWorks() {
           {/* Left: Step Indicators */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             {[
-              { num: '01', title: 'Set Preferences', desc: 'Job type, location, experience', icon: '⚙️' },
-              { num: '02', title: 'Start AI Scout', desc: 'AI finds matching jobs', icon: '🔍' },
-              { num: '03', title: 'Auto-Apply', desc: 'Send applications instantly', icon: '✉️' },
-              { num: '04', title: 'Track Progress', desc: 'Real-time dashboard', icon: '📊' },
+              { num: '01', title: 'Set Preferences', desc: 'Job type, location, experience', icon: Icons.setup(28) },
+              { num: '02', title: 'Start AI Scout', desc: 'AI finds matching jobs', icon: Icons.search(28) },
+              { num: '03', title: 'Auto-Apply', desc: 'Send applications instantly', icon: Icons.envelope(28) },
+              { num: '04', title: 'Track Progress', desc: 'Real-time dashboard', icon: Icons.chartBars(28) },
             ].map((step, i) => (
               <motion.div
                 key={i}

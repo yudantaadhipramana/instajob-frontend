@@ -3,6 +3,7 @@
 import { Logo } from '@/components/Logo';
 import { ScrollAnimation } from '@/components/Animations';
 import { useI18n } from '@/context/I18nContext';
+import Icons from '@/components/Icons';
 
 export default function Footer() {
   const { t } = useI18n();
@@ -10,7 +11,7 @@ export default function Footer() {
     <footer
       style={{
         padding: '80px 48px 40px',
-        background: '#1E293B',
+        background: 'var(--color-primary-dark)',
         color: '#94A3B8',
       }}
     >
@@ -48,34 +49,37 @@ export default function Footer() {
                   marginTop: '24px',
                 }}
               >
-                {['Twitter', 'LinkedIn', 'GitHub'].map((social) => (
+                {[
+                  { name: 'Twitter', icon: Icons.twitterX },
+                  { name: 'LinkedIn', icon: Icons.linkedinBrand },
+                  { name: 'Instagram', icon: Icons.instagramBrand },
+                ].map((social) => (
                   <a
-                    key={social}
+                    key={social.name}
                     href="#"
+                    aria-label={social.name}
                     style={{
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '8px',
-                      background: 'rgba(255,255,255,0.1)',
+                      width: '38px',
+                      height: '38px',
+                      borderRadius: '10px',
+                      background: 'rgba(255,255,255,0.08)',
+                      border: '1px solid rgba(255,255,255,0.1)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: '#94A3B8',
                       textDecoration: 'none',
-                      fontSize: '12px',
-                      fontWeight: '600',
                       transition: 'all 0.2s ease',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.background = '#0051FF';
-                      e.currentTarget.style.color = '#fff';
+                      e.currentTarget.style.background = 'var(--color-primary)';
+                      e.currentTarget.style.borderColor = 'var(--color-primary)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
-                      e.currentTarget.style.color = '#94A3B8';
+                      e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
+                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
                     }}
                   >
-                    {social.charAt(0)}
+                    {social.icon(16, '#CBD5E1')}
                   </a>
                 ))}
               </div>
@@ -128,7 +132,7 @@ export default function Footer() {
                           transition: 'all 0.2s ease',
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.color = '#0051FF';
+                          e.currentTarget.style.color = 'var(--color-primary)';
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.color = '#94A3B8';

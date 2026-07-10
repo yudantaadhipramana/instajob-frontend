@@ -135,6 +135,7 @@ const translations: Record<Lang, Record<string, string>> = {
     'footer.legal': 'Legal',
     'footer.privacy': 'Privasi',
     'footer.terms': 'Syarat',
+    'footer.cookies': 'Kebijakan Cookie',
     'footer.copyright': '© 2026 InstaJob. Hak cipta dilindungi.',
     
     // Dashboard

@@ -210,6 +210,96 @@ export const Icons = {
       <path d="M20 6L9 17l-5-5" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   ),
+
+  // How It Works Icons (Geometric Rounded)
+  setup: (size = 24, color = 'var(--color-primary)') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="18" height="18" rx="4" fill={color} opacity="0.15" />
+      <circle cx="12" cy="12" r="3" stroke={color} strokeWidth="2" fill="none" />
+      <path d="M12 6v1.5M12 16.5V18M6 12h1.5M16.5 12H18" stroke={color} strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  ),
+
+  search: (size = 24, color = 'var(--color-primary)') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="18" height="18" rx="4" fill={color} opacity="0.15" />
+      <circle cx="11" cy="11" r="4" stroke={color} strokeWidth="2" fill="none" />
+      <path d="M14 14l3 3" stroke={color} strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  ),
+
+  envelope: (size = 24, color = 'var(--color-primary)') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="18" height="18" rx="4" fill={color} opacity="0.15" />
+      <rect x="5" y="7" width="14" height="10" rx="2" stroke={color} strokeWidth="2" fill="none" />
+      <path d="M5 9l7 4 7-4" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+
+  // Chart/Stats (Bar style - geometric rounded for HowItWorks)
+  chartBars: (size = 24, color = 'var(--color-primary)') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="18" height="18" rx="4" fill={color} opacity="0.15" />
+      <path d="M7 14v3M12 10v7M17 7v10" stroke={color} strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  ),
+
+  // Affiliate Icons (Geometric Rounded)
+  money: (size = 24, color = '#fff') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="18" height="18" rx="4" fill={color} opacity="0.2" />
+      <circle cx="12" cy="12" r="5" stroke={color} strokeWidth="2" fill="none" />
+      <path d="M12 8v8M10 10h4M10 14h4" stroke={color} strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  ),
+
+  dashboard: (size = 24, color = '#fff') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="18" height="18" rx="4" fill={color} opacity="0.2" />
+      <rect x="6" y="6" width="5" height="5" rx="1" stroke={color} strokeWidth="1.5" fill="none" />
+      <rect x="13" y="6" width="5" height="5" rx="1" stroke={color} strokeWidth="1.5" fill="none" />
+      <rect x="6" y="13" width="5" height="5" rx="1" stroke={color} strokeWidth="1.5" fill="none" />
+      <rect x="13" y="13" width="5" height="5" rx="1" stroke={color} strokeWidth="1.5" fill="none" />
+    </svg>
+  ),
+
+  payment: (size = 24, color = '#fff') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="18" height="18" rx="4" fill={color} opacity="0.2" />
+      <rect x="5" y="8" width="14" height="9" rx="2" stroke={color} strokeWidth="2" fill="none" />
+      <path d="M5 11h14" stroke={color} strokeWidth="2" />
+      <circle cx="8" cy="14" r="0.5" fill={color} />
+    </svg>
+  ),
+
+  support: (size = 24, color = '#fff') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="18" height="18" rx="4" fill={color} opacity="0.2" />
+      <circle cx="12" cy="10" r="3" stroke={color} strokeWidth="2" fill="none" />
+      <path d="M6 19c0-3.5 2.5-6 6-6s6 2.5 6 6" stroke={color} strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  ),
+
+  // Social Icons (Footer)
+  twitterX: (size = 18, color = '#94A3B8') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M18.9 2H22l-7.1 8.1L23 22h-6.9l-5.4-7-6.2 7H2l7.6-8.7L1 2h7l4.9 6.4L18.9 2z" fill={color} />
+    </svg>
+  ),
+
+  linkedinBrand: (size = 18, color = '#94A3B8') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4.98 3.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5zM3 8.98h4v12H3v-12zM9 8.98h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.78 2.65 4.78 6.1v6.25h-4v-5.55c0-1.32-.02-3.02-1.85-3.02-1.85 0-2.13 1.44-2.13 2.93v5.64H9v-12z" fill={color} />
+    </svg>
+  ),
+
+  instagramBrand: (size = 18, color = '#94A3B8') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="18" height="18" rx="5" stroke={color} strokeWidth="2" fill="none" />
+      <circle cx="12" cy="12" r="4" stroke={color} strokeWidth="2" fill="none" />
+      <circle cx="17.5" cy="6.5" r="1.2" fill={color} />
+    </svg>
+  ),
 };
 
 export default Icons;

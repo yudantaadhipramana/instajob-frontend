@@ -249,26 +249,28 @@ export default function HeroSection() {
           }}
         >
           <div style={{ display: 'flex', gap: '-8px' }}>
-            {['RS', 'BH', 'MW'].map((init, i) => (
+            {[
+              { id: 1, seed: 'Budi' },
+              { id: 2, seed: 'Sari' },
+              { id: 3, seed: 'Andi' },
+            ].map((user, i) => (
               <div
                 key={i}
                 style={{
                   width: '40px',
                   height: '40px',
                   borderRadius: '50%',
-                  background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))',
+                  background: 'var(--color-muted)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#fff',
-                  fontWeight: '700',
-                  fontSize: '12px',
                   marginLeft: i > 0 ? '-12px' : 0,
                   border: '2px solid #fff',
                   zIndex: 3 - i,
+                  overflow: 'hidden',
                 }}
               >
-                {init}
+                <img src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${user.seed}&backgroundColor=e2e8f0`} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             ))}
           </div>

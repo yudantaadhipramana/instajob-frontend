@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import Icons from '@/components/Icons';
 import { useI18n } from '@/context/I18nContext';
 import { useState } from 'react';
@@ -174,10 +174,10 @@ export default function FeaturesSection() {
             ))}
           </div>
 
-          {/* Right: Feature Image/Mockup */}
+          {/* Right: Dynamic Feature Visualization */}
           <div
             style={{
-              background: '#FFFFFF',
+              background: 'var(--gradient-card)',
               borderRadius: '24px',
               padding: '48px',
               minHeight: '400px',
@@ -185,46 +185,82 @@ export default function FeaturesSection() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.05)',
+              boxShadow: '0 20px 60px rgba(30, 64, 255, 0.15)',
               position: 'relative',
+              overflow: 'hidden',
             }}
           >
-            {/* Dynamic UI Mockup based on active feature */}
-            <motion.div
-              key={activeFeature}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3 }}
-              style={{
-                width: '100%',
-                background: 'var(--color-background)',
-                borderRadius: '16px',
-                padding: '24px',
-                border: '1px solid var(--color-border)',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-                <div style={{ width: '40px', height: '40px', background: '#fff', borderRadius: '8px' }} />
-                <div>
-                  <div style={{ width: '120px', height: '12px', background: 'var(--color-primary)', borderRadius: '4px', marginBottom: '6px' }} />
-                  <div style={{ width: '80px', height: '8px', background: '#cbd5e1', borderRadius: '4px' }} />
-                </div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {[1, 2, 3].map((_, idx) => (
-                  <div
-                    key={idx}
-                    style={{
-                      width: '100%',
-                      height: '60px',
-                      background: '#fff',
-                      borderRadius: '8px',
-                      border: '1px solid var(--color-border)',
-                    }}
-                  />
-                ))}
-              </div>
-            </motion.div>
+            <AnimatePresence mode="wait">
+              {activeFeature === 0 && (
+                <motion.div key={0} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ duration: 0.3 }} style={{ width: '100%', textAlign: 'center' }}>
+                  <div style={{ position: 'relative', width: '160px', height: '160px', margin: '0 auto 24px' }}>
+                    <motion.div animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }} transition={{ duration: 2, repeat: Infinity }} style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '2px solid rgba(255,255,255,0.5)' }} />
+                    <div style={{ position: 'absolute', inset: '30px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.6)' }} />
+                    <div style={{ position: 'absolute', top: '50%', left: '50%', width: '16px', height: '16px', background: '#fff', borderRadius: '50%', transform: 'translate(-50%,-50%)' }} />
+                  </div>
+                  {['PT Teknologi Maju', 'Startup Digital ID', 'Global Corp Asia'].map((company, idx) => (
+                    <motion.div key={company} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 + idx * 0.2 }} style={{ background: 'rgba(255,255,255,0.15)', borderRadius: '10px', padding: '10px 16px', marginBottom: '8px', color: '#fff', fontSize: '13px', fontWeight: '600', textAlign: 'left', fontFamily: 'var(--font-body)' }}>
+                      ✓ Ditemukan: {company}
+                    </motion.div>
+                  ))}
+                </motion.div>
+              )}
+              {activeFeature === 1 && (
+                <motion.div key={1} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ duration: 0.3 }} style={{ width: '100%' }}>
+                  <div style={{ color: '#fff', fontSize: '14px', fontWeight: '700', marginBottom: '16px', fontFamily: 'var(--font-body)' }}>Skor Kecocokan Profil</div>
+                  {[{ label: 'Skill Match', val: 94 }, { label: 'Pengalaman', val: 87 }, { label: 'Lokasi & Gaji', val: 91 }].map((item, idx) => (
+                    <div key={item.label} style={{ marginBottom: '16px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', color: 'rgba(255,255,255,0.9)', fontSize: '13px', marginBottom: '6px', fontFamily: 'var(--font-body)' }}>
+                        <span>{item.label}</span><span>{item.val}%</span>
+                      </div>
+                      <div style={{ height: '8px', background: 'rgba(255,255,255,0.2)', borderRadius: '4px', overflow: 'hidden' }}>
+                        <motion.div initial={{ width: 0 }} animate={{ width: `${item.val}%` }} transition={{ duration: 0.8, delay: idx * 0.15 }} style={{ height: '100%', background: '#fff', borderRadius: '4px' }} />
+                      </div>
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+              {activeFeature === 2 && (
+                <motion.div key={2} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ duration: 0.3 }} style={{ width: '100%', textAlign: 'center' }}>
+                  <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 1.5, repeat: Infinity }} style={{ fontSize: '56px', marginBottom: '16px' }}>✉️</motion.div>
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} style={{ color: '#fff', fontSize: '32px', fontWeight: '800', fontFamily: 'var(--font-heading)' }}>
+                    <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}>127</motion.span> Email Terkirim
+                  </motion.div>
+                  <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: '14px', marginTop: '8px', fontFamily: 'var(--font-body)' }}>Personalized cover letter per perusahaan</div>
+                </motion.div>
+              )}
+              {activeFeature === 3 && (
+                <motion.div key={3} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ duration: 0.3 }} style={{ width: '100%' }}>
+                  {['Software Engineer @ Gojek', 'Product Manager @ Traveloka', 'UX Designer @ Bukalapak'].map((job, idx) => (
+                    <motion.div key={job} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.2 }} style={{ background: 'rgba(255,255,255,0.15)', borderRadius: '10px', padding: '14px 16px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: '#fff', fontSize: '13px', fontWeight: '600', fontFamily: 'var(--font-body)' }}>{job}</span>
+                      <span style={{ background: 'var(--color-accent)', color: '#fff', fontSize: '11px', fontWeight: '700', padding: '4px 10px', borderRadius: '20px' }}>Applied</span>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              )}
+              {activeFeature === 4 && (
+                <motion.div key={4} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ duration: 0.3 }} style={{ width: '100%', display: 'flex', gap: '10px' }}>
+                  {[{ label: 'Applied', count: 24 }, { label: 'Interview', count: 8 }, { label: 'Offer', count: 2 }].map((col, idx) => (
+                    <motion.div key={col.label} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.15 }} style={{ flex: 1, background: 'rgba(255,255,255,0.12)', borderRadius: '12px', padding: '16px 10px', textAlign: 'center' }}>
+                      <div style={{ color: '#fff', fontSize: '28px', fontWeight: '800', fontFamily: 'var(--font-heading)' }}>{col.count}</div>
+                      <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: '12px', fontWeight: '600', marginTop: '4px', fontFamily: 'var(--font-body)' }}>{col.label}</div>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              )}
+              {activeFeature === 5 && (
+                <motion.div key={5} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ duration: 0.3 }} style={{ width: '100%' }}>
+                  <div style={{ background: 'rgba(255,255,255,0.15)', borderRadius: '16px', padding: '16px' }}>
+                    {['🎉 Lamaran ke Gojek terkirim!', '📅 Interview terjadwal besok 10:00', '✅ 15 lowongan baru cocok denganmu'].map((msg, idx) => (
+                      <motion.div key={msg} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.25 }} style={{ background: '#fff', color: 'var(--color-foreground)', borderRadius: '10px', padding: '10px 14px', marginBottom: '8px', fontSize: '13px', fontWeight: '600', fontFamily: 'var(--font-body)' }}>
+                        {msg}
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>

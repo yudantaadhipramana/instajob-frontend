@@ -16,8 +16,8 @@ export default function CTASection() {
   return (
     <section
       style={{
-        padding: '100px 48px',
-        background: 'linear-gradient(135deg, #0051FF 0%, #003AA3 100%)',
+        padding: '120px 48px',
+        background: 'var(--gradient-card)',
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -28,9 +28,9 @@ export default function CTASection() {
           position: 'absolute',
           top: '-50%',
           right: '-20%',
-          width: '600px',
-          height: '600px',
-          background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
+          width: '800px',
+          height: '800px',
+          background: 'radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%)',
           borderRadius: '50%',
           pointerEvents: 'none',
         }}
@@ -40,9 +40,9 @@ export default function CTASection() {
           position: 'absolute',
           bottom: '-30%',
           left: '-10%',
-          width: '400px',
-          height: '400px',
-          background: 'radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%)',
+          width: '600px',
+          height: '600px',
+          background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
           borderRadius: '50%',
           pointerEvents: 'none',
         }}
@@ -64,16 +64,20 @@ export default function CTASection() {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
-              padding: '8px 20px',
+              padding: '8px 24px',
               background: 'rgba(255,255,255,0.15)',
+              border: '1px solid rgba(255,255,255,0.2)',
               borderRadius: '100px',
               marginBottom: '32px',
               color: '#fff',
-              fontSize: '14px',
-              fontWeight: '600',
+              fontSize: '13px',
+              fontWeight: '700',
+              letterSpacing: '0.05em',
+              textTransform: 'uppercase',
+              fontFamily: 'var(--font-heading)'
             }}
           >
-            <span>⚡</span> FREE untuk selamanya
+            Mulai Transformasi Karir
           </div>
         </ScrollAnimation>
 
@@ -81,31 +85,35 @@ export default function CTASection() {
         <ScrollAnimation delay={100}>
           <h2
             style={{
-              fontSize: '48px',
+              fontSize: '56px',
               fontWeight: '800',
               color: '#FFFFFF',
               margin: '0 0 24px 0',
-              lineHeight: '1.2',
+              lineHeight: '1.15',
+              fontFamily: 'var(--font-heading)',
+              letterSpacing: '-0.03em',
             }}
           >
-            {t('cta.title')}
-                        </h2>
-                    </ScrollAnimation>
+            Ubah proses mencari kerja <br/>jadi lebih otomatis dan terukur.
+          </h2>
+        </ScrollAnimation>
 
-                    {/* Subheadline */}
-                    <ScrollAnimation delay={200}>
-                      <p
-                        style={{
-                          fontSize: '20px',
-                          color: 'rgba(255,255,255,0.9)',
-                          marginBottom: '48px',
-                          maxWidth: '600px',
-                          margin: '0 auto 48px',
-                        }}
-                      >
-                        {t('cta.subtitle')}
-                      </p>
-                    </ScrollAnimation>
+        {/* Subheadline */}
+        <ScrollAnimation delay={200}>
+          <p
+            style={{
+              fontSize: '18px',
+              color: 'rgba(255,255,255,0.85)',
+              marginBottom: '48px',
+              maxWidth: '640px',
+              margin: '0 auto 48px',
+              lineHeight: '1.7',
+              fontFamily: 'var(--font-body)'
+            }}
+          >
+            {t('cta.subtitle')}
+          </p>
+        </ScrollAnimation>
 
         {/* CTA Buttons */}
         <ScrollAnimation delay={300}>
@@ -144,7 +152,6 @@ export default function CTASection() {
                 e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
               }}
             >
-              <span style={{ fontSize: '24px' }}>🚀</span>
               {t('cta.primaryBtn')}
             </button>
             <button

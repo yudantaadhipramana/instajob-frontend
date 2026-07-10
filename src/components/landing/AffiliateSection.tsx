@@ -89,10 +89,10 @@ export default function AffiliateSection() {
             }}
           >
             {[
-              { icon: '💰', title: '20% Komisi', desc: 'Per referral yang berlangganan Pro' },
-              { icon: '📊', title: 'Dashboard Real-time', desc: 'Tracking lengkap performa affiliate' },
-              { icon: '💳', title: 'Pembayaran Mudah', desc: 'Transfer bank atau e-wallet' },
-              { icon: '🚀', title: 'Support 24/7', desc: 'Tim kami siap membantu' },
+              { icon: Icons.money(40), title: '20% Komisi', desc: 'Per referral yang berlangganan Pro' },
+              { icon: Icons.dashboard(40), title: 'Dashboard Real-time', desc: 'Tracking lengkap performa affiliate' },
+              { icon: Icons.payment(40), title: 'Pembayaran Mudah', desc: 'Transfer bank atau e-wallet' },
+              { icon: Icons.support(40), title: 'Support 24/7', desc: 'Tim kami siap membantu' },
             ].map((benefit, i) => (
               <motion.div
                 key={i}
