@@ -3,76 +3,78 @@
 import { motion } from 'motion/react';
 import { useState } from 'react';
 import Icons from '@/components/Icons';
+import { useI18n } from '@/context/I18nContext';
 
 export default function PricingSection() {
+  const { t } = useI18n();
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'quarterly'>('monthly');
 
   const plans = billingPeriod === 'monthly' ? [
     {
-      name: 'Pro',
+      name: t('pricing.plan.pro.name'),
       price: 179000,
       originalPrice: 279000,
-      period: '/bulan',
-      description: 'Otomatisasi lamaran standar',
+      period: t('pricing.period.monthly'),
+      description: t('pricing.plan.pro.desc'),
       features: [
-        'AI Job Scouting',
-        'AI Matching Algorithm',
-        'AI Email Auto Apply',
-        'AI LinkedIn Auto Apply',
-        'Job Tracking System',
-        'Telegram Bot Notification',
+        t('pricing.feat.scouting'),
+        t('pricing.feat.matching'),
+        t('pricing.feat.email'),
+        t('pricing.feat.linkedin'),
+        t('pricing.feat.tracking'),
+        t('pricing.feat.telegram'),
       ],
-      cta: 'Mulai Sekarang',
+      cta: t('pricing.cta.start'),
       highlighted: false,
     },
     {
-      name: 'Premium',
+      name: t('pricing.plan.premium.name'),
       price: 239000,
       originalPrice: 350000,
-      period: '/bulan',
-      description: 'Termasuk optimasi profil & CV',
+      period: t('pricing.period.monthly'),
+      description: t('pricing.plan.premium.desc'),
       features: [
-        'Semua fitur di paket Pro',
-        '3x token LinkedIn Auto Apply',
-        'Kelas CV Booster + Template',
-        'Kelas Portfolio Booster',
-        'Priority Support 24/7',
+        t('pricing.feat.all_pro'),
+        t('pricing.feat.token'),
+        t('pricing.feat.cv'),
+        t('pricing.feat.portfolio'),
+        t('pricing.feat.support'),
       ],
-      cta: 'Mulai Premium',
+      cta: t('pricing.cta.premium'),
       highlighted: true,
     },
   ] : [
     {
-      name: 'Pro',
+      name: t('pricing.plan.pro.name'),
       price: 499000,
       originalPrice: 837000,
-      period: '/3 bulan',
-      description: 'Otomatisasi lamaran standar',
+      period: t('pricing.period.quarterly'),
+      description: t('pricing.plan.pro.desc'),
       features: [
-        'AI Job Scouting',
-        'AI Matching Algorithm',
-        'AI Email Auto Apply',
-        'AI LinkedIn Auto Apply',
-        'Job Tracking System',
-        'Telegram Bot Notification',
+        t('pricing.feat.scouting'),
+        t('pricing.feat.matching'),
+        t('pricing.feat.email'),
+        t('pricing.feat.linkedin'),
+        t('pricing.feat.tracking'),
+        t('pricing.feat.telegram'),
       ],
-      cta: 'Mulai Sekarang',
+      cta: t('pricing.cta.start'),
       highlighted: false,
     },
     {
-      name: 'Premium',
+      name: t('pricing.plan.premium.name'),
       price: 650000,
       originalPrice: 1050000,
-      period: '/3 bulan',
-      description: 'Termasuk optimasi profil & CV',
+      period: t('pricing.period.quarterly'),
+      description: t('pricing.plan.premium.desc'),
       features: [
-        'Semua fitur di paket Pro',
-        '3x token LinkedIn Auto Apply',
-        'Kelas CV Booster + Template',
-        'Kelas Portfolio Booster',
-        'Priority Support 24/7',
+        t('pricing.feat.all_pro'),
+        t('pricing.feat.token'),
+        t('pricing.feat.cv'),
+        t('pricing.feat.portfolio'),
+        t('pricing.feat.support'),
       ],
-      cta: 'Mulai Premium',
+      cta: t('pricing.cta.premium'),
       highlighted: true,
     },
   ];
@@ -105,7 +107,7 @@ export default function PricingSection() {
               fontFamily: 'var(--font-heading)',
             }}
           >
-            HARGA
+            {t('pricing.badge')}
           </p>
           <h2
             style={{
@@ -116,8 +118,8 @@ export default function PricingSection() {
               fontFamily: 'var(--font-heading)',
             }}
           >
-            Mulai dari{' '}
-            <span style={{ color: 'var(--color-primary)' }}>Rp 6.000/hari</span>
+            {t('pricing.title')}{' '}
+            <span style={{ color: 'var(--color-primary)' }}>{t('pricing.hook')}</span>
           </h2>
           <p
             style={{
@@ -128,7 +130,7 @@ export default function PricingSection() {
               fontFamily: 'var(--font-body)',
             }}
           >
-            Investasi kecil untuk peluang karir yang lebih besar. Tanpa kartu kredit.
+            {t('pricing.subtitle')}
           </p>
         </motion.div>
 
@@ -159,7 +161,7 @@ export default function PricingSection() {
               fontFamily: 'var(--font-body)',
             }}
           >
-            Bulanan
+            {t('pricing.toggle.monthly')}
           </button>
           <button
             onClick={() => setBillingPeriod('quarterly')}
@@ -177,7 +179,7 @@ export default function PricingSection() {
               position: 'relative',
             }}
           >
-            3 Bulanan
+            {t('pricing.toggle.quarterly')}
             {billingPeriod === 'quarterly' && (
               <span
                 style={{
@@ -193,7 +195,7 @@ export default function PricingSection() {
                   whiteSpace: 'nowrap',
                 }}
               >
-                Hemat 15%
+                {t('pricing.toggle.save')}
               </span>
             )}
           </button>
@@ -243,7 +245,7 @@ export default function PricingSection() {
                     fontFamily: 'var(--font-body)',
                   }}
                 >
-                  POPULER
+                  {t('pricing.badge.popular')}
                 </div>
               )}
 

@@ -2,8 +2,11 @@
 
 import { motion } from 'motion/react';
 import Icons from '@/components/Icons';
+import { useI18n } from '@/context/I18nContext';
 
 export default function AffiliateSection() {
+  const { t } = useI18n();
+
   return (
     <section
       id="affiliate"
@@ -90,7 +93,7 @@ export default function AffiliateSection() {
                 fontFamily: 'var(--font-heading)',
               }}
             >
-              Program Affiliate
+              {t('affiliate.badge')}
             </p>
 
             <h2
@@ -103,7 +106,7 @@ export default function AffiliateSection() {
                 lineHeight: '1.2',
               }}
             >
-              Dapatkan Penghasilan Tambahan
+              {t('affiliate.title')}
             </h2>
 
             <p
@@ -115,17 +118,16 @@ export default function AffiliateSection() {
                 lineHeight: '1.7',
               }}
             >
-              Rekomendasikan InstaJob kepada bisnis Anda dan dapatkan komisi berkelanjutan.
-              Dashboard real-time, pembayaran otomatis, dan dukungan penuh dari tim kami.
+              {t('affiliate.subtitle')}
             </p>
 
             {/* Features list */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '48px' }}>
               {[
-                { icon: Icons.check(24, 'var(--color-primary)'), label: 'Komisi 20% untuk setiap referral' },
-                { icon: Icons.check(24, 'var(--color-primary)'), label: 'Dashboard tracking real-time' },
-                { icon: Icons.check(24, 'var(--color-primary)'), label: 'Pembayaran mingguan otomatis' },
-                { icon: Icons.check(24, 'var(--color-primary)'), label: 'Support team tersedia 24/7' },
+                { key: 'affiliate.feature1' },
+                { key: 'affiliate.feature2' },
+                { key: 'affiliate.feature3' },
+                { key: 'affiliate.feature4' },
               ].map((item, i) => (
                 <motion.div
                   key={i}
@@ -135,7 +137,7 @@ export default function AffiliateSection() {
                   transition={{ delay: i * 0.1, duration: 0.5 }}
                   style={{ display: 'flex', alignItems: 'center', gap: '16px' }}
                 >
-                  <div style={{ flexShrink: 0 }}>{item.icon}</div>
+                  <div style={{ flexShrink: 0 }}>{Icons.check(24, 'var(--color-primary)')}</div>
                   <span
                     style={{
                       fontSize: '16px',
@@ -144,7 +146,7 @@ export default function AffiliateSection() {
                       fontFamily: 'var(--font-body)',
                     }}
                   >
-                    {item.label}
+                    {t(item.key)}
                   </span>
                 </motion.div>
               ))}
@@ -182,7 +184,7 @@ export default function AffiliateSection() {
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
-              Daftar Sebagai Affiliate
+              {t('affiliate.btn')}
               {Icons.arrowRight(20, '#fff')}
             </motion.button>
 
@@ -194,11 +196,11 @@ export default function AffiliateSection() {
                 fontFamily: 'var(--font-body)',
               }}
             >
-              Gratis. Tanpa biaya tersembunyi.
+              {t('affiliate.note')}
             </p>
           </motion.div>
 
-          {/* Right: Stats cards */}
+          {/* Right: Stats cards + Leveling system */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -213,10 +215,23 @@ export default function AffiliateSection() {
               borderLeft: '1px solid var(--color-border)',
             }}
           >
+            {/* Commission & Stats */}
             {[
-              { number: '20%', label: 'Komisi Referral', desc: 'Per pelanggan berlangganan' },
-              { number: '500+', label: 'Affiliate Aktif', desc: 'Menghasilkan bersama kami' },
-              { number: '$50K+', label: 'Dibayarkan', desc: 'Ke affiliate partners tahun ini' },
+              { 
+                numKey: 'affiliate.stat1.num', 
+                labelKey: 'affiliate.stat1.label', 
+                descKey: 'affiliate.stat1.desc' 
+              },
+              { 
+                numKey: 'affiliate.stat2.num', 
+                labelKey: 'affiliate.stat2.label', 
+                descKey: 'affiliate.stat2.desc' 
+              },
+              { 
+                numKey: 'affiliate.stat3.num', 
+                labelKey: 'affiliate.stat3.label', 
+                descKey: 'affiliate.stat3.desc' 
+              },
             ].map((stat, i) => (
               <motion.div
                 key={i}
@@ -254,7 +269,7 @@ export default function AffiliateSection() {
                     lineHeight: '1',
                   }}
                 >
-                  {stat.number}
+                  {t(stat.numKey)}
                 </div>
                 <div
                   style={{
@@ -265,7 +280,7 @@ export default function AffiliateSection() {
                     fontFamily: 'var(--font-heading)',
                   }}
                 >
-                  {stat.label}
+                  {t(stat.labelKey)}
                 </div>
                 <div
                   style={{
@@ -274,10 +289,96 @@ export default function AffiliateSection() {
                     fontFamily: 'var(--font-body)',
                   }}
                 >
-                  {stat.desc}
+                  {t(stat.descKey)}
                 </div>
               </motion.div>
             ))}
+
+            {/* Leveling/Badge System Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.45, duration: 0.5 }}
+              style={{
+                padding: '28px 24px',
+                background: 'linear-gradient(135deg, rgba(30, 64, 255, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%)',
+                border: '2px solid rgba(30, 64, 255, 0.2)',
+                borderRadius: '14px',
+                transition: 'all 0.3s ease',
+              }}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget as HTMLDivElement;
+                el.style.borderColor = 'rgba(30, 64, 255, 0.4)';
+                el.style.transform = 'translateY(-4px)';
+                el.style.boxShadow = '0 8px 24px rgba(30, 64, 255, 0.15)';
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget as HTMLDivElement;
+                el.style.borderColor = 'rgba(30, 64, 255, 0.2)';
+                el.style.transform = 'translateY(0)';
+                el.style.boxShadow = 'none';
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                <span style={{ fontSize: '24px' }}>🏆</span>
+                <div
+                  style={{
+                    fontSize: '18px',
+                    fontWeight: '700',
+                    color: 'var(--color-primary)',
+                    fontFamily: 'var(--font-heading)',
+                  }}
+                >
+                  {t('affiliate.level.num')}
+                </div>
+              </div>
+              <div
+                style={{
+                  fontSize: '18px',
+                  fontWeight: '700',
+                  color: 'var(--color-foreground)',
+                  marginBottom: '8px',
+                  fontFamily: 'var(--font-heading)',
+                }}
+              >
+                {t('affiliate.level.label')}
+              </div>
+              <div
+                style={{
+                  fontSize: '14px',
+                  color: 'var(--color-foreground-secondary)',
+                  fontFamily: 'var(--font-body)',
+                  lineHeight: '1.6',
+                }}
+              >
+                {t('affiliate.level.desc')}
+              </div>
+              <div style={{ marginTop: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {[
+                  t('affiliate.level.bronze'),
+                  t('affiliate.level.silver'),
+                  t('affiliate.level.gold'),
+                  t('affiliate.level.platinum'),
+                ].map((badge, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      padding: '6px 12px',
+                      background: i === 0 ? '#CD7F32' : i === 1 ? '#C0C0C0' : i === 2 ? '#FFD700' : '#E5E4E2',
+                      borderRadius: '12px',
+                      fontSize: '11px',
+                      fontWeight: '700',
+                      color: i < 2 ? '#fff' : '#333',
+                      fontFamily: 'var(--font-body)',
+                      textAlign: 'center',
+                    }}
+                  >
+                    {badge}
+                  </div>
+                ))}
+              </div>
+            </motion.div>
           </motion.div>
         </div>
       </div>

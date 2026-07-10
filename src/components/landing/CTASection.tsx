@@ -81,7 +81,7 @@ export default function CTASection() {
                 }}
               >
                 {Icons.zap(16, '#FFFFFF')}
-                Mulai Transformasi Karir
+                {t('cta.badge')}
               </div>
 
               {/* Headline */}
@@ -96,7 +96,7 @@ export default function CTASection() {
                   letterSpacing: '-0.02em',
                 }}
               >
-                Ubah proses mencari kerja jadi lebih otomatis dan terukur.
+                {t('cta.headline')}
               </h2>
 
               {/* Subheadline */}

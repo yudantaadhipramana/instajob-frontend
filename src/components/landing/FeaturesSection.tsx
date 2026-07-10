@@ -77,7 +77,7 @@ export default function FeaturesSection() {
               fontFamily: 'var(--font-heading)',
             }}
           >
-            FITUR UNGGULAN
+            {t('features.badge')}
           </p>
           <h2
             style={{
@@ -200,7 +200,7 @@ export default function FeaturesSection() {
                   </div>
                   {['PT Teknologi Maju', 'Startup Digital ID', 'Global Corp Asia'].map((company, idx) => (
                     <motion.div key={company} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 + idx * 0.2 }} style={{ background: 'rgba(255,255,255,0.15)', borderRadius: '10px', padding: '10px 16px', marginBottom: '8px', color: '#fff', fontSize: '13px', fontWeight: '600', textAlign: 'left', fontFamily: 'var(--font-body)' }}>
-                      ✓ Ditemukan: {company}
+                      {t('features.found')} {company}
                     </motion.div>
                   ))}
                 </motion.div>

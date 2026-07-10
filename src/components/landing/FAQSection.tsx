@@ -3,34 +3,36 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Icons from '@/components/Icons';
+import { useI18n } from '@/context/I18nContext';
 
 export default function FAQSection() {
+  const { t } = useI18n();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const faqs = [
     {
-      q: 'Bagaimana cara kerja AI InstaJob dalam mencari lowongan?',
-      a: 'AI kami melakukan scouting cerdas melalui 4 layer pencarian (termasuk Google Jobs dan platform karir besar), mencocokkan algoritma dengan profil, pengalaman, dan preferensi lokasi Anda setiap harinya secara otomatis.',
+      q: t('faq.q1'),
+      a: t('faq.a1'),
     },
     {
-      q: 'Apakah saya perlu memberikan password email atau LinkedIn?',
-      a: 'Tidak. Untuk email, kami menggunakan sistem App Password resmi (seperti Gmail App Password) yang sangat aman. Untuk LinkedIn, kami menggunakan integrasi ekstensi browser yang tidak memerlukan password Anda sama sekali.',
+      q: t('faq.q2'),
+      a: t('faq.a2'),
     },
     {
-      q: 'Apakah email lamaran yang dikirim AI akan terlihat seperti robot?',
-      a: 'Sama sekali tidak. AI kami membaca Job Description (JD) dari setiap lowongan, lalu men-generate cover letter dan body email secara unik, natural, dan sangat spesifik menyesuaikan kebutuhan perusahaan tersebut.',
+      q: t('faq.q3'),
+      a: t('faq.a3'),
     },
     {
-      q: 'Berapa banyak lamaran yang bisa dikirim otomatis?',
-      a: 'Untuk paket Free, AI mengirimkan maksimal 5 aplikasi per bulan. Untuk pengguna Pro, AI akan mengirimkan aplikasi secara unlimited setiap harinya selama lowongan tersebut memenuhi kriteria ketat Anda.',
+      q: t('faq.q4'),
+      a: t('faq.a4'),
     },
     {
-      q: 'Bagaimana jika AI melamar ke perusahaan yang tidak saya inginkan?',
-      a: 'Anda memegang kendali penuh. Anda bisa mengatur "Blacklist Perusahaan", kata kunci negatif, atau mengaktifkan mode "Manual Review" di mana AI hanya menyiapkan draft dan Anda yang menekan tombol kirim.',
+      q: t('faq.q5'),
+      a: t('faq.a5'),
     },
     {
-      q: 'Apakah akun LinkedIn saya aman dari pemblokiran?',
-      a: 'Sangat aman. Sistem kami dilengkapi dengan Human-Mimicking Delay dan Rate-Limiting ketat yang mensimulasikan perilaku manusia asli, sehingga akun Anda terlindungi 100% dari flag spam.',
+      q: t('faq.q6'),
+      a: t('faq.a6'),
     },
   ];
 
@@ -71,7 +73,7 @@ export default function FAQSection() {
               fontFamily: 'var(--font-heading)',
             }}
           >
-            Pertanyaan yang Sering Diajukan
+            {t('faq.title')}
           </h2>
           <p
             style={{
@@ -80,7 +82,7 @@ export default function FAQSection() {
               fontFamily: 'var(--font-body)',
             }}
           >
-            Pelajari lebih lanjut tentang bagaimana InstaJob bekerja untuk karir Anda.
+            {t('faq.subtitle')}
           </p>
         </motion.div>
 

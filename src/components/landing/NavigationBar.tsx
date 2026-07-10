@@ -54,11 +54,11 @@ export default function NavigationBar() {
   }, []);
 
   const navItems = [
-    { label: 'Cara Kerja', id: 'cara-kerja' },
-    { label: 'Fitur', id: 'fitur' },
-    { label: 'Harga', id: 'harga' },
-    { label: 'Affiliate', id: 'affiliate' },
-    { label: 'FAQ', id: 'faq' },
+    { label: t('nav.howItWorks'), id: 'cara-kerja' },
+    { label: t('nav.features'), id: 'fitur' },
+    { label: t('nav.pricing'), id: 'harga' },
+    { label: t('nav.affiliate'), id: 'affiliate' },
+    { label: t('nav.faq'), id: 'faq' },
   ];
 
   return (
