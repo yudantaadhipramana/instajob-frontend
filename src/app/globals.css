@@ -18,6 +18,7 @@
   --color-ring: #1E40FF;
   
   /* NO gradients for sections - clean white backgrounds only */
+  --gradient-card: linear-gradient(135deg, #F8FAFC 0%, #FFFFFF 100%);
   
   /* Typography */
   --font-heading: var(--font-plus-jakarta);
