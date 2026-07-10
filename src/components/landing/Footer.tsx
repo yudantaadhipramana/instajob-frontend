@@ -11,8 +11,9 @@ export default function Footer() {
     <footer
       style={{
         padding: '80px 48px 40px',
-        background: '#0F172A',
-        color: '#94A3B8',
+        background: '#FFFFFF',
+        color: 'var(--color-foreground-secondary)',
+        borderTop: '1px solid var(--color-border)',
       }}
     >
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -37,6 +38,8 @@ export default function Footer() {
                   fontSize: '14px',
                   lineHeight: '1.7',
                   maxWidth: '320px',
+                  color: 'var(--color-foreground-secondary)',
+                  fontFamily: 'var(--font-body)',
                 }}
               >
                 {t('footer.description')}
@@ -62,8 +65,8 @@ export default function Footer() {
                       width: '38px',
                       height: '38px',
                       borderRadius: '10px',
-                      background: 'rgba(255,255,255,0.08)',
-                      border: '1px solid rgba(255,255,255,0.1)',
+                      background: 'var(--color-muted)',
+                      border: '1px solid var(--color-border)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -75,11 +78,11 @@ export default function Footer() {
                       e.currentTarget.style.borderColor = 'var(--color-primary)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                      e.currentTarget.style.background = 'var(--color-muted)';
+                      e.currentTarget.style.borderColor = 'var(--color-border)';
                     }}
                   >
-                    {social.icon(16, '#CBD5E1')}
+                    {social.icon(16, 'var(--color-foreground-secondary)')}
                   </a>
                 ))}
               </div>
@@ -103,10 +106,13 @@ export default function Footer() {
               <div key={column.title}>
                 <h4
                   style={{
-                    color: '#FFFFFF',
-                    fontSize: '16px',
+                    color: 'var(--color-foreground)',
+                    fontSize: '13px',
                     fontWeight: '700',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
                     margin: '0 0 24px 0',
+                    fontFamily: 'var(--font-heading)',
                   }}
                 >
                   {column.title}
@@ -126,16 +132,17 @@ export default function Footer() {
                       <a
                         href="#"
                         style={{
-                          color: '#94A3B8',
+                          color: 'var(--color-foreground-secondary)',
                           textDecoration: 'none',
                           fontSize: '14px',
+                          fontFamily: 'var(--font-body)',
                           transition: 'all 0.2s ease',
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.color = 'var(--color-primary)';
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.color = '#94A3B8';
+                          e.currentTarget.style.color = 'var(--color-foreground-secondary)';
                         }}
                       >
                         {link}
@@ -151,21 +158,36 @@ export default function Footer() {
           <div
             style={{
               paddingTop: '32px',
-              borderTop: '1px solid rgba(255,255,255,0.1)',
+              borderTop: '1px solid var(--color-border)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '12px',
             }}
           >
-            <p style={{ margin: 0, fontSize: '14px' }}>
+            <p style={{ margin: 0, fontSize: '14px', color: 'var(--color-foreground-tertiary)', fontFamily: 'var(--font-body)' }}>
               © 2026 InstaJob. Hak cipta dilindungi.
             </p>
-            <p style={{ margin: 0, fontSize: '14px' }}>
+            <p style={{ margin: 0, fontSize: '14px', color: 'var(--color-foreground-tertiary)', fontFamily: 'var(--font-body)' }}>
               Dibuat dengan ❤️ di Jakarta, Indonesia
             </p>
           </div>
         </ScrollAnimation>
       </div>
+
+      <style jsx>{`
+        @media (max-width: 768px) {
+          footer > div > div:first-of-type {
+            grid-template-columns: 1fr !important;
+            gap: 32px !important;
+          }
+          footer > div > div:last-of-type {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+          }
+        }
+      `}</style>
     </footer>
   );
 }

@@ -180,23 +180,25 @@ export default function CTASection() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
-                  color: 'rgba(255,255,255,0.9)',
+                  color: 'var(--color-foreground-secondary)',
                   fontSize: '14px',
                   fontWeight: '500',
+                  fontFamily: 'var(--font-body)',
                 }}
               >
                 <span
                   style={{
                     width: '20px',
                     height: '20px',
-                    background: 'rgba(34,197,94,0.3)',
+                    background: 'rgba(34,197,94,0.12)',
                     borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#22C55E',
+                    color: '#059669',
                     fontWeight: '700',
                     fontSize: '12px',
+                    flexShrink: 0,
                   }}
                 >
                   {item.icon}
