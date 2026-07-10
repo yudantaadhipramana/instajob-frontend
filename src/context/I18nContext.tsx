@@ -25,7 +25,7 @@ const translations: Record<Lang, Record<string, string>> = {
     'nav.settings': 'Pengaturan',
     
     // Landing Hero
-    'hero.badge': '🚀 Dipercaya oleh 50,000+ Pencari Kerja',
+    'hero.badge': '🎯 AI Job Hunter Otomatis Pertama di Dunia',
     'hero.title1': 'Sekali Setup',
     'hero.title2': '2.000+ Lamaran. 0% Ribet',
     'hero.subtitle': 'AI kami menganalisis profil Anda dan mengirimkan lamaran ke ribuan perusahaan secara otomatis. Hemat 3+ jam per hari dan fokus pada interview yang penting.',

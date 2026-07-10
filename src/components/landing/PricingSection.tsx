@@ -5,19 +5,20 @@ import { useState } from 'react';
 import Icons from '@/components/Icons';
 
 export default function PricingSection() {
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'quarterly'>('monthly');
 
-  const plans = [
+  const plans = billingPeriod === 'monthly' ? [
     {
       name: 'Pro',
       price: 179000,
       originalPrice: 279000,
-      dailyPrice: '6.000',
       period: '/bulan',
       description: 'Otomatisasi lamaran standar',
       features: [
         'AI Job Scouting',
         'AI Matching Algorithm',
         'AI Email Auto Apply',
+        'AI LinkedIn Auto Apply',
         'Job Tracking System',
         'Telegram Bot Notification',
       ],
@@ -28,14 +29,47 @@ export default function PricingSection() {
       name: 'Premium',
       price: 239000,
       originalPrice: 350000,
-      dailyPrice: '8.000',
       period: '/bulan',
       description: 'Termasuk optimasi profil & CV',
       features: [
         'Semua fitur di paket Pro',
+        '3x token LinkedIn Auto Apply',
+        'Kelas CV Booster + Template',
+        'Kelas Portfolio Booster',
+        'Priority Support 24/7',
+      ],
+      cta: 'Mulai Premium',
+      highlighted: true,
+    },
+  ] : [
+    {
+      name: 'Pro',
+      price: 499000,
+      originalPrice: 837000,
+      period: '/3 bulan',
+      description: 'Otomatisasi lamaran standar',
+      features: [
+        'AI Job Scouting',
+        'AI Matching Algorithm',
+        'AI Email Auto Apply',
         'AI LinkedIn Auto Apply',
-        'Kelas Career Booster + Template CV ATS',
-        'Kelas Portfolio Booster + Template Portfolio',
+        'Job Tracking System',
+        'Telegram Bot Notification',
+      ],
+      cta: 'Mulai Sekarang',
+      highlighted: false,
+    },
+    {
+      name: 'Premium',
+      price: 650000,
+      originalPrice: 1050000,
+      period: '/3 bulan',
+      description: 'Termasuk optimasi profil & CV',
+      features: [
+        'Semua fitur di paket Pro',
+        '3x token LinkedIn Auto Apply',
+        'Kelas CV Booster + Template',
+        'Kelas Portfolio Booster',
         'Priority Support 24/7',
       ],
       cta: 'Mulai Premium',
@@ -82,7 +116,8 @@ export default function PricingSection() {
               fontFamily: 'var(--font-heading)',
             }}
           >
-            Pilih Paket yang Tepat
+            Mulai dari{' '}
+            <span style={{ color: 'var(--color-primary)' }}>Rp 6.000/hari</span>
           </h2>
           <p
             style={{
@@ -95,6 +130,73 @@ export default function PricingSection() {
           >
             Investasi kecil untuk peluang karir yang lebih besar. Tanpa kartu kredit.
           </p>
+        </motion.div>
+
+        {/* Billing Toggle */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginBottom: '48px',
+            gap: '12px',
+          }}
+        >
+          <button
+            onClick={() => setBillingPeriod('monthly')}
+            style={{
+              padding: '10px 24px',
+              background: billingPeriod === 'monthly' ? 'var(--color-primary)' : 'var(--color-muted)',
+              color: billingPeriod === 'monthly' ? '#fff' : 'var(--color-foreground)',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              fontFamily: 'var(--font-body)',
+            }}
+          >
+            Bulanan
+          </button>
+          <button
+            onClick={() => setBillingPeriod('quarterly')}
+            style={{
+              padding: '10px 24px',
+              background: billingPeriod === 'quarterly' ? 'var(--color-primary)' : 'var(--color-muted)',
+              color: billingPeriod === 'quarterly' ? '#fff' : 'var(--color-foreground)',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              fontFamily: 'var(--font-body)',
+              position: 'relative',
+            }}
+          >
+            3 Bulanan
+            {billingPeriod === 'quarterly' && (
+              <span
+                style={{
+                  position: 'absolute',
+                  top: '-8px',
+                  right: '-8px',
+                  background: 'var(--color-accent)',
+                  color: '#fff',
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  padding: '2px 6px',
+                  borderRadius: '4px',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Hemat 15%
+              </span>
+            )}
+          </button>
         </motion.div>
 
         {/* Pricing Cards */}
@@ -119,7 +221,9 @@ export default function PricingSection() {
                 background: plan.highlighted ? 'var(--color-primary)' : '#FFFFFF',
                 borderRadius: '24px',
                 border: plan.highlighted ? 'none' : '1px solid var(--color-border)',
-                boxShadow: plan.highlighted ? '0 20px 60px rgba(3, 105, 161, 0.2)' : '0 4px 20px rgba(0,0,0,0.05)',
+                boxShadow: plan.highlighted
+                  ? '0 20px 60px rgba(30, 64, 255, 0.2)'
+                  : '0 4px 20px rgba(0,0,0,0.05)',
                 position: 'relative',
                 transform: plan.highlighted ? 'scale(1.05)' : 'scale(1)',
               }}
@@ -164,31 +268,6 @@ export default function PricingSection() {
               >
                 {plan.description}
               </p>
-
-              {/* Price Hook per hari */}
-              {plan.dailyPrice && (
-                <div
-                  style={{
-                    padding: '12px 16px',
-                    background: plan.highlighted ? 'rgba(255, 255, 255, 0.15)' : 'var(--color-muted)',
-                    borderRadius: '12px',
-                    marginBottom: '16px',
-                    textAlign: 'center',
-                  }}
-                >
-                  <p
-                    style={{
-                      fontSize: '13px',
-                      fontWeight: '700',
-                      color: plan.highlighted ? '#fff' : 'var(--color-primary)',
-                      margin: 0,
-                      fontFamily: 'var(--font-heading)',
-                    }}
-                  >
-                    Mulai dari Rp {plan.dailyPrice}/hari
-                  </p>
-                </div>
-              )}
 
               <div style={{ marginBottom: '24px' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>

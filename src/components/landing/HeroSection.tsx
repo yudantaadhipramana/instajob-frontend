@@ -48,41 +48,20 @@ export default function HeroSection() {
           style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '8px',
-            padding: '12px 20px',
-            background: 'rgba(22, 163, 74, 0.1)',
-            border: '1px solid rgba(22, 163, 74, 0.3)',
-            borderRadius: '12px',
+            gap: '10px',
+            padding: '10px 20px',
+            background: 'linear-gradient(135deg, rgba(30, 64, 255, 0.08) 0%, rgba(59, 130, 246, 0.12) 100%)',
+            border: '1px solid rgba(30, 64, 255, 0.2)',
+            borderRadius: '100px',
             marginBottom: '24px',
             fontSize: '14px',
             fontWeight: '600',
-            color: 'var(--color-accent)',
+            color: 'var(--color-primary)',
             fontFamily: 'var(--font-body)',
           }}
         >
-          <span>🚀</span>
-          {t('hero.badge').replace('🚀 ', '')}
-        </motion.div>
-
-        {/* Pricing Hook */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          style={{
-            display: 'inline-block',
-            padding: '8px 16px',
-            background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))',
-            borderRadius: '8px',
-            marginBottom: '20px',
-            fontSize: '13px',
-            fontWeight: '700',
-            color: '#fff',
-            fontFamily: 'var(--font-heading)',
-            letterSpacing: '0.02em',
-          }}
-        >
-          Mulai dari Rp 6.000/hari
+          <span style={{ fontSize: '18px' }}>🎯</span>
+          {t('hero.badge').replace('🎯 ', '')}
         </motion.div>
 
         {/* Main Headline */}

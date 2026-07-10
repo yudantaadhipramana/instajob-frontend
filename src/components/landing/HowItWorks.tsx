@@ -187,9 +187,9 @@ export default function HowItWorks() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  style={{ padding: '20px' }}
+                  style={{ padding: '20px', position: 'relative', zIndex: 10 }}
                 >
-                  <h4 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '16px', fontFamily: 'var(--font-heading)' }}>
+                  <h4 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '16px', fontFamily: 'var(--font-heading)', color: '#fff' }}>
                     Job Preferences
                   </h4>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -200,10 +200,12 @@ export default function HowItWorks() {
                       value="Software Engineer"
                       style={{
                         padding: '12px',
-                        border: '1px solid var(--color-border)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        background: 'rgba(255,255,255,0.1)',
                         borderRadius: '8px',
                         fontSize: '14px',
                         fontFamily: 'var(--font-body)',
+                        color: '#fff',
                       }}
                     />
                     <input
@@ -213,17 +215,19 @@ export default function HowItWorks() {
                       value="Jakarta, Indonesia"
                       style={{
                         padding: '12px',
-                        border: '1px solid var(--color-border)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        background: 'rgba(255,255,255,0.1)',
                         borderRadius: '8px',
                         fontSize: '14px',
                         fontFamily: 'var(--font-body)',
+                        color: '#fff',
                       }}
                     />
                     <button
                       style={{
                         padding: '12px',
-                        background: 'var(--color-primary)',
-                        color: '#fff',
+                        background: '#fff',
+                        color: 'var(--color-primary)',
                         border: 'none',
                         borderRadius: '8px',
                         fontWeight: '600',
@@ -243,7 +247,7 @@ export default function HowItWorks() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  style={{ padding: '20px', textAlign: 'center' }}
+                  style={{ padding: '20px', textAlign: 'center', position: 'relative', zIndex: 10 }}
                 >
                   <motion.div
                     animate={{ rotate: 360 }}
@@ -252,18 +256,18 @@ export default function HowItWorks() {
                   >
                     🔍
                   </motion.div>
-                  <h4 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '8px', fontFamily: 'var(--font-heading)' }}>
+                  <h4 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '8px', fontFamily: 'var(--font-heading)', color: '#fff' }}>
                     Scanning Job Boards...
                   </h4>
-                  <p style={{ fontSize: '14px', color: '#64748B', fontFamily: 'var(--font-body)' }}>
+                  <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.9)', fontFamily: 'var(--font-body)' }}>
                     AI finding matching jobs
                   </p>
-                  <div style={{ marginTop: '16px', background: 'var(--color-muted)', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
+                  <div style={{ marginTop: '16px', background: 'rgba(255,255,255,0.1)', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
                     <motion.div
                       initial={{ width: '0%' }}
                       animate={{ width: '100%' }}
                       transition={{ duration: 2 }}
-                      style={{ background: 'var(--color-primary)', height: '100%' }}
+                      style={{ background: '#fff', height: '100%' }}
                     />
                   </div>
                 </motion.div>
@@ -275,9 +279,9 @@ export default function HowItWorks() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  style={{ padding: '20px' }}
+                  style={{ padding: '20px', position: 'relative', zIndex: 10 }}
                 >
-                  <h4 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '16px', fontFamily: 'var(--font-heading)' }}>
+                  <h4 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '16px', fontFamily: 'var(--font-heading)', color: '#fff' }}>
                     Found 47 Jobs
                   </h4>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -289,13 +293,13 @@ export default function HowItWorks() {
                         transition={{ delay: i * 0.2 }}
                         style={{
                           padding: '12px',
-                          background: 'var(--color-background)',
+                          background: 'rgba(255,255,255,0.1)',
                           borderRadius: '8px',
-                          border: '1px solid var(--color-border)',
+                          border: '1px solid rgba(255,255,255,0.15)',
                         }}
                       >
-                        <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px', fontFamily: 'var(--font-body)' }}>{job}</div>
-                        <div style={{ fontSize: '12px', color: 'var(--color-accent)', fontFamily: 'var(--font-body)' }}>✓ Auto-applying...</div>
+                        <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px', fontFamily: 'var(--font-body)', color: '#fff' }}>{job}</div>
+                        <div style={{ fontSize: '12px', color: 'rgba(34, 197, 94, 0.9)', fontFamily: 'var(--font-body)' }}>✓ Auto-applying...</div>
                       </motion.div>
                     ))}
                   </div>
@@ -308,28 +312,28 @@ export default function HowItWorks() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  style={{ padding: '20px', textAlign: 'center' }}
+                  style={{ padding: '20px', textAlign: 'center', position: 'relative', zIndex: 10 }}
                 >
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: 'spring', stiffness: 200 }}
-                    style={{ fontSize: '64px', marginBottom: '16px' }}
+                    style={{ fontSize: '64px', marginBottom: '16px', color: '#fff' }}
                   >
                     {jobsApplied}
                   </motion.div>
-                  <h4 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '8px', fontFamily: 'var(--font-heading)' }}>
+                  <h4 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '8px', fontFamily: 'var(--font-heading)', color: '#fff' }}>
                     Applications Sent Today
                   </h4>
-                  <p style={{ fontSize: '14px', color: '#64748B', marginBottom: '16px', fontFamily: 'var(--font-body)' }}>
+                  <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.9)', marginBottom: '16px', fontFamily: 'var(--font-body)' }}>
                     AI is working 24/7 for you
                   </p>
                   <button
                     onClick={resetDemo}
                     style={{
                       padding: '10px 20px',
-                      background: 'var(--color-accent)',
-                      color: '#fff',
+                      background: '#fff',
+                      color: 'var(--color-primary)',
                       border: 'none',
                       borderRadius: '8px',
                       fontWeight: '600',
