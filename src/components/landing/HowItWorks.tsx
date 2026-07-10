@@ -90,10 +90,10 @@ export default function HowItWorks() {
           {/* Left: Step Indicators */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             {[
-              { num: '01', title: 'Set Preferences', desc: 'Job type, location, experience', icon: Icons.setup(28) },
-              { num: '02', title: 'Start AI Scout', desc: 'AI finds matching jobs', icon: Icons.search(28) },
-              { num: '03', title: 'Auto-Apply', desc: 'Send applications instantly', icon: Icons.envelope(28) },
-              { num: '04', title: 'Track Progress', desc: 'Real-time dashboard', icon: Icons.chartBars(28) },
+              { num: '01', title: 'Set Preferences', desc: 'Job type, location, experience', icon: Icons.setup(28, 'var(--color-foreground-tertiary)'), iconActive: Icons.setup(28, '#fff') },
+              { num: '02', title: 'Start AI Scout', desc: 'AI finds matching jobs', icon: Icons.search(28, 'var(--color-foreground-tertiary)'), iconActive: Icons.search(28, '#fff') },
+              { num: '03', title: 'Auto-Apply', desc: 'Send applications instantly', icon: Icons.envelope(28, 'var(--color-foreground-tertiary)'), iconActive: Icons.envelope(28, '#fff') },
+              { num: '04', title: 'Track Progress', desc: 'Real-time dashboard', icon: Icons.chartBars(28, 'var(--color-foreground-tertiary)'), iconActive: Icons.chartBars(28, '#fff') },
             ].map((step, i) => (
               <motion.div
                 key={i}
@@ -124,7 +124,7 @@ export default function HowItWorks() {
                     flexShrink: 0,
                   }}
                 >
-                  {step.icon}
+                  {demoStep >= i ? step.iconActive : step.icon}
                 </div>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
@@ -169,14 +169,17 @@ export default function HowItWorks() {
           <div
             style={{
               position: 'relative',
-              background: '#fff',
-              borderRadius: '16px',
-              padding: '24px',
-              boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
-              border: '1px solid var(--color-border)',
+              background: 'linear-gradient(135deg, #1E3A8A 0%, #1E40FF 55%, #3B82F6 100%)',
+              borderRadius: '20px',
+              padding: '32px',
+              boxShadow: '0 20px 60px rgba(30, 64, 255, 0.3)',
+              border: '1px solid rgba(255,255,255,0.15)',
               minHeight: '500px',
+              overflow: 'hidden',
             }}
           >
+            {/* subtle glow orb */}
+            <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '200px', height: '200px', background: 'radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }} />
             <AnimatePresence mode="wait">
               {demoStep === 0 && (
                 <motion.div

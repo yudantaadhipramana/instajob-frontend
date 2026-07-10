@@ -177,15 +177,15 @@ export default function FeaturesSection() {
           {/* Right: Dynamic Feature Visualization */}
           <div
             style={{
-              background: 'var(--gradient-card)',
+              background: 'linear-gradient(135deg, #1E3A8A 0%, #1E40FF 55%, #3B82F6 100%)',
               borderRadius: '24px',
               padding: '48px',
               minHeight: '400px',
-              border: '1px solid var(--color-border)',
+              border: '1px solid rgba(255,255,255,0.1)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 20px 60px rgba(30, 64, 255, 0.15)',
+              boxShadow: '0 20px 60px rgba(30, 64, 255, 0.25)',
               position: 'relative',
               overflow: 'hidden',
             }}
