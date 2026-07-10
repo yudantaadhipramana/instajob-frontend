@@ -13,13 +13,15 @@ export const Icons = {
     </svg>
   ),
 
-  // Job Matching
-  jobMatch: (size = 24, color = '#0051FF') => (
+  // Job Matching (Professional Radar/Network)
+  jobMatch: (size = 24, color = 'var(--color-primary)') => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="9" cy="9" r="3" stroke={color} strokeWidth="2" />
-      <circle cx="15" cy="15" r="3" stroke={color} strokeWidth="2" />
-      <path d="M9 12a5 5 0 0 1 5 0" stroke={color} strokeWidth="2" strokeLinecap="round" />
-      <path d="M15 12a5 5 0 0 1-5 0" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2" stroke={color} strokeWidth="2" strokeLinecap="round" strokeDasharray="2 4" />
+      <path d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22" stroke={color} strokeWidth="2" strokeLinecap="round" opacity="0.3" />
+      <circle cx="12" cy="12" r="3" fill={color} />
+      <circle cx="18" cy="8" r="1.5" fill={color} opacity="0.6" />
+      <circle cx="6" cy="16" r="1.5" fill={color} opacity="0.6" />
+      <path d="M12 12L18 8M12 12L6 16" stroke={color} strokeWidth="1.5" opacity="0.4" />
     </svg>
   ),
 
@@ -42,36 +44,48 @@ export const Icons = {
     </svg>
   ),
 
-  // Auto Apply
-  autoApply: (size = 24, color = '#0051FF') => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 2L2 7l10 5 10-5-10-5z" stroke={color} strokeWidth="2" strokeLinejoin="round" />
-      <path d="M2 17l10 5 10-5" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M2 12l10 5 10-5" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
-
-  // Cover Letter
-  coverLetter: (size = 24, color = '#0051FF') => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke={color} strokeWidth="2" />
-      <path d="M22 6l-10 7L2 6" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
-
-  // Job Tracking
-  tracking: (size = 24, color = '#0051FF') => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 20V4" stroke={color} strokeWidth="2" strokeLinecap="round" />
-      <path d="M5 11l7-7 7 7" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
-
-  // Telegram Bot
-  telegram: (size = 24, color = '#0051FF') => (
+  // Auto Apply (Rocket/Send Professional)
+  autoApply: (size = 24, color = 'var(--color-primary)') => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M22 2L11 13" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.3" fill={color} />
       <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+
+  // Cover Letter / AI Email
+  coverLetter: (size = 24, color = 'var(--color-primary)') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="5" width="18" height="14" rx="2" stroke={color} strokeWidth="2" strokeLinecap="round" opacity="0.3" fill={color} />
+      <rect x="3" y="5" width="18" height="14" rx="2" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <path d="M3 7L12 13L21 7" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+
+  // Job Tracking (Kanban/Progress)
+  tracking: (size = 24, color = 'var(--color-primary)') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="18" height="18" rx="2" stroke={color} strokeWidth="2" opacity="0.3" fill={color} />
+      <rect x="3" y="3" width="18" height="18" rx="2" stroke={color} strokeWidth="2" />
+      <path d="M8 7V17M12 7V13M16 7V15" stroke={color} strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  ),
+
+  // Telegram Bot (Professional Shield/Bot)
+  telegram: (size = 24, color = 'var(--color-primary)') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.2" fill={color} />
+      <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M9 12L11 14L15 10" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+
+  // LinkedIn
+  linkedin: (size = 24, color = 'var(--color-primary)') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="2" width="20" height="20" rx="4" stroke={color} strokeWidth="2" opacity="0.2" fill={color} />
+      <rect x="2" y="2" width="20" height="20" rx="4" stroke={color} strokeWidth="2" />
+      <path d="M8 11V16M8 8H8.01M12 16V11C12 11 12 11 13 11C14 11 16 11 16 13V16" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   ),
 
@@ -131,14 +145,6 @@ export const Icons = {
   arrowRight: (size = 24, color = '#0051FF') => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M5 12h14M12 5l7 7-7 7" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
-
-  // LinkedIn
-  linkedin: (size = 24, color = '#0077B5') => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="2" y="2" width="20" height="20" rx="3" stroke={color} strokeWidth="2" />
-      <path d="M8 11v5M8 8v.01M12 16v-5c0-1 1-2 2-2s2 1 2 2v5" stroke={color} strokeWidth="2" strokeLinecap="round" />
     </svg>
   ),
 

@@ -1,221 +1,382 @@
 'use client';
 
-import { ScrollAnimation, HighlightText } from '@/components/Animations';
-import Icons from '@/components/Icons';
+import { motion, AnimatePresence } from 'motion/react';
+import { useState, useEffect } from 'react';
 import { useI18n } from '@/context/I18nContext';
+import Icons from '@/components/Icons';
 
 export default function HowItWorks() {
   const { t } = useI18n();
-  const steps = [
-    {
-      number: '01',
-      title: t('howItWorks.step1.title'),
-      description: t('howItWorks.step1.desc'),
-      icon: Icons.profile(32, '#FF6B6B'),
-      color: '#FF6B6B',
-    },
-    {
-      number: '02',
-      title: t('howItWorks.step2.title'),
-      description: t('howItWorks.step2.desc'),
-      icon: Icons.analysis(32, '#0051FF'),
-      color: '#0051FF',
-    },
-    {
-      number: '03',
-      title: t('howItWorks.step3.title'),
-      description: t('howItWorks.step3.desc'),
-      icon: Icons.autoApply(32, '#FFB800'),
-      color: '#FFB800',
-    },
-    {
-      number: '04',
-      title: t('howItWorks.step4.title'),
-      description: t('howItWorks.step4.desc'),
-      icon: Icons.tracking(32, '#22C55E'),
-      color: '#22C55E',
-    },
-  ];
+  const [demoStep, setDemoStep] = useState(0);
+  const [jobsApplied, setJobsApplied] = useState(0);
+
+  // Auto-advance demo animation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDemoStep((prev) => {
+        if (prev === 3) {
+          setJobsApplied((j) => (j < 15 ? j + 1 : j));
+          return prev;
+        }
+        return prev + 1;
+      });
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const resetDemo = () => {
+    setDemoStep(0);
+    setJobsApplied(0);
+  };
 
   return (
     <section
+      id="cara-kerja"
       style={{
         padding: '80px 48px',
-        background: 'linear-gradient(135deg, #F8FAFC 0%, #FFFFFF 100%)',
+        background: 'linear-gradient(135deg, #FFFFFF 0%, var(--color-background) 100%)',
       }}
     >
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         {/* Header */}
-        <ScrollAnimation delay={0}>
-          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
-            <p
-              style={{
-                fontSize: '14px',
-                fontWeight: '700',
-                textTransform: 'uppercase',
-                letterSpacing: '0.1em',
-                color: '#0051FF',
-                margin: '0 0 16px 0',
-              }}
-            >
-              {t('howItWorks.badge')}
-            </p>
-            <h2
-              style={{
-                fontSize: '40px',
-                fontWeight: '800',
-                color: '#1E293B',
-                margin: '0 0 16px 0',
-              }}
-            >
-              {t('howItWorks.title')}
-            </h2>
-            <p
-              style={{
-                fontSize: '18px',
-                color: '#64748B',
-                maxWidth: '600px',
-                margin: '16px auto 0',
-              }}
-            >
-              {t('howItWorks.subtitle')}
-            </p>
-          </div>
-        </ScrollAnimation>
+        <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+          <p
+            style={{
+              fontSize: '14px',
+              fontWeight: '700',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              color: 'var(--color-primary)',
+              margin: '0 0 16px 0',
+              fontFamily: 'var(--font-heading)',
+            }}
+          >
+            {t('howItWorks.badge')}
+          </p>
+          <h2
+            style={{
+              fontSize: '40px',
+              fontWeight: '800',
+              color: 'var(--color-foreground)',
+              margin: '0 0 16px 0',
+              fontFamily: 'var(--font-heading)',
+            }}
+          >
+            {t('howItWorks.title')}
+          </h2>
+          <p
+            style={{
+              fontSize: '18px',
+              color: '#64748B',
+              maxWidth: '600px',
+              margin: '16px auto 0',
+              fontFamily: 'var(--font-body)',
+            }}
+          >
+            {t('howItWorks.subtitle')}
+          </p>
+        </div>
 
-        {/* Steps Grid */}
+        {/* Interactive Demo Area */}
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-            gap: '32px',
-            marginBottom: '48px',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '48px',
+            alignItems: 'center',
           }}
         >
-          {steps.map((step, i) => (
-            <ScrollAnimation key={i} delay={i * 100}>
-              <div
+          {/* Left: Step Indicators */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {[
+              { num: '01', title: 'Set Preferences', desc: 'Job type, location, experience', icon: '⚙️' },
+              { num: '02', title: 'Start AI Scout', desc: 'AI finds matching jobs', icon: '🔍' },
+              { num: '03', title: 'Auto-Apply', desc: 'Send applications instantly', icon: '✉️' },
+              { num: '04', title: 'Track Progress', desc: 'Real-time dashboard', icon: '📊' },
+            ].map((step, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.1 }}
                 style={{
-                  position: 'relative',
-                  padding: '32px 24px',
-                  background: '#FFFFFF',
-                  border: '1px solid #E2E8F0',
-                  borderRadius: '16px',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-8px)';
-                  e.currentTarget.style.boxShadow = `0 16px 40px rgba(0,81,255,0.15)`;
-                  e.currentTarget.style.borderColor = step.color;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
-                  e.currentTarget.style.borderColor = '#E2E8F0';
+                  display: 'flex',
+                  gap: '16px',
+                  alignItems: 'flex-start',
+                  padding: '20px',
+                  background: demoStep >= i ? '#fff' : 'transparent',
+                  borderRadius: '12px',
+                  border: `2px solid ${demoStep >= i ? 'var(--color-primary)' : 'var(--color-border)'}`,
+                  transition: 'all 0.3s',
                 }}
               >
-                {/* Number Badge */}
                 <div
                   style={{
-                    position: 'absolute',
-                    top: '-12px',
-                    left: '24px',
                     width: '48px',
                     height: '48px',
-                    background: step.color,
                     borderRadius: '12px',
+                    background: demoStep >= i ? 'var(--color-primary)' : 'var(--color-muted)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: '24px',
-                    fontWeight: '800',
-                    color: '#FFFFFF',
-                    boxShadow: `0 4px 12px rgba(0,0,0,0.1)`,
-                  }}
-                >
-                  {step.number}
-                </div>
-
-                {/* Icon */}
-                <div
-                  style={{
-                    marginBottom: '16px',
-                    marginTop: '16px',
+                    flexShrink: 0,
                   }}
                 >
                   {step.icon}
                 </div>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    <span
+                      style={{
+                        fontSize: '12px',
+                        fontWeight: '700',
+                        color: 'var(--color-primary)',
+                        fontFamily: 'var(--font-heading)',
+                      }}
+                    >
+                      {step.num}
+                    </span>
+                    <h3
+                      style={{
+                        fontSize: '18px',
+                        fontWeight: '700',
+                        color: 'var(--color-foreground)',
+                        margin: 0,
+                        fontFamily: 'var(--font-heading)',
+                      }}
+                    >
+                      {step.title}
+                    </h3>
+                  </div>
+                  <p
+                    style={{
+                      fontSize: '14px',
+                      color: '#64748B',
+                      margin: 0,
+                      fontFamily: 'var(--font-body)',
+                    }}
+                  >
+                    {step.desc}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
 
-                {/* Title */}
-                <h3
-                  style={{
-                    fontSize: '18px',
-                    fontWeight: '700',
-                    color: '#1E293B',
-                    margin: '0 0 12px 0',
-                  }}
+          {/* Right: Animated Mockup */}
+          <div
+            style={{
+              position: 'relative',
+              background: '#fff',
+              borderRadius: '16px',
+              padding: '24px',
+              boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+              border: '1px solid var(--color-border)',
+              minHeight: '500px',
+            }}
+          >
+            <AnimatePresence mode="wait">
+              {demoStep === 0 && (
+                <motion.div
+                  key="step0"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  style={{ padding: '20px' }}
                 >
-                  {step.title}
-                </h3>
+                  <h4 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '16px', fontFamily: 'var(--font-heading)' }}>
+                    Job Preferences
+                  </h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <input
+                      type="text"
+                      placeholder="Job Title (e.g., Software Engineer)"
+                      readOnly
+                      value="Software Engineer"
+                      style={{
+                        padding: '12px',
+                        border: '1px solid var(--color-border)',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        fontFamily: 'var(--font-body)',
+                      }}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Location"
+                      readOnly
+                      value="Jakarta, Indonesia"
+                      style={{
+                        padding: '12px',
+                        border: '1px solid var(--color-border)',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        fontFamily: 'var(--font-body)',
+                      }}
+                    />
+                    <button
+                      style={{
+                        padding: '12px',
+                        background: 'var(--color-primary)',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        fontFamily: 'var(--font-body)',
+                      }}
+                    >
+                      Start AI Scout →
+                    </button>
+                  </div>
+                </motion.div>
+              )}
 
-                {/* Description */}
-                <p
-                  style={{
-                    fontSize: '14px',
-                    color: '#64748B',
-                    margin: 0,
-                    lineHeight: '1.6',
-                  }}
+              {demoStep === 1 && (
+                <motion.div
+                  key="step1"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  style={{ padding: '20px', textAlign: 'center' }}
                 >
-                  {step.description}
-                </p>
-              </div>
-            </ScrollAnimation>
-          ))}
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                    style={{ fontSize: '48px', marginBottom: '16px' }}
+                  >
+                    🔍
+                  </motion.div>
+                  <h4 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '8px', fontFamily: 'var(--font-heading)' }}>
+                    Scanning Job Boards...
+                  </h4>
+                  <p style={{ fontSize: '14px', color: '#64748B', fontFamily: 'var(--font-body)' }}>
+                    AI finding matching jobs
+                  </p>
+                  <div style={{ marginTop: '16px', background: 'var(--color-muted)', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
+                    <motion.div
+                      initial={{ width: '0%' }}
+                      animate={{ width: '100%' }}
+                      transition={{ duration: 2 }}
+                      style={{ background: 'var(--color-primary)', height: '100%' }}
+                    />
+                  </div>
+                </motion.div>
+              )}
+
+              {demoStep === 2 && (
+                <motion.div
+                  key="step2"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  style={{ padding: '20px' }}
+                >
+                  <h4 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '16px', fontFamily: 'var(--font-heading)' }}>
+                    Found 47 Jobs
+                  </h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {['Senior Software Engineer - Tech Corp', 'Full Stack Developer - Startup Inc', 'Backend Engineer - Finance Ltd'].map((job, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.2 }}
+                        style={{
+                          padding: '12px',
+                          background: 'var(--color-background)',
+                          borderRadius: '8px',
+                          border: '1px solid var(--color-border)',
+                        }}
+                      >
+                        <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px', fontFamily: 'var(--font-body)' }}>{job}</div>
+                        <div style={{ fontSize: '12px', color: 'var(--color-accent)', fontFamily: 'var(--font-body)' }}>✓ Auto-applying...</div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
+              {demoStep === 3 && (
+                <motion.div
+                  key="step3"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  style={{ padding: '20px', textAlign: 'center' }}
+                >
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 200 }}
+                    style={{ fontSize: '64px', marginBottom: '16px' }}
+                  >
+                    {jobsApplied}
+                  </motion.div>
+                  <h4 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '8px', fontFamily: 'var(--font-heading)' }}>
+                    Applications Sent Today
+                  </h4>
+                  <p style={{ fontSize: '14px', color: '#64748B', marginBottom: '16px', fontFamily: 'var(--font-body)' }}>
+                    AI is working 24/7 for you
+                  </p>
+                  <button
+                    onClick={resetDemo}
+                    style={{
+                      padding: '10px 20px',
+                      background: 'var(--color-accent)',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      fontFamily: 'var(--font-body)',
+                    }}
+                  >
+                    ↻ Replay Demo
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
         {/* Bottom CTA */}
-        <ScrollAnimation delay={400}>
-          <div style={{ textAlign: 'center' }}>
-            <p
-              style={{
-                fontSize: '16px',
-                color: '#64748B',
-                marginBottom: '24px',
-              }}
-            >
-              {t('howItWorks.cta.title')}
-            </p>
-            <button
-              style={{
-                padding: '14px 36px',
-                background: '#0051FF',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '10px',
-                fontSize: '16px',
-                fontWeight: '700',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                transition: 'all 0.3s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,81,255,0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
-            >
-              {t('howItWorks.cta.button')}
-              {Icons.arrowRight(20, '#fff')}
-            </button>
-          </div>
-        </ScrollAnimation>
+        <div style={{ textAlign: 'center', marginTop: '64px' }}>
+          <p
+            style={{
+              fontSize: '16px',
+              color: '#64748B',
+              marginBottom: '24px',
+              fontFamily: 'var(--font-body)',
+            }}
+          >
+            {t('howItWorks.cta.title')}
+          </p>
+          <button
+            onClick={() => window.location.href = '/register'}
+            style={{
+              padding: '14px 36px',
+              background: 'var(--color-primary)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '10px',
+              fontSize: '16px',
+              fontWeight: '700',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.3s ease',
+              fontFamily: 'var(--font-body)',
+            }}
+          >
+            {t('howItWorks.cta.button')}
+            {Icons.arrowRight(20, '#fff')}
+          </button>
+        </div>
       </div>
     </section>
   );

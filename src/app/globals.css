@@ -1,7 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  /* Logo Color Palette - InstaJob Brand */
+  /* InstaJob Design System - Unified Tech Blue */
+  --color-primary: #0051FF;
+  --color-on-primary: #FFFFFF;
+  --color-secondary: #1E40AF;
+  --color-accent: #F59E0B;
+  --color-background: #FFFFFF;
+  --color-surface: #F8FAFC;
+  --color-foreground: #0F172A;
+  --color-muted: #E2E8F0;
+  --color-border: #CBD5E1;
+  --color-destructive: #DC2626;
+  --color-ring: #0051FF;
+  
+  /* Typography */
+  --font-heading: var(--font-plus-jakarta);
+  --font-body: var(--font-inter);
+  
+  /* Legacy support (dashboard dark mode) */
   --blue-primary: #2563EB;
   --purple-primary: #7C3AED;
   --navy-dark: #0B1120;
@@ -9,8 +26,6 @@
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --border-subtle: rgba(255, 255, 255, 0.05);
-  
-  /* Gradient combinations */
   --gradient-brand: linear-gradient(135deg, #2563EB, #7C3AED);
   --gradient-glow: radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, transparent 70%);
 }
@@ -18,10 +33,9 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background: var(--navy-dark);
-  color: var(--text-primary);
-  font-family: "Inter", sans-serif;
-  letter-spacing: -0.01em;
+  font-family: var(--font-body, "DM Sans", sans-serif);
+  color: var(--color-foreground);
+  background: var(--color-background);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -137,3 +151,14 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

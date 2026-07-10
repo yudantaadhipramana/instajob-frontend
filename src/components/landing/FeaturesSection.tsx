@@ -1,210 +1,231 @@
 'use client';
 
-import { ScrollAnimation } from '@/components/Animations';
+import { motion } from 'motion/react';
 import Icons from '@/components/Icons';
 import { useI18n } from '@/context/I18nContext';
+import { useState } from 'react';
 
 export default function FeaturesSection() {
   const { t } = useI18n();
+  const [activeFeature, setActiveFeature] = useState(0);
+
   const features = [
     {
-      icon: Icons.jobMatch(32, '#0051FF'),
-      title: t('features.ai_job.title'),
-      description: t('features.ai_job.desc'),
-      color: '#0051FF',
+      id: 0,
+      icon: Icons.jobMatch(32, 'var(--color-primary)'),
+      title: 'AI Job Scouting',
+      description: 'Cari pekerjaan yang sesuai dengan skill dan preferensi Anda secara otomatis',
     },
     {
-      icon: Icons.coverLetter(32, '#7C3AED'),
-      title: t('features.cover.title'),
-      description: t('features.cover.desc'),
-      color: '#7C3AED',
+      id: 1,
+      icon: Icons.analysis(32, 'var(--color-primary)'),
+      title: 'AI Matching',
+      description: 'Analisis kecocokan profil dengan lowongan menggunakan algoritma cerdas',
     },
     {
-      icon: Icons.autoApply(32, '#22C55E'),
-      title: t('features.apply.title'),
-      description: t('features.apply.desc'),
-      color: '#22C55E',
+      id: 2,
+      icon: Icons.coverLetter(32, 'var(--color-primary)'),
+      title: 'AI Email Auto Apply',
+      description: 'Generate dan kirim email lamaran otomatis ke ribuan perusahaan',
     },
     {
-      icon: Icons.tracking(32, '#0051FF'),
-      title: t('features.tracking.title'),
-      description: t('features.tracking.desc'),
-      color: '#0051FF',
+      id: 3,
+      icon: Icons.linkedin(32, 'var(--color-primary)'),
+      title: 'AI LinkedIn Auto Apply',
+      description: 'Otomatis apply ke lowongan di LinkedIn tanpa effort manual',
     },
     {
-      icon: Icons.telegram(32, '#FFB800'),
-      title: t('features.telegram.title'),
-      description: t('features.telegram.desc'),
-      color: '#FFB800',
+      id: 4,
+      icon: Icons.tracking(32, 'var(--color-primary)'),
+      title: 'Job Tracking System',
+      description: 'Monitor status aplikasi, feedback, dan progress wawancara di satu dashboard',
     },
     {
-      icon: Icons.analytics(32, '#1E293B'),
-      title: t('features.analytics.title'),
-      description: t('features.analytics.desc'),
-      color: '#1E293B',
+      id: 5,
+      icon: Icons.telegram(32, 'var(--color-primary)'),
+      title: 'Telegram Bot Automation',
+      description: 'Terima notifikasi real-time dan kelola aplikasi via Telegram',
     },
   ];
 
   return (
     <section
+      id="fitur"
       style={{
         padding: '100px 48px',
-        background: '#FFFFFF',
+        background: 'var(--color-background)',
         position: 'relative',
+        overflow: 'hidden',
       }}
     >
-      {/* Background Decoration */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '20%',
-          right: '-200px',
-          width: '600px',
-          height: '600px',
-          background: 'radial-gradient(circle, rgba(0,81,255,0.1) 0%, transparent 70%)',
-          borderRadius: '50%',
-          pointerEvents: 'none',
-        }}
-      />
-
       <div style={{ maxWidth: '1200px', margin: '0 auto', position: 'relative' }}>
         {/* Header */}
-        <ScrollAnimation delay={0}>
-          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
-            <p
-              style={{
-                fontSize: '14px',
-                fontWeight: '700',
-                textTransform: 'uppercase',
-                letterSpacing: '0.1em',
-                color: '#0051FF',
-                margin: '0 0 16px 0',
-              }}
-            >
-              FITUR UNGGULAN
-            </p>
-            <h2
-              style={{
-                fontSize: '40px',
-                fontWeight: '800',
-                color: '#1E293B',
-                margin: '0 0 16px 0',
-              }}
-            >
-              {t('features.title')}
-            </h2>
-            <p
-              style={{
-                fontSize: '18px',
-                color: '#64748B',
-                maxWidth: '600px',
-                margin: '0 auto',
-              }}
-            >
-              {t('features.subtitle')}
-            </p>
-          </div>
-        </ScrollAnimation>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          style={{ textAlign: 'center', marginBottom: '64px' }}
+        >
+          <p
+            style={{
+              fontSize: '14px',
+              fontWeight: '700',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              color: 'var(--color-primary)',
+              margin: '0 0 16px 0',
+              fontFamily: 'var(--font-heading)',
+            }}
+          >
+            FITUR UNGGULAN
+          </p>
+          <h2
+            style={{
+              fontSize: '40px',
+              fontWeight: '800',
+              color: 'var(--color-foreground)',
+              margin: '0 0 16px 0',
+              fontFamily: 'var(--font-heading)',
+            }}
+          >
+            {t('features.title')}
+          </h2>
+          <p
+            style={{
+              fontSize: '18px',
+              color: '#64748B',
+              maxWidth: '600px',
+              margin: '0 auto',
+              fontFamily: 'var(--font-body)',
+            }}
+          >
+            {t('features.subtitle')}
+          </p>
+        </motion.div>
 
-        {/* Features Grid */}
+        {/* Carousel / Tabs Style Features */}
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '32px',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '64px',
+            alignItems: 'center',
           }}
         >
-          {features.map((feature, i) => (
-            <ScrollAnimation key={i} delay={i * 100}>
-              <div
+          {/* Left: Feature List */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {features.map((feature, i) => (
+              <motion.div
+                key={i}
+                onClick={() => setActiveFeature(i)}
                 style={{
-                  padding: '40px 32px',
-                  background: '#FFFFFF',
-                  border: '1px solid #E2E8F0',
-                  borderRadius: '20px',
+                  padding: '24px',
+                  background: activeFeature === i ? '#FFFFFF' : 'transparent',
+                  borderRadius: '16px',
                   cursor: 'pointer',
+                  border: `1px solid ${activeFeature === i ? 'var(--color-border)' : 'transparent'}`,
+                  boxShadow: activeFeature === i ? '0 10px 30px rgba(0,0,0,0.05)' : 'none',
                   transition: 'all 0.3s ease',
-                  position: 'relative',
-                  overflow: 'hidden',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-8px)';
-                  e.currentTarget.style.boxShadow = `0 20px 40px ${feature.color}15`;
-                  e.currentTarget.style.borderColor = feature.color;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
-                  e.currentTarget.style.borderColor = '#E2E8F0';
+                  display: 'flex',
+                  gap: '20px',
+                  alignItems: 'flex-start',
                 }}
               >
-                {/* Icon */}
                 <div
                   style={{
-                    width: '60px',
-                    height: '60px',
-                    background: `${feature.color}10`,
-                    borderRadius: '16px',
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '12px',
+                    background: activeFeature === i ? 'var(--color-background)' : 'transparent',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    marginBottom: '24px',
-                    position: 'relative',
+                    flexShrink: 0,
                   }}
                 >
                   {feature.icon}
                 </div>
-
-                {/* Title */}
-                <h3
-                  style={{
-                    fontSize: '20px',
-                    fontWeight: '700',
-                    color: '#1E293B',
-                    margin: '0 0 12px 0',
-                    position: 'relative',
-                  }}
-                >
-                  {feature.title}
-                </h3>
-
-                {/* Description */}
-                <p
-                  style={{
-                    fontSize: '15px',
-                    color: '#64748B',
-                    margin: 0,
-                    lineHeight: '1.7',
-                    position: 'relative',
-                  }}
-                >
-                  {feature.description}
-                </p>
-
-                {/* Learn More Link */}
-                <div
-                  style={{
-                    marginTop: '24px',
-                    position: 'relative',
-                  }}
-                >
-                  <span
+                <div>
+                  <h3
                     style={{
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      color: feature.color,
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px',
+                      fontSize: '18px',
+                      fontWeight: '700',
+                      color: 'var(--color-foreground)',
+                      margin: '0 0 8px 0',
+                      fontFamily: 'var(--font-heading)',
                     }}
                   >
-                    Pelajari Lebih Lanjut {Icons.arrowRight(16, feature.color)}
-                  </span>
+                    {feature.title}
+                  </h3>
+                  <p
+                    style={{
+                      fontSize: '14px',
+                      color: '#64748B',
+                      margin: 0,
+                      lineHeight: '1.6',
+                      fontFamily: 'var(--font-body)',
+                      display: activeFeature === i ? 'block' : 'none',
+                    }}
+                  >
+                    {feature.description}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Right: Feature Image/Mockup */}
+          <div
+            style={{
+              background: '#FFFFFF',
+              borderRadius: '24px',
+              padding: '48px',
+              minHeight: '400px',
+              border: '1px solid var(--color-border)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.05)',
+              position: 'relative',
+            }}
+          >
+            {/* Dynamic UI Mockup based on active feature */}
+            <motion.div
+              key={activeFeature}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+              style={{
+                width: '100%',
+                background: 'var(--color-background)',
+                borderRadius: '16px',
+                padding: '24px',
+                border: '1px solid var(--color-border)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+                <div style={{ width: '40px', height: '40px', background: '#fff', borderRadius: '8px' }} />
+                <div>
+                  <div style={{ width: '120px', height: '12px', background: 'var(--color-primary)', borderRadius: '4px', marginBottom: '6px' }} />
+                  <div style={{ width: '80px', height: '8px', background: '#cbd5e1', borderRadius: '4px' }} />
                 </div>
               </div>
-            </ScrollAnimation>
-          ))}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {[1, 2, 3].map((_, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      width: '100%',
+                      height: '60px',
+                      background: '#fff',
+                      borderRadius: '8px',
+                      border: '1px solid var(--color-border)',
+                    }}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          </div>
         </div>
       </div>
     </section>

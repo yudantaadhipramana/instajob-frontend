@@ -42,7 +42,7 @@ export default function Navigation() {
       >
         {/* Logo */}
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Logo size={32} showText={true} />
+          <a href="/" style={{textDecoration: 'none'}}><Logo size={32} showText={true} /></a>
         </div>
 
         {/* Desktop Menu */}

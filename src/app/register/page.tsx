@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import Link from 'next/link';
+import { Logo } from '@/components/Logo';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -112,12 +113,20 @@ export default function RegisterPage() {
         style={{
           minHeight: '100vh',
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           background: 'linear-gradient(135deg, #F8FAFC 0%, #FFFFFF 100%)',
           padding: '20px',
         }}
       >
+        {/* Logo Header */}
+        <div style={{ marginBottom: '32px', textAlign: 'center' }}>
+          <a href="/" style={{ textDecoration: 'none', display: 'inline-block' }}>
+            <Logo size={40} showText={true} />
+          </a>
+        </div>
+
         <div
           className="register-card"
           style={{

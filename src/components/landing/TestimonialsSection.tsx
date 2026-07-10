@@ -22,28 +22,28 @@ export default function TestimonialsSection() {
         role: 'Fresh Graduate → SEO Specialist',
         company: 'Google',
         quote: t('quote1.text'),
-        avatar: 'RS',
+        avatar: 'https://i.pravatar.cc/150?img=47',
       },
       {
         name: 'Budi Hartono',
         role: 'Sales → Digital Marketing Manager',
         company: 'Shopee',
         quote: t('quote2.text'),
-        avatar: 'BH',
+        avatar: 'https://i.pravatar.cc/150?img=12',
       },
       {
         name: 'Maya Wijaya',
         role: 'Fresh Graduate → Data Analyst',
         company: 'GoTo',
         quote: t('quote3.text'),
-        avatar: 'MW',
+        avatar: 'https://i.pravatar.cc/150?img=32',
       },
       {
         name: 'Dian Permata',
         role: 'Admin → Product Designer',
         company: 'Tokopedia',
         quote: t('quote4.text'),
-        avatar: 'DP',
+        avatar: 'https://i.pravatar.cc/150?img=44',
       },
     ],
     1: [
@@ -52,14 +52,14 @@ export default function TestimonialsSection() {
         role: 'Customer Service → Data Analyst',
         company: 'BCA',
         quote: t('quote5.text'),
-        avatar: 'AP',
+        avatar: 'https://i.pravatar.cc/150?img=15',
       },
       {
         name: 'Sari Dewi',
         role: 'Fresh Graduate → Junior Data Analyst',
         company: 'Telkom',
         quote: t('quote6.text'),
-        avatar: 'SD',
+        avatar: 'https://i.pravatar.cc/150?img=36',
       },
     ],
     2: [
@@ -68,14 +68,14 @@ export default function TestimonialsSection() {
         role: 'Junior Dev → Software Engineer',
         company: 'Microsoft',
         quote: t('quote7.text'),
-        avatar: 'DA',
+        avatar: 'https://i.pravatar.cc/150?img=8',
       },
       {
         name: 'Ratna Kusuma',
         role: 'UI Designer → Full Stack Developer',
         company: 'Gojek',
         quote: t('quote8.text'),
-        avatar: 'RK',
+        avatar: 'https://i.pravatar.cc/150?img=29',
       },
     ],
   };
@@ -226,16 +226,22 @@ export default function TestimonialsSection() {
                       width: '48px',
                       height: '48px',
                       borderRadius: '50%',
-                      background: 'linear-gradient(135deg, #0051FF, #7C3AED)',
+                      background: 'var(--color-muted)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: '#fff',
+                      color: 'var(--color-primary)',
                       fontWeight: '700',
                       fontSize: '16px',
+                      overflow: 'hidden',
+                      fontFamily: 'var(--font-heading)',
                     }}
                   >
-                    {item.avatar}
+                    {item.avatar.startsWith('http') ? (
+                      <img src={item.avatar} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      item.avatar
+                    )}
                   </div>
                   <div>
                     <p
