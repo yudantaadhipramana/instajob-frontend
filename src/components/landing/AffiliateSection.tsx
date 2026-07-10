@@ -47,18 +47,37 @@ export default function AffiliateSection() {
       <div style={{ maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
         <div
           style={{
+            position: 'relative',
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
-            gap: '80px',
-            alignItems: 'center',
+            gap: '0px',
+            alignItems: 'stretch',
+            background: '#FFFFFF',
+            borderRadius: '28px',
+            border: '1px solid var(--color-border)',
+            boxShadow: '0 20px 60px rgba(15, 23, 42, 0.06)',
+            overflow: 'hidden',
           }}
         >
+          {/* Left accent strip */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              bottom: 0,
+              width: '6px',
+              background: 'linear-gradient(180deg, #1E40FF 0%, #3B82F6 100%)',
+            }}
+          />
+
           {/* Left: Content */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
+            style={{ padding: '56px 56px 56px 64px' }}
           >
             <p
               style={{
@@ -189,6 +208,9 @@ export default function AffiliateSection() {
               display: 'flex',
               flexDirection: 'column',
               gap: '24px',
+              padding: '56px 64px 56px 40px',
+              background: 'var(--color-muted)',
+              borderLeft: '1px solid var(--color-border)',
             }}
           >
             {[
@@ -203,23 +225,20 @@ export default function AffiliateSection() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.15, duration: 0.5 }}
                 style={{
-                  padding: '32px 28px',
-                  background: 'rgba(255, 255, 255, 0.5)',
+                  padding: '28px 24px',
+                  background: '#FFFFFF',
                   border: '1px solid var(--color-border)',
-                  borderRadius: '16px',
-                  backdropFilter: 'blur(12px)',
+                  borderRadius: '14px',
                   transition: 'all 0.3s ease',
                 }}
                 onMouseEnter={(e) => {
                   const el = e.currentTarget as HTMLDivElement;
-                  el.style.background = 'rgba(30, 64, 255, 0.04)';
-                  el.style.borderColor = 'rgba(30, 64, 255, 0.2)';
+                  el.style.borderColor = 'rgba(30, 64, 255, 0.3)';
                   el.style.transform = 'translateY(-4px)';
-                  el.style.boxShadow = '0 8px 24px rgba(30, 64, 255, 0.08)';
+                  el.style.boxShadow = '0 8px 24px rgba(30, 64, 255, 0.1)';
                 }}
                 onMouseLeave={(e) => {
                   const el = e.currentTarget as HTMLDivElement;
-                  el.style.background = 'rgba(255, 255, 255, 0.5)';
                   el.style.borderColor = 'var(--color-border)';
                   el.style.transform = 'translateY(0)';
                   el.style.boxShadow = 'none';

@@ -300,6 +300,39 @@ export const Icons = {
       <circle cx="17.5" cy="6.5" r="1.2" fill={color} />
     </svg>
   ),
+
+  whatsapp: (size = 18, color = '#94A3B8') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2C6.48 2 2 6.48 2 12c0 1.77.46 3.43 1.27 4.87L2 22l5.27-1.24A9.94 9.94 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z" stroke={color} strokeWidth="1.8" strokeLinejoin="round" fill="none" />
+      <path d="M8.5 9c0-.28.22-.5.5-.5h.5c.28 0 .5.22.5.5l.75 2-.5.5s.75 1.5 2.25 2.25l.5-.5 2 .75c.28 0 .5.22.5.5v.5c0 .28-.22.5-.5.5C11 16 8 13 8.5 9z" fill={color} />
+    </svg>
+  ),
+
+  threads: (size = 18, color = '#94A3B8') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2C7 2 4 5.5 4 9c0 2 .8 3.7 2.1 4.9.3.3.2.7-.1.9C4.7 15.6 4 17.2 4 19c0 1.7 1.3 3 3 3h10c1.7 0 3-1.3 3-3 0-1.8-.7-3.4-2-4.2-.3-.2-.4-.6-.1-.9C19.2 12.7 20 11 20 9c0-3.5-3-7-8-7z" stroke={color} strokeWidth="1.8" fill="none" strokeLinejoin="round" />
+      <path d="M9 10c0-1.7 1.3-3 3-3s3 1.3 3 3-1.3 3-3 3-3-1.3-3-3z" stroke={color} strokeWidth="1.8" fill="none" />
+    </svg>
+  ),
+
+  tiktok: (size = 18, color = '#94A3B8') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M9 12a4 4 0 104 4V4a5 5 0 005 5" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </svg>
+  ),
+
+  // CTA section icons (non-AI, geometric clean)
+  sparkle: (size = 20, color = '#fff') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2v4M12 18v4M2 12h4M18 12h4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke={color} strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  ),
+
+  zap: (size = 20, color = '#fff') => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
 };
 
 export default Icons;

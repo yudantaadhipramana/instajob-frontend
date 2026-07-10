@@ -13,202 +13,233 @@ export default function CTASection() {
   const handleRegister = useCallback(() => {
     router.push('/register');
   }, [router]);
+
   return (
     <section
       style={{
-        padding: '120px 48px',
+        padding: '80px 24px',
         background: '#FFFFFF',
-        position: 'relative',
-        overflow: 'hidden',
-        borderTop: '1px solid var(--color-border)'
       }}
     >
-      {/* Background Decoration Removed */}
-
-      <div
-        style={{
-          maxWidth: '900px',
-          margin: '0 auto',
-          textAlign: 'center',
-          position: 'relative',
-          zIndex: 1,
-        }}
-      >
-        {/* Badge */}
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <ScrollAnimation delay={0}>
           <div
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '8px 24px',
-              background: 'var(--color-muted)',
-              border: '1px solid var(--color-border)',
-              borderRadius: '100px',
-              marginBottom: '32px',
-              color: 'var(--color-primary)',
-              fontSize: '13px',
-              fontWeight: '700',
-              letterSpacing: '0.05em',
-              textTransform: 'uppercase',
-              fontFamily: 'var(--font-heading)'
+              position: 'relative',
+              overflow: 'hidden',
+              borderRadius: '32px',
+              padding: '80px 64px',
+              background: 'linear-gradient(135deg, #1E3A8A 0%, #1E40FF 55%, #3B82F6 100%)',
+              textAlign: 'center',
+              boxShadow: '0 30px 80px rgba(30, 64, 255, 0.35)',
             }}
           >
-            Mulai Transformasi Karir
-          </div>
-        </ScrollAnimation>
-
-        {/* Headline */}
-        <ScrollAnimation delay={100}>
-          <h2
-            style={{
-              fontSize: '56px',
-              fontWeight: '800',
-              color: 'var(--color-foreground)',
-              margin: '0 0 24px 0',
-              lineHeight: '1.15',
-              fontFamily: 'var(--font-heading)',
-              letterSpacing: '-0.03em',
-            }}
-          >
-            Ubah proses mencari kerja <br/>jadi lebih otomatis dan terukur.
-          </h2>
-        </ScrollAnimation>
-
-        {/* Subheadline */}
-        <ScrollAnimation delay={200}>
-          <p
-            style={{
-              fontSize: '18px',
-              color: 'var(--color-foreground-secondary)',
-              marginBottom: '48px',
-              maxWidth: '640px',
-              margin: '0 auto 48px',
-              lineHeight: '1.7',
-              fontFamily: 'var(--font-body)'
-            }}
-          >
-            {t('cta.subtitle')}
-          </p>
-        </ScrollAnimation>
-
-        {/* CTA Buttons */}
-        <ScrollAnimation delay={300}>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '16px',
-              marginBottom: '32px',
-            }}
-          >
-            <button
-              onClick={handleRegister}
+            {/* Decorative glow orbs */}
+            <div
               style={{
-                padding: '18px 48px',
-                background: 'var(--color-primary)',
-                color: '#FFFFFF',
-                border: 'none',
-                borderRadius: '14px',
-                fontSize: '18px',
-                fontWeight: '700',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '12px',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                fontFamily: 'var(--font-heading)',
-                boxShadow: '0 8px 24px rgba(30, 64, 255, 0.25)',
+                position: 'absolute',
+                top: '-120px',
+                right: '-80px',
+                width: '360px',
+                height: '360px',
+                background: 'radial-gradient(circle, rgba(255,255,255,0.14) 0%, transparent 70%)',
+                borderRadius: '50%',
+                pointerEvents: 'none',
               }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)';
-              e.currentTarget.style.boxShadow = '0 12px 32px rgba(30, 64, 255, 0.35)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0) scale(1)';
-              e.currentTarget.style.boxShadow = '0 8px 24px rgba(30, 64, 255, 0.25)';
-            }}
-          >
-            {t('cta.primaryBtn')}
-          </button>
-          <button
-            style={{
-              padding: '14px 32px',
-              background: 'transparent',
-              color: 'var(--color-foreground)',
-              border: '1px solid var(--color-border)',
-              borderRadius: '12px',
-              fontSize: '16px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'var(--color-muted)';
-              e.currentTarget.style.borderColor = 'var(--color-border)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent';
-              e.currentTarget.style.borderColor = 'var(--color-border)';
-            }}
-            >
-              {t('cta.secondaryBtn')}
-            </button>
-          </div>
-        </ScrollAnimation>
+            />
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '-140px',
+                left: '-100px',
+                width: '400px',
+                height: '400px',
+                background: 'radial-gradient(circle, rgba(255,255,255,0.10) 0%, transparent 70%)',
+                borderRadius: '50%',
+                pointerEvents: 'none',
+              }}
+            />
 
-        {/* Trust Indicators */}
-        <ScrollAnimation delay={400}>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              gap: '32px',
-              flexWrap: 'wrap',
-            }}
-          >
-            {[
-              { icon: '✓', text: t('cta.trust1') },
-              { icon: '✓', text: t('cta.trust2') },
-              { icon: '✓', text: t('cta.trust3') },
-            ].map((item, i) => (
+            <div style={{ position: 'relative', zIndex: 1, maxWidth: '760px', margin: '0 auto' }}>
+              {/* Badge */}
               <div
-                key={i}
                 style={{
-                  display: 'flex',
+                  display: 'inline-flex',
                   alignItems: 'center',
                   gap: '8px',
-                  color: 'var(--color-foreground-secondary)',
-                  fontSize: '14px',
-                  fontWeight: '500',
+                  padding: '8px 20px',
+                  background: 'rgba(255, 255, 255, 0.14)',
+                  border: '1px solid rgba(255, 255, 255, 0.25)',
+                  borderRadius: '100px',
+                  marginBottom: '32px',
+                  color: '#FFFFFF',
+                  fontSize: '13px',
+                  fontWeight: '700',
+                  letterSpacing: '0.05em',
+                  textTransform: 'uppercase',
+                  fontFamily: 'var(--font-heading)',
+                }}
+              >
+                {Icons.zap(16, '#FFFFFF')}
+                Mulai Transformasi Karir
+              </div>
+
+              {/* Headline */}
+              <h2
+                style={{
+                  fontSize: '48px',
+                  fontWeight: '800',
+                  color: '#FFFFFF',
+                  margin: '0 0 20px 0',
+                  lineHeight: '1.15',
+                  fontFamily: 'var(--font-heading)',
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                Ubah proses mencari kerja jadi lebih otomatis dan terukur.
+              </h2>
+
+              {/* Subheadline */}
+              <p
+                style={{
+                  fontSize: '18px',
+                  color: 'rgba(255, 255, 255, 0.85)',
+                  marginBottom: '40px',
+                  maxWidth: '560px',
+                  margin: '0 auto 40px',
+                  lineHeight: '1.7',
                   fontFamily: 'var(--font-body)',
                 }}
               >
-                <span
+                {t('cta.subtitle')}
+              </p>
+
+              {/* CTA Buttons */}
+              <div
+                style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  justifyContent: 'center',
+                  gap: '16px',
+                  marginBottom: '40px',
+                }}
+              >
+                <button
+                  onClick={handleRegister}
                   style={{
-                    width: '20px',
-                    height: '20px',
-                    background: 'rgba(34,197,94,0.12)',
-                    borderRadius: '50%',
-                    display: 'flex',
+                    padding: '16px 40px',
+                    background: '#FFFFFF',
+                    color: '#1E40FF',
+                    border: 'none',
+                    borderRadius: '14px',
+                    fontSize: '16px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#059669',
-                    fontWeight: '700',
-                    fontSize: '12px',
-                    flexShrink: 0,
+                    gap: '10px',
+                    whiteSpace: 'nowrap',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    fontFamily: 'var(--font-heading)',
+                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.18)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-3px)';
+                    e.currentTarget.style.boxShadow = '0 12px 28px rgba(0, 0, 0, 0.24)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.18)';
                   }}
                 >
-                  {item.icon}
-                </span>
-                {item.text}
+                  {t('cta.primaryBtn')}
+                  {Icons.arrowRight(18, '#1E40FF')}
+                </button>
+                <button
+                  style={{
+                    padding: '16px 32px',
+                    background: 'transparent',
+                    color: '#FFFFFF',
+                    border: '1px solid rgba(255, 255, 255, 0.4)',
+                    borderRadius: '14px',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    transition: 'all 0.3s ease',
+                    fontFamily: 'var(--font-body)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.6)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+                  }}
+                >
+                  {t('cta.secondaryBtn')}
+                </button>
               </div>
-            ))}
+
+              {/* Trust Indicators */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  gap: '28px',
+                  flexWrap: 'wrap',
+                }}
+              >
+                {[
+                  { text: t('cta.trust1') },
+                  { text: t('cta.trust2') },
+                  { text: t('cta.trust3') },
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      color: 'rgba(255, 255, 255, 0.85)',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      fontFamily: 'var(--font-body)',
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: '18px',
+                        height: '18px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {Icons.check(14, '#FFFFFF')}
+                    </span>
+                    {item.text}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </ScrollAnimation>
       </div>
+
+      <style jsx>{`
+        @media (max-width: 768px) {
+          section {
+            padding: 48px 16px;
+          }
+          div :global(h2) {
+            font-size: 32px !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }
