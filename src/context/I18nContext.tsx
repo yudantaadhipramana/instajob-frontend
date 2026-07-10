@@ -448,6 +448,7 @@ const translations: Record<Lang, Record<string, string>> = {
     'footer.legal': 'Legal',
     'footer.privacy': 'Privacy',
     'footer.terms': 'Terms',
+    'footer.cookies': 'Cookie Policy',
     'footer.copyright': '© 2026 InstaJob. All rights reserved.',
     
     // FAQ
