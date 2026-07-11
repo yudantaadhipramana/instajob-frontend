@@ -57,29 +57,11 @@ export default function AffiliateLoginPage() {
           textDecoration: 'none',
           cursor: 'pointer'
         }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            background: 'linear-gradient(135deg, #1E40FF 0%, #3B82F6 100%)',
-            borderRadius: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
-            fontWeight: '800',
-            fontSize: '20px',
-            fontFamily: 'var(--font-heading)'
-          }}>
-            I
-          </div>
-          <span style={{
-            fontSize: '20px',
-            fontWeight: '700',
-            color: 'var(--color-foreground)',
-            fontFamily: 'var(--font-heading)'
-          }}>
-            InstaJob
-          </span>
+          <img 
+            src="/logo-instajob.png" 
+            alt="InstaJob Logo" 
+            style={{ height: '40px', width: 'auto' }}
+          />
         </Link>
       </header>
 

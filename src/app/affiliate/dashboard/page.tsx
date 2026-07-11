@@ -168,28 +168,11 @@ export default function AffiliateDashboardPage() {
           gap: '12px',
           textDecoration: 'none'
         }}>
-          <div style={{
-            width: '36px',
-            height: '36px',
-            background: 'linear-gradient(135deg, #1E40FF 0%, #3B82F6 100%)',
-            borderRadius: '10px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
-            fontWeight: '800',
-            fontSize: '18px'
-          }}>
-            I
-          </div>
-          <span style={{
-            fontSize: '18px',
-            fontWeight: '700',
-            color: 'var(--color-foreground)',
-            fontFamily: 'var(--font-heading)'
-          }}>
-            InstaJob
-          </span>
+          <img 
+            src="/logo-instajob.png" 
+            alt="InstaJob Logo" 
+            style={{ height: '36px', width: 'auto' }}
+          />
         </Link>
         <button
           onClick={handleLogout}
