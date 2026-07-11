@@ -12,11 +12,11 @@ export default function NavigationBar() {
   const router = useRouter();
 
   const handleLogin = useCallback(() => {
-    router.push('/login');
+    router.push('/affiliate/login');
   }, [router]);
 
   const handleRegister = useCallback(() => {
-    router.push('/register');
+    router.push('/affiliate/daftar');
   }, [router]);
 
   const scrollToSection = (id: string) => {

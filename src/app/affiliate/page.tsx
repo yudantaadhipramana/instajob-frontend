@@ -11,7 +11,7 @@ export default function AffiliateLandingPage() {
   const router = useRouter();
 
   const benefits = [
-    { rate: '20-30%', label: 'Komisi Tiering' },
+    { rate: '20-35%', label: 'Komisi Tiering' },
     { rate: '7 hari', label: 'Masa Validasi' }
   ];
 
@@ -138,7 +138,7 @@ export default function AffiliateLandingPage() {
             }}
           >
             InstaJob adalah platform otomasi pencarian kerja berbasis AI. Dapatkan komisi hingga{' '}
-            <strong style={{ color: 'var(--color-primary)' }}>30%</strong> dari setiap referral yang berlangganan.
+            <strong style={{ color: 'var(--color-primary)' }}>35%</strong> dari setiap referral yang berlangganan.
           </motion.p>
 
           {/* CTA Buttons */}
@@ -347,7 +347,7 @@ export default function AffiliateLandingPage() {
             Keuntungan Bergabung
           </h3>
           {[
-            'Komisi 20%-30% (4 tier) dari pembayaran subscription pertama.',
+            'Komisi 20%-35% (4 tier) dari pembayaran subscription pertama.',
             'Komisi satu kali, bukan recurring.',
             'Validasi 7 hari sebelum komisi siap dibayar.',
             'Payout setiap Jumat melalui transfer manual.',
