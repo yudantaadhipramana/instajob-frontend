@@ -104,7 +104,7 @@ export default function SettingsPage() {
       // Fetch Telegram link status
       try {
         console.log("Fetching Telegram status with token:", token ? token.substring(0, 15) + "..." : "No token");
-        const res = await fetch('http://localhost:3001/api/telegram/link-status', {
+        const res = await fetch('${process.env.NEXT_PUBLIC_API_URL}/api/telegram/link-status', {
           headers: { 
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -157,7 +157,7 @@ export default function SettingsPage() {
     if (!token) return;
     setTelegramLoading(true);
     try {
-      const res = await fetch('http://localhost:3001/api/telegram/unlink', {
+      const res = await fetch('${process.env.NEXT_PUBLIC_API_URL}/api/telegram/unlink', {
         method: 'POST',
         headers: { 'Authorization': 'Bearer ' + token }
       });
@@ -192,7 +192,7 @@ export default function SettingsPage() {
 
     try {
       // Wire notification prefs → real API
-      const prefsRes = await fetch('http://localhost:3001/api/user/preferences', {
+      const prefsRes = await fetch('${process.env.NEXT_PUBLIC_API_URL}/api/user/preferences', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

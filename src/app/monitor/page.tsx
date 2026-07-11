@@ -148,7 +148,7 @@ export default function MonitorPage() {
       
       // Fetch initial bot status
       try {
-        const res = await fetch('http://localhost:3001/api/bot/status', {
+        const res = await fetch('${process.env.NEXT_PUBLIC_API_URL}/api/bot/status', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {
@@ -175,7 +175,7 @@ export default function MonitorPage() {
       if (!token) return;
 
       try {
-        const res = await fetch('http://localhost:3001/api/bot/status', {
+        const res = await fetch('${process.env.NEXT_PUBLIC_API_URL}/api/bot/status', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {
@@ -204,7 +204,7 @@ export default function MonitorPage() {
     
     try {
       const endpoint = runStatus === 'paused' ? 'resume' : 'start';
-      const res = await fetch(`http://localhost:3001/api/bot/${endpoint}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bot/${endpoint}`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -219,7 +219,7 @@ export default function MonitorPage() {
       setStats(prev => ({ ...prev, isActive: true }));
       
       // Immediate status refresh
-      const statusRes = await fetch('http://localhost:3001/api/bot/status', {
+      const statusRes = await fetch('${process.env.NEXT_PUBLIC_API_URL}/api/bot/status', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (statusRes.ok) {
@@ -239,7 +239,7 @@ export default function MonitorPage() {
     const token = localStorage.getItem('instajob_token');
     
     try {
-      const res = await fetch('http://localhost:3001/api/bot/pause', {
+      const res = await fetch('${process.env.NEXT_PUBLIC_API_URL}/api/bot/pause', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -260,7 +260,7 @@ export default function MonitorPage() {
     const token = localStorage.getItem('instajob_token');
     
     try {
-      const res = await fetch('http://localhost:3001/api/bot/stop', {
+      const res = await fetch('${process.env.NEXT_PUBLIC_API_URL}/api/bot/stop', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });

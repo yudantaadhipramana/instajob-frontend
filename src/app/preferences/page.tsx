@@ -51,7 +51,7 @@ export default function PreferencesPage() {
       }
 
       try {
-        const res = await fetch('http://localhost:3001/api/user/preferences', {
+        const res = await fetch('${process.env.NEXT_PUBLIC_API_URL}/api/user/preferences', {
           headers: { 'Authorization': `Bearer ${token}` },
         });
 
@@ -162,7 +162,7 @@ export default function PreferencesPage() {
     setSaveError(false);
 
     try {
-      const res = await fetch('http://localhost:3001/api/user/preferences', {
+      const res = await fetch('${process.env.NEXT_PUBLIC_API_URL}/api/user/preferences', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

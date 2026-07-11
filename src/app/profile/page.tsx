@@ -52,7 +52,7 @@ export default function ProfilePage() {
       return;
     }
 
-    fetch('http://localhost:3001/api/user/profile', {
+    fetch('${process.env.NEXT_PUBLIC_API_URL}/api/user/profile', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -187,7 +187,7 @@ export default function ProfilePage() {
     setSaveSuccess(false);
 
     try {
-      const res = await fetch('http://localhost:3001/api/user/profile', {
+      const res = await fetch('${process.env.NEXT_PUBLIC_API_URL}/api/user/profile', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

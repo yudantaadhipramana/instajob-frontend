@@ -260,7 +260,7 @@ export default function AffiliateDaftarPage() {
                     <label style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <InstagramSVG /> Instagram <span style={{ fontSize: '12px', color: '#DC2626' }}>*</span>
                     </label>
-                    <input name="instagram" type="text" value={form.instagram} onChange={onChange} placeholder="@username atau link profil Instagram"
+                    <input name="instagram" type="text" value={form.instagram} onChange={onChange} placeholder="https://instagram.com/username"
                       style={noIconFieldStyle(errors.instagram)}
                       onFocus={e => { e.target.style.borderColor = '#EC4899'; e.target.style.boxShadow = '0 0 0 3px rgba(236,72,153,0.1)'; }}
                       onBlur={e => { e.target.style.borderColor = errors.instagram ? '#FECACA' : 'rgba(0,0,0,0.1)'; e.target.style.boxShadow = 'none'; }} />
@@ -273,7 +273,7 @@ export default function AffiliateDaftarPage() {
                       <label style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <TikTokSVG /> TikTok <span style={{ fontSize: '11px', color: '#94A3B8', fontWeight: '400' }}>(opsional)</span>
                       </label>
-                      <input name="tiktok" type="text" value={form.tiktok} onChange={onChange} placeholder="@username"
+                      <input name="tiktok" type="text" value={form.tiktok} onChange={onChange} placeholder="https://tiktok.com/@username"
                         style={noIconFieldStyle()}
                         onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
                         onBlur={e => e.target.style.borderColor = 'rgba(0,0,0,0.1)'} />
@@ -282,7 +282,7 @@ export default function AffiliateDaftarPage() {
                       <label style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <ThreadsSVG /> Threads <span style={{ fontSize: '11px', color: '#94A3B8', fontWeight: '400' }}>(opsional)</span>
                       </label>
-                      <input name="threads" type="text" value={form.threads} onChange={onChange} placeholder="@username"
+                      <input name="threads" type="text" value={form.threads} onChange={onChange} placeholder="https://threads.net/@username"
                         style={noIconFieldStyle()}
                         onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
                         onBlur={e => e.target.style.borderColor = 'rgba(0,0,0,0.1)'} />
