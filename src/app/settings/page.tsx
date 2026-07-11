@@ -44,6 +44,38 @@ export default function SettingsPage() {
   const [currentPlan, setCurrentPlan] = useState('monthly');
   const [autoRenew, setAutoRenew] = useState(true);
 
+  // Gmail State
+  const [gmailStatus, setGmailStatus] = useState<{ isConnected: boolean; email: string | null } | null>(null);
+  const [gmailLoading, setGmailLoading] = useState(false);
+
+  const handleConnectGmail = async () => {
+    const token = localStorage.getItem('instajob_token');
+    if (!token) return;
+    setGmailLoading(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/integrations/gmail/auth-url`, {
+        method: 'POST', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+      if (data.authUrl) window.open(data.authUrl, '_blank');
+    } catch { setErrorMessage('Gagal memuat URL koneksi Gmail'); }
+    setGmailLoading(false);
+  };
+
+  const handleDisconnectGmail = async () => {
+    const token = localStorage.getItem('instajob_token');
+    if (!token) return;
+    setGmailLoading(true);
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/integrations/gmail/disconnect`, {
+        method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setGmailStatus({ isConnected: false, email: null });
+      setSuccessMessage('Gmail berhasil diputus');
+    } catch { setErrorMessage('Gagal memutus Gmail'); }
+    setGmailLoading(false);
+  };
+
   // Telegram State
   const [telegramData, setTelegramData] = useState<{
     isLinked: boolean;
@@ -91,6 +123,14 @@ export default function SettingsPage() {
       } catch (err) {
         console.error("Fetch error:", err);
       }
+
+      // Fetch Gmail status
+      try {
+        const gmailRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/integrations/gmail/status`, {
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+        });
+        if (gmailRes.ok) setGmailStatus(await gmailRes.json());
+      } catch { /* non-fatal */ }
 
       setLoading(false);
     };
@@ -730,6 +770,71 @@ export default function SettingsPage() {
                   </a>
                 )}
               </>
+            )}
+          </div>
+        </div>
+
+        {/* Gmail Account Linking */}
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(254,242,242,0.95) 0%, rgba(254,226,226,0.8) 100%)',
+          backdropFilter: 'blur(12px)',
+          borderRadius: '16px',
+          border: '1px solid rgba(252,165,165,0.4)',
+          boxShadow: '0 4px 20px -2px rgba(0,0,0,0.02)',
+          padding: '24px',
+          marginBottom: '24px',
+          marginTop: '0'
+        }}>
+          <h2 style={{
+            fontSize: '18px', fontWeight: '600', color: '#B91C1C',
+            margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: '10px'
+          }}>
+            <Mail size={20} color="#B91C1C" />
+            Gmail Auto-Send
+          </h2>
+          <p style={{ fontSize: '14px', color: '#EF4444', marginBottom: '16px' }}>
+            {gmailStatus?.isConnected
+              ? `Gmail terhubung: ${gmailStatus.email}. InstaJob dapat mengirim lamaran otomatis via Gmail kamu.`
+              : 'Hubungkan Gmail untuk mengaktifkan fitur auto-send lamaran kerja langsung dari akun Gmail kamu.'}
+          </p>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            {gmailStatus?.isConnected ? (
+              <>
+                <div style={{
+                  flex: 1, padding: '10px 16px', borderRadius: '8px',
+                  backgroundColor: '#D1FAE5', color: '#065F46',
+                  display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500'
+                }}>
+                  <CheckCircle size={18} /> Terhubung ke Gmail
+                </div>
+                <button
+                  onClick={handleDisconnectGmail}
+                  disabled={gmailLoading}
+                  style={{
+                    padding: '10px 20px', backgroundColor: '#EF4444', color: 'white',
+                    border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '500',
+                    cursor: gmailLoading ? 'not-allowed' : 'pointer', opacity: gmailLoading ? 0.7 : 1
+                  }}
+                >
+                  {gmailLoading ? 'Memutus...' : 'Putus Koneksi'}
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={handleConnectGmail}
+                disabled={gmailLoading}
+                style={{
+                  padding: '10px 24px',
+                  background: 'linear-gradient(135deg, #1E40FF 0%, #3B82F6 100%)',
+                  color: 'white', border: 'none', borderRadius: '8px',
+                  fontSize: '14px', fontWeight: '600',
+                  cursor: gmailLoading ? 'not-allowed' : 'pointer', opacity: gmailLoading ? 0.7 : 1,
+                  display: 'flex', alignItems: 'center', gap: '8px'
+                }}
+              >
+                <Mail size={16} />
+                {gmailLoading ? 'Memuat...' : 'Hubungkan Gmail'}
+              </button>
             )}
           </div>
         </div>
