@@ -50,3 +50,7 @@ yarn.lock
 pnpm-lock.yaml
 
 .vercel
+node_modules/
+.next/
+.env
+.env.local
