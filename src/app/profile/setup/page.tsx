@@ -132,7 +132,7 @@ export default function ProfileSetupPage() {
     const t = localStorage.getItem('instajob_token');
     
     try {
-      const response = await fetch('http://localhost:3000/api/user/profile', {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/user/profile', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${t}`,
