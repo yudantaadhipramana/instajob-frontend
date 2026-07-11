@@ -53,13 +53,13 @@ export default function AffiliateDashboardPage() {
   };
 
   const handleCopyCode = () => {
-    navigator.clipboard.writeText('YUDANTA-ADHIPRAM-CODE');
+    navigator.clipboard.writeText(data?.code || 'YUDANTA-ADHIPRAM-CODE');
     setCopiedCode(true);
     setTimeout(() => setCopiedCode(false), 2000);
   };
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(`${window.location.origin}/register?ref=YUDANTA-ADHIPRAM-CODE`);
+    navigator.clipboard.writeText(`${window.location.origin}/register?ref=${data?.code || 'CODE'}`);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
   };
@@ -152,13 +152,20 @@ export default function AffiliateDashboardPage() {
     );
   }
 
+  const tierBadges = [
+    { emoji: '🥉', name: 'Bronze', rate: '20%', color: '#CD7F32' },
+    { emoji: '🥈', name: 'Silver', rate: '25%', color: '#C0C0C0' },
+    { emoji: '🥇', name: 'Gold', rate: '30%', color: '#FFD700' },
+    { emoji: '💎', name: 'Platinum', rate: '35%', color: '#E5E4E2' }
+  ];
+
   return (
-    <div style={{ minHeight: '100vh', background: '#FFFFFF' }}>
-      {/* Header */}
+    <div style={{ minHeight: '100vh', background: '#F9FAFB' }}>
+      {/* Header - Compact dengan Title di samping Logo */}
       <header style={{
         background: '#FFFFFF',
         borderBottom: '1px solid #E5E7EB',
-        padding: '20px 48px',
+        padding: '16px 48px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -167,27 +174,35 @@ export default function AffiliateDashboardPage() {
         zIndex: 100,
         boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
       }}>
-        <Link href="/" style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          textDecoration: 'none'
-        }}>
-          <img 
-            src="/logo-instajob.png" 
-            alt="InstaJob Logo" 
-            style={{ height: '36px', width: 'auto' }}
-          />
-        </Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+            <img 
+              src="/logo-instajob.png" 
+              alt="InstaJob Logo" 
+              style={{ height: '32px', width: 'auto' }}
+            />
+          </Link>
+          <div style={{ borderLeft: '1px solid #E5E7EB', paddingLeft: '24px' }}>
+            <h1 style={{
+              fontSize: '20px',
+              fontWeight: '700',
+              color: '#1F2937',
+              margin: 0,
+              fontFamily: 'var(--font-heading)'
+            }}>
+              Affiliate Dashboard
+            </h1>
+          </div>
+        </div>
         <button
           onClick={handleLogout}
           style={{
-            padding: '10px 20px',
+            padding: '8px 18px',
             background: '#F3F4F6',
             color: '#374151',
             border: '1px solid #E5E7EB',
             borderRadius: '8px',
-            fontSize: '14px',
+            fontSize: '13px',
             fontWeight: '600',
             cursor: 'pointer',
             fontFamily: 'var(--font-body)',
@@ -204,155 +219,86 @@ export default function AffiliateDashboardPage() {
         </button>
       </header>
 
-      {/* Main Content */}
-      <main style={{ padding: '48px', maxWidth: '1400px', margin: '0 auto' }}>
-        {/* Page Title */}
+      {/* Main Content - Compact Layout untuk Fit 1 halaman */}
+      <main style={{ padding: '24px 48px', maxWidth: '1400px', margin: '0 auto' }}>
+        
+        {/* Info Badge + Action Row */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          style={{ marginBottom: '32px' }}
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '20px',
+            background: '#FFFFFF',
+            border: '1px solid #E5E7EB',
+            borderRadius: '12px',
+            padding: '16px 24px',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
+          }}
         >
-          <h1 style={{
-            fontSize: '32px',
-            fontWeight: '700',
-            color: '#1F2937',
-            marginBottom: '12px',
-            fontFamily: 'var(--font-heading)'
-          }}>
-            Affiliate Dashboard
-          </h1>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <span style={{
-              padding: '6px 14px',
+              padding: '6px 12px',
               background: '#DBEAFE',
               color: '#1E40AF',
-              fontSize: '12px',
-              fontWeight: '600',
-              borderRadius: '8px',
+              fontSize: '11px',
+              fontWeight: '700',
+              borderRadius: '6px',
               fontFamily: 'var(--font-body)',
               textTransform: 'uppercase',
               letterSpacing: '0.5px'
             }}>
               PAYOUT SETIAP JUMAT
             </span>
-            <span style={{
-              fontSize: '14px',
-              color: '#6B7280',
-              fontFamily: 'var(--font-body)'
-            }}>
-              Komisi 20% diberikan satu kali dari pembayaran subscription pertama customer.
-            </span>
-          </div>
-        </motion.div>
-
-        {/* Affiliate Info Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          style={{
-            background: '#FFFFFF',
-            border: '1px solid #E5E7EB',
-            borderRadius: '12px',
-            padding: '32px',
-            marginBottom: '32px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
-          }}
-        >
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            marginBottom: '24px'
-          }}>
-            <div>
-              <div style={{
-                fontSize: '13px',
-                color: '#6B7280',
-                fontWeight: '600',
-                marginBottom: '4px',
-                fontFamily: 'var(--font-body)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
-                Status
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <div style={{
-                  width: '10px',
-                  height: '10px',
+                  width: '8px',
+                  height: '8px',
                   background: '#10B981',
                   borderRadius: '50%'
                 }} />
                 <span style={{
-                  fontSize: '16px',
+                  fontSize: '13px',
                   fontWeight: '600',
-                  color: '#1F2937',
+                  color: '#10B981',
                   fontFamily: 'var(--font-body)'
                 }}>
                   Active
                 </span>
               </div>
-            </div>
-            <div>
-              <div style={{
+              <span style={{ color: '#E5E7EB' }}>•</span>
+              <span style={{
                 fontSize: '13px',
-                color: '#6B7280',
                 fontWeight: '600',
-                marginBottom: '4px',
-                fontFamily: 'var(--font-body)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
-                Rate Komisi
-              </div>
-              <div style={{
-                fontSize: '20px',
-                fontWeight: '700',
                 color: '#3B82F6',
-                fontFamily: 'var(--font-heading)'
-              }}>
-                {data?.commission || '20%'}
-              </div>
-            </div>
-            <div>
-              <div style={{
-                fontSize: '13px',
-                color: '#6B7280',
-                fontWeight: '600',
-                marginBottom: '4px',
-                fontFamily: 'var(--font-body)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
-                Masa Validasi
-              </div>
-              <div style={{
-                fontSize: '16px',
-                fontWeight: '600',
-                color: '#1F2937',
                 fontFamily: 'var(--font-body)'
               }}>
-                7 Hari
-              </div>
+                Rate: {data?.commission || '20%'}
+              </span>
+              <span style={{ color: '#E5E7EB' }}>•</span>
+              <span style={{
+                fontSize: '13px',
+                color: '#6B7280',
+                fontFamily: 'var(--font-body)'
+              }}>
+                Validasi 7 hari
+              </span>
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div style={{
-            display: 'flex',
-            gap: '12px',
-            flexWrap: 'wrap'
-          }}>
+          <div style={{ display: 'flex', gap: '10px' }}>
             <button
               onClick={handleCopyCode}
               style={{
-                padding: '10px 18px',
-                background: '#F3F4F6',
-                color: '#374151',
+                padding: '8px 16px',
+                background: copiedCode ? '#10B981' : '#F3F4F6',
+                color: copiedCode ? 'white' : '#374151',
                 border: '1px solid #E5E7EB',
-                borderRadius: '8px',
-                fontSize: '13px',
+                borderRadius: '6px',
+                fontSize: '12px',
                 fontWeight: '600',
                 cursor: 'pointer',
                 fontFamily: 'var(--font-body)',
@@ -360,12 +306,6 @@ export default function AffiliateDashboardPage() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px'
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.background = '#E5E7EB';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.background = '#F3F4F6';
               }}
             >
               {copiedCode ? '✓' : '📋'} {copiedCode ? 'Tersalin!' : 'Copy Code'}
@@ -373,12 +313,12 @@ export default function AffiliateDashboardPage() {
             <button
               onClick={handleCopyLink}
               style={{
-                padding: '10px 18px',
-                background: '#F3F4F6',
-                color: '#374151',
+                padding: '8px 16px',
+                background: copiedLink ? '#10B981' : '#F3F4F6',
+                color: copiedLink ? 'white' : '#374151',
                 border: '1px solid #E5E7EB',
-                borderRadius: '8px',
-                fontSize: '13px',
+                borderRadius: '6px',
+                fontSize: '12px',
                 fontWeight: '600',
                 cursor: 'pointer',
                 fontFamily: 'var(--font-body)',
@@ -387,43 +327,62 @@ export default function AffiliateDashboardPage() {
                 alignItems: 'center',
                 gap: '6px'
               }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.background = '#E5E7EB';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.background = '#F3F4F6';
-              }}
             >
               {copiedLink ? '✓' : '🔗'} {copiedLink ? 'Tersalin!' : 'Copy Link'}
             </button>
           </div>
         </motion.div>
 
-        {/* Stats Grid - 5 Columns */}
+        {/* Stats Grid - 5 Columns + Badge Card */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(5, 1fr)',
-          gap: '16px',
-          marginBottom: '32px'
+          gridTemplateColumns: 'repeat(6, 1fr)',
+          gap: '14px',
+          marginBottom: '20px'
         }}>
           {[
-            { label: 'Total Referrals', value: data?.referralCount || 0, desc: '0 paid tenant', icon: '👥' },
-            { label: 'Pending', value: formatIDR(data?.pendingPayout || 0), desc: 'Validasi 7 hari', icon: '⏳' },
-            { label: 'Payable', value: formatIDR(data?.totalEarnings || 0), desc: 'Siap payout', icon: '💰' },
-            { label: 'Paid', value: 'Rp 0', desc: 'Sudah dibayar', icon: '✓' },
-            { label: 'Next Payout', value: 'Jumat', desc: 'Manual transfer', icon: '📅' }
+            { 
+              label: 'Total Referrals', 
+              value: data?.referralCount || 0, 
+              desc: '0 paid tenant',
+              iconColor: '#6366F1'
+            },
+            { 
+              label: 'Pending', 
+              value: formatIDR(data?.pendingPayout || 0), 
+              desc: 'Validasi 7 hari',
+              iconColor: '#F97316'
+            },
+            { 
+              label: 'Payable', 
+              value: formatIDR(data?.totalEarnings || 0), 
+              desc: 'Siap payout',
+              iconColor: '#10B981'
+            },
+            { 
+              label: 'Paid', 
+              value: 'Rp 0', 
+              desc: 'Sudah dibayar',
+              iconColor: '#10B981'
+            },
+            { 
+              label: 'Next Payout', 
+              value: 'Jumat', 
+              desc: 'Manual transfer',
+              iconColor: '#3B82F6'
+            }
           ].map((stat, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 + i * 0.05 }}
+              transition={{ delay: 0.05 + i * 0.03 }}
               style={{
                 background: '#FFFFFF',
-                borderRadius: '12px',
-                padding: '20px',
+                borderRadius: '10px',
+                padding: '16px',
                 border: '1px solid #E5E7EB',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
                 transition: 'all 0.2s'
               }}
               onMouseEnter={(e) => {
@@ -434,14 +393,14 @@ export default function AffiliateDashboardPage() {
               onMouseLeave={(e) => {
                 const el = e.currentTarget as HTMLDivElement;
                 el.style.borderColor = '#E5E7EB';
-                el.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08)';
+                el.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)';
               }}
             >
               <div style={{
-                fontSize: '12px',
+                fontSize: '11px',
                 color: '#9CA3AF',
-                fontWeight: '600',
-                marginBottom: '8px',
+                fontWeight: '700',
+                marginBottom: '6px',
                 fontFamily: 'var(--font-body)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px'
@@ -449,17 +408,17 @@ export default function AffiliateDashboardPage() {
                 {stat.label}
               </div>
               <div style={{
-                fontSize: '24px',
+                fontSize: '20px',
                 fontWeight: '700',
                 color: '#111827',
-                marginBottom: '4px',
+                marginBottom: '2px',
                 fontFamily: 'var(--font-heading)',
                 lineHeight: '1.2'
               }}>
                 {stat.value}
               </div>
               <div style={{
-                fontSize: '12px',
+                fontSize: '11px',
                 color: '#9CA3AF',
                 fontFamily: 'var(--font-body)'
               }}>
@@ -467,61 +426,148 @@ export default function AffiliateDashboardPage() {
               </div>
             </motion.div>
           ))}
+
+          {/* Badge/Lencana Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            style={{
+              background: 'linear-gradient(135deg, rgba(30, 64, 255, 0.05) 0%, rgba(59, 130, 246, 0.08) 100%)',
+              borderRadius: '10px',
+              padding: '16px',
+              border: '1px solid rgba(30, 64, 255, 0.2)',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              const el = e.currentTarget as HTMLDivElement;
+              el.style.borderColor = 'rgba(30, 64, 255, 0.3)';
+              el.style.boxShadow = '0 4px 12px rgba(30, 64, 255, 0.12)';
+            }}
+            onMouseLeave={(e) => {
+              const el = e.currentTarget as HTMLDivElement;
+              el.style.borderColor = 'rgba(30, 64, 255, 0.2)';
+              el.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)';
+            }}
+          >
+            <div style={{
+              fontSize: '11px',
+              color: '#3B82F6',
+              fontWeight: '700',
+              marginBottom: '6px',
+              fontFamily: 'var(--font-body)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              🏆 LENCANA
+            </div>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '4px',
+              marginTop: '8px'
+            }}>
+              {tierBadges.map((badge, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    padding: '4px 6px',
+                    background: idx < 2 ? badge.color : '#FFFFFF',
+                    border: idx >= 2 ? `1px solid ${badge.color}` : 'none',
+                    borderRadius: '6px',
+                    fontSize: '9px',
+                    fontWeight: '700',
+                    color: idx < 2 ? '#fff' : '#374151',
+                    fontFamily: 'var(--font-body)',
+                    textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px'
+                  }}
+                >
+                  <span>{badge.emoji}</span>
+                  <span style={{ fontSize: '8px', opacity: 0.8 }}>{badge.rate}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
         </div>
 
-        {/* Content Cards - 3 Columns */}
+        {/* Content Cards - 3 Columns dengan ikon profesional SVG */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '16px'
+          gap: '14px'
         }}>
           {[
-            { title: 'Latest Referrals', icon: '👥', message: 'No referrals yet', desc: 'Referral yang masuk dari link atau kode kamu akan tampil di sini.' },
-            { title: 'Latest Commissions', icon: '📝', message: 'No commissions yet', desc: 'Komisi akan muncul setelah invoice subscription pertama customer dibayar.' },
-            { title: 'Latest Payouts', icon: '📋', message: 'No payouts yet', desc: 'Payout setiap Jumat akan tampil setelah komisi masuk payable.' }
+            { 
+              title: 'Latest Referrals', 
+              iconComponent: Icons.users(32, '#6366F1'),
+              message: 'No referrals yet', 
+              desc: 'Referral yang masuk dari link atau kode kamu akan tampil di sini.' 
+            },
+            { 
+              title: 'Latest Commissions', 
+              iconComponent: Icons.money(32, '#F97316'),
+              message: 'No commissions yet', 
+              desc: 'Komisi akan muncul setelah invoice subscription pertama customer dibayar.' 
+            },
+            { 
+              title: 'Latest Payouts', 
+              iconComponent: Icons.payment(32, '#10B981'),
+              message: 'No payouts yet', 
+              desc: 'Payout setiap Jumat akan tampil setelah komisi masuk payable.' 
+            }
           ].map((section, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 + i * 0.05 }}
+              transition={{ delay: 0.3 + i * 0.04 }}
               style={{
                 background: '#FFFFFF',
-                borderRadius: '12px',
+                borderRadius: '10px',
                 border: '1px solid #E5E7EB',
-                padding: '32px',
+                padding: '24px',
                 textAlign: 'center',
-                minHeight: '280px',
+                minHeight: '200px',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
+                boxShadow: '0 1px 3px rgba(0,0,0,0.06)'
               }}
             >
-              <div style={{ fontSize: '40px', marginBottom: '16px' }}>{section.icon}</div>
+              <div style={{ 
+                marginBottom: '12px',
+                opacity: 0.5
+              }}>
+                {section.iconComponent}
+              </div>
               <h3 style={{
-                fontSize: '18px',
+                fontSize: '16px',
                 fontWeight: '600',
                 color: '#1F2937',
-                marginBottom: '8px',
+                marginBottom: '6px',
                 fontFamily: 'var(--font-heading)'
               }}>
                 {section.title}
               </h3>
               <p style={{
-                fontSize: '14px',
+                fontSize: '13px',
                 color: '#6B7280',
                 marginBottom: '4px',
-                fontFamily: 'var(--font-body)'
+                fontFamily: 'var(--font-body)',
+                fontWeight: '500'
               }}>
                 {section.message}
               </p>
               <p style={{
-                fontSize: '13px',
+                fontSize: '12px',
                 color: '#9CA3AF',
                 fontFamily: 'var(--font-body)',
-                lineHeight: '1.5'
+                lineHeight: '1.4'
               }}>
                 {section.desc}
               </p>
@@ -534,19 +580,19 @@ export default function AffiliateDashboardPage() {
         @keyframes spin {
           to { transform: rotate(360deg); }
         }
-        @media (max-width: 1024px) {
+        @media (max-width: 1200px) {
           main {
-            padding: 32px;
+            padding: 20px 32px;
           }
-          h1 {
-            font-size: 28px;
+          div[style*="gridTemplateColumns: 'repeat(6"] {
+            grid-template-columns: repeat(3, 1fr);
           }
         }
         @media (max-width: 768px) {
           main {
-            padding: 24px;
+            padding: 16px 24px;
           }
-          div[style*="gridTemplateColumns: 'repeat(5"] {
+          div[style*="gridTemplateColumns: 'repeat(6"] {
             grid-template-columns: repeat(2, 1fr);
           }
           div[style*="gridTemplateColumns: 'repeat(3"] {

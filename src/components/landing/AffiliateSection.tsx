@@ -158,7 +158,7 @@ export default function AffiliateSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.4, duration: 0.5 }}
-              onClick={() => (window.location.href = '/affiliate/daftar')}
+              onClick={() => (window.location.href = '/affiliate')}
               style={{
                 padding: '16px 40px',
                 background: 'var(--color-primary)',

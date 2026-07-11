@@ -149,7 +149,7 @@ export default function AffiliateLandingPage() {
             style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}
           >
             <button
-              onClick={() => router.push('/affiliate/login')}
+              onClick={() => router.push('/affiliate/daftar')}
               style={{
                 padding: '16px 32px',
                 background: 'linear-gradient(135deg, #1E40FF 0%, #3B82F6 100%)',
@@ -421,7 +421,7 @@ export default function AffiliateLandingPage() {
             Daftar sekarang dan mulai ajak job seeker menggunakan InstaJob.
           </p>
           <button
-            onClick={() => router.push('/affiliate/login')}
+            onClick={() => router.push('/affiliate/daftar')}
             style={{
               padding: '18px 40px',
               background: 'white',
