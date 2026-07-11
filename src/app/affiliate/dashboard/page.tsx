@@ -152,12 +152,16 @@ export default function AffiliateDashboardPage() {
     );
   }
 
-  const tierBadges = [
-    { emoji: '🥉', name: 'Bronze', rate: '20%', color: '#CD7F32' },
-    { emoji: '🥈', name: 'Silver', rate: '25%', color: '#C0C0C0' },
-    { emoji: '🥇', name: 'Gold', rate: '30%', color: '#FFD700' },
-    { emoji: '💎', name: 'Platinum', rate: '35%', color: '#E5E4E2' }
-  ];
+  // Badge tier system: Bronze 0, Silver 30, Gold 100, Platinum 250
+  const referralCount = data?.referralCount || 0;
+  const getCurrentTier = () => {
+    if (referralCount >= 250) return { emoji: '💎', name: 'Platinum', rate: '35%', color: '#E5E4E2', next: null, progress: 100 };
+    if (referralCount >= 100) return { emoji: '🥇', name: 'Gold', rate: '30%', color: '#FFD700', next: 250, progress: ((referralCount - 100) / 150) * 100 };
+    if (referralCount >= 30) return { emoji: '🥈', name: 'Silver', rate: '25%', color: '#C0C0C0', next: 100, progress: ((referralCount - 30) / 70) * 100 };
+    return { emoji: '🥉', name: 'Bronze', rate: '20%', color: '#CD7F32', next: 30, progress: (referralCount / 30) * 100 };
+  };
+
+  const currentTier = getCurrentTier();
 
   return (
     <div style={{ minHeight: '100vh', background: '#F9FAFB' }}>
@@ -220,7 +224,7 @@ export default function AffiliateDashboardPage() {
       </header>
 
       {/* Main Content - Compact Layout untuk Fit 1 halaman */}
-      <main style={{ padding: '24px 48px', maxWidth: '1400px', margin: '0 auto' }}>
+      <main style={{ padding: '24px 48px', maxWidth: '1440px', margin: '0 auto' }}>
         
         {/* Info Badge + Action Row */}
         <motion.div
@@ -238,7 +242,7 @@ export default function AffiliateDashboardPage() {
             boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
             <span style={{
               padding: '6px 12px',
               background: '#DBEAFE',
@@ -276,7 +280,7 @@ export default function AffiliateDashboardPage() {
                 color: '#3B82F6',
                 fontFamily: 'var(--font-body)'
               }}>
-                Rate: {data?.commission || '20%'}
+                Rate: {currentTier.rate}
               </span>
               <span style={{ color: '#E5E7EB' }}>•</span>
               <span style={{
@@ -286,6 +290,26 @@ export default function AffiliateDashboardPage() {
               }}>
                 Validasi 7 hari
               </span>
+              <span style={{ color: '#E5E7EB' }}>•</span>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '4px 10px',
+                background: 'linear-gradient(135deg, rgba(205, 127, 50, 0.1) 0%, rgba(205, 127, 50, 0.15) 100%)',
+                borderRadius: '6px',
+                border: `1px solid ${currentTier.color}`
+              }}>
+                <span style={{ fontSize: '14px' }}>{currentTier.emoji}</span>
+                <span style={{
+                  fontSize: '12px',
+                  fontWeight: '700',
+                  color: '#374151',
+                  fontFamily: 'var(--font-body)'
+                }}>
+                  {currentTier.name}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -333,18 +357,18 @@ export default function AffiliateDashboardPage() {
           </div>
         </motion.div>
 
-        {/* Stats Grid - 5 Columns + Badge Card */}
+        {/* Stats Grid - 5 Columns */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(6, 1fr)',
-          gap: '14px',
+          gridTemplateColumns: 'repeat(5, 1fr)',
+          gap: '16px',
           marginBottom: '20px'
         }}>
           {[
             { 
               label: 'Total Referrals', 
-              value: data?.referralCount || 0, 
-              desc: '0 paid tenant',
+              value: referralCount, 
+              desc: `${referralCount} paid tenant`,
               iconColor: '#6366F1'
             },
             { 
@@ -379,8 +403,8 @@ export default function AffiliateDashboardPage() {
               transition={{ delay: 0.05 + i * 0.03 }}
               style={{
                 background: '#FFFFFF',
-                borderRadius: '10px',
-                padding: '16px',
+                borderRadius: '12px',
+                padding: '20px',
                 border: '1px solid #E5E7EB',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
                 transition: 'all 0.2s'
@@ -400,7 +424,7 @@ export default function AffiliateDashboardPage() {
                 fontSize: '11px',
                 color: '#9CA3AF',
                 fontWeight: '700',
-                marginBottom: '6px',
+                marginBottom: '8px',
                 fontFamily: 'var(--font-body)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px'
@@ -408,17 +432,17 @@ export default function AffiliateDashboardPage() {
                 {stat.label}
               </div>
               <div style={{
-                fontSize: '20px',
+                fontSize: '26px',
                 fontWeight: '700',
                 color: '#111827',
-                marginBottom: '2px',
+                marginBottom: '4px',
                 fontFamily: 'var(--font-heading)',
                 lineHeight: '1.2'
               }}>
                 {stat.value}
               </div>
               <div style={{
-                fontSize: '11px',
+                fontSize: '12px',
                 color: '#9CA3AF',
                 fontFamily: 'var(--font-body)'
               }}>
@@ -426,19 +450,103 @@ export default function AffiliateDashboardPage() {
               </div>
             </motion.div>
           ))}
+        </div>
 
-          {/* Badge/Lencana Card */}
+        {/* Content Cards - 4 Columns dengan Badge Journey/Progress */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: '16px'
+        }}>
+          {[
+            { 
+              title: 'Latest Referrals', 
+              iconComponent: Icons.users(36, '#6366F1'),
+              message: 'No referrals yet', 
+              desc: 'Referral yang masuk dari link atau kode kamu akan tampil di sini.' 
+            },
+            { 
+              title: 'Latest Commissions', 
+              iconComponent: Icons.money(36, '#F97316'),
+              message: 'No commissions yet', 
+              desc: 'Komisi akan muncul setelah invoice subscription pertama customer dibayar.' 
+            },
+            { 
+              title: 'Latest Payouts', 
+              iconComponent: Icons.payment(36, '#10B981'),
+              message: 'No payouts yet', 
+              desc: 'Payout setiap Jumat akan tampil setelah komisi masuk payable.' 
+            }
+          ].map((section, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + i * 0.04 }}
+              style={{
+                background: '#FFFFFF',
+                borderRadius: '12px',
+                border: '1px solid #E5E7EB',
+                padding: '28px',
+                textAlign: 'center',
+                minHeight: '240px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.06)'
+              }}
+            >
+              <div style={{ 
+                marginBottom: '16px',
+                opacity: 0.5
+              }}>
+                {section.iconComponent}
+              </div>
+              <h3 style={{
+                fontSize: '17px',
+                fontWeight: '600',
+                color: '#1F2937',
+                marginBottom: '8px',
+                fontFamily: 'var(--font-heading)'
+              }}>
+                {section.title}
+              </h3>
+              <p style={{
+                fontSize: '14px',
+                color: '#6B7280',
+                marginBottom: '6px',
+                fontFamily: 'var(--font-body)',
+                fontWeight: '500'
+              }}>
+                {section.message}
+              </p>
+              <p style={{
+                fontSize: '12px',
+                color: '#9CA3AF',
+                fontFamily: 'var(--font-body)',
+                lineHeight: '1.5'
+              }}>
+                {section.desc}
+              </p>
+            </motion.div>
+          ))}
+
+          {/* Badge Journey/Progress Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
+            transition={{ delay: 0.42 }}
             style={{
               background: 'linear-gradient(135deg, rgba(30, 64, 255, 0.05) 0%, rgba(59, 130, 246, 0.08) 100%)',
-              borderRadius: '10px',
-              padding: '16px',
+              borderRadius: '12px',
+              padding: '28px',
               border: '1px solid rgba(30, 64, 255, 0.2)',
               boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-              transition: 'all 0.2s'
+              transition: 'all 0.2s',
+              minHeight: '240px',
+              display: 'flex',
+              flexDirection: 'column'
             }}
             onMouseEnter={(e) => {
               const el = e.currentTarget as HTMLDivElement;
@@ -452,127 +560,144 @@ export default function AffiliateDashboardPage() {
             }}
           >
             <div style={{
-              fontSize: '11px',
-              color: '#3B82F6',
-              fontWeight: '700',
-              marginBottom: '6px',
-              fontFamily: 'var(--font-body)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px'
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              marginBottom: '16px'
             }}>
-              🏆 LENCANA
-            </div>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '4px',
-              marginTop: '8px'
-            }}>
-              {tierBadges.map((badge, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    padding: '4px 6px',
-                    background: idx < 2 ? badge.color : '#FFFFFF',
-                    border: idx >= 2 ? `1px solid ${badge.color}` : 'none',
-                    borderRadius: '6px',
-                    fontSize: '9px',
-                    fontWeight: '700',
-                    color: idx < 2 ? '#fff' : '#374151',
-                    fontFamily: 'var(--font-body)',
-                    textAlign: 'center',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '2px'
-                  }}
-                >
-                  <span>{badge.emoji}</span>
-                  <span style={{ fontSize: '8px', opacity: 0.8 }}>{badge.rate}</span>
+              <span style={{ fontSize: '32px' }}>{currentTier.emoji}</span>
+              <div>
+                <div style={{
+                  fontSize: '11px',
+                  color: '#3B82F6',
+                  fontWeight: '700',
+                  fontFamily: 'var(--font-body)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  Current Tier
                 </div>
-              ))}
+                <div style={{
+                  fontSize: '18px',
+                  fontWeight: '700',
+                  color: '#1F2937',
+                  fontFamily: 'var(--font-heading)'
+                }}>
+                  {currentTier.name}
+                </div>
+              </div>
+            </div>
+
+            {currentTier.next && (
+              <>
+                <div style={{
+                  fontSize: '13px',
+                  color: '#6B7280',
+                  marginBottom: '12px',
+                  textAlign: 'center',
+                  fontFamily: 'var(--font-body)'
+                }}>
+                  {referralCount} / {currentTier.next} referrals
+                </div>
+
+                {/* Progress Bar */}
+                <div style={{
+                  width: '100%',
+                  height: '8px',
+                  background: 'rgba(30, 64, 255, 0.1)',
+                  borderRadius: '10px',
+                  overflow: 'hidden',
+                  marginBottom: '12px'
+                }}>
+                  <div style={{
+                    width: `${Math.min(currentTier.progress, 100)}%`,
+                    height: '100%',
+                    background: 'linear-gradient(90deg, #1E40FF 0%, #3B82F6 100%)',
+                    borderRadius: '10px',
+                    transition: 'width 0.3s ease'
+                  }} />
+                </div>
+
+                <div style={{
+                  fontSize: '12px',
+                  color: '#3B82F6',
+                  fontWeight: '600',
+                  textAlign: 'center',
+                  fontFamily: 'var(--font-body)',
+                  marginBottom: '16px'
+                }}>
+                  {currentTier.next - referralCount} referral lagi ke tier berikutnya
+                </div>
+              </>
+            )}
+
+            {!currentTier.next && (
+              <div style={{
+                fontSize: '13px',
+                color: '#10B981',
+                fontWeight: '600',
+                textAlign: 'center',
+                fontFamily: 'var(--font-body)',
+                marginTop: '12px'
+              }}>
+                🎉 Tier tertinggi tercapai!
+              </div>
+            )}
+
+            {/* Tier Badges */}
+            <div style={{
+              marginTop: 'auto',
+              paddingTop: '16px',
+              borderTop: '1px solid rgba(30, 64, 255, 0.15)'
+            }}>
+              <div style={{
+                fontSize: '10px',
+                color: '#9CA3AF',
+                marginBottom: '8px',
+                textAlign: 'center',
+                fontFamily: 'var(--font-body)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}>
+                Semua Tier
+              </div>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '6px'
+              }}>
+                {[
+                  { emoji: '🥉', name: 'Bronze', rate: '20%', req: '0' },
+                  { emoji: '🥈', name: 'Silver', rate: '25%', req: '30' },
+                  { emoji: '🥇', name: 'Gold', rate: '30%', req: '100' },
+                  { emoji: '💎', name: 'Platinum', rate: '35%', req: '250' }
+                ].map((badge, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      padding: '6px',
+                      background: '#FFFFFF',
+                      border: '1px solid #E5E7EB',
+                      borderRadius: '6px',
+                      fontSize: '9px',
+                      fontWeight: '600',
+                      color: '#374151',
+                      fontFamily: 'var(--font-body)',
+                      textAlign: 'center',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '2px'
+                    }}
+                  >
+                    <span style={{ fontSize: '16px' }}>{badge.emoji}</span>
+                    <span style={{ fontSize: '10px', fontWeight: '700' }}>{badge.rate}</span>
+                    <span style={{ fontSize: '8px', color: '#9CA3AF' }}>{badge.req}+</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </motion.div>
-        </div>
-
-        {/* Content Cards - 3 Columns dengan ikon profesional SVG */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '14px'
-        }}>
-          {[
-            { 
-              title: 'Latest Referrals', 
-              iconComponent: Icons.users(32, '#6366F1'),
-              message: 'No referrals yet', 
-              desc: 'Referral yang masuk dari link atau kode kamu akan tampil di sini.' 
-            },
-            { 
-              title: 'Latest Commissions', 
-              iconComponent: Icons.money(32, '#F97316'),
-              message: 'No commissions yet', 
-              desc: 'Komisi akan muncul setelah invoice subscription pertama customer dibayar.' 
-            },
-            { 
-              title: 'Latest Payouts', 
-              iconComponent: Icons.payment(32, '#10B981'),
-              message: 'No payouts yet', 
-              desc: 'Payout setiap Jumat akan tampil setelah komisi masuk payable.' 
-            }
-          ].map((section, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 + i * 0.04 }}
-              style={{
-                background: '#FFFFFF',
-                borderRadius: '10px',
-                border: '1px solid #E5E7EB',
-                padding: '24px',
-                textAlign: 'center',
-                minHeight: '200px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.06)'
-              }}
-            >
-              <div style={{ 
-                marginBottom: '12px',
-                opacity: 0.5
-              }}>
-                {section.iconComponent}
-              </div>
-              <h3 style={{
-                fontSize: '16px',
-                fontWeight: '600',
-                color: '#1F2937',
-                marginBottom: '6px',
-                fontFamily: 'var(--font-heading)'
-              }}>
-                {section.title}
-              </h3>
-              <p style={{
-                fontSize: '13px',
-                color: '#6B7280',
-                marginBottom: '4px',
-                fontFamily: 'var(--font-body)',
-                fontWeight: '500'
-              }}>
-                {section.message}
-              </p>
-              <p style={{
-                fontSize: '12px',
-                color: '#9CA3AF',
-                fontFamily: 'var(--font-body)',
-                lineHeight: '1.4'
-              }}>
-                {section.desc}
-              </p>
-            </motion.div>
-          ))}
         </div>
       </main>
 
@@ -580,22 +705,25 @@ export default function AffiliateDashboardPage() {
         @keyframes spin {
           to { transform: rotate(360deg); }
         }
-        @media (max-width: 1200px) {
+        @media (max-width: 1280px) {
           main {
             padding: 20px 32px;
           }
-          div[style*="gridTemplateColumns: 'repeat(6"] {
+          div[style*="gridTemplateColumns: 'repeat(5"] {
             grid-template-columns: repeat(3, 1fr);
+          }
+          div[style*="gridTemplateColumns: 'repeat(4"] {
+            grid-template-columns: repeat(2, 1fr);
           }
         }
         @media (max-width: 768px) {
           main {
             padding: 16px 24px;
           }
-          div[style*="gridTemplateColumns: 'repeat(6"] {
+          div[style*="gridTemplateColumns: 'repeat(5"] {
             grid-template-columns: repeat(2, 1fr);
           }
-          div[style*="gridTemplateColumns: 'repeat(3"] {
+          div[style*="gridTemplateColumns: 'repeat(4"] {
             grid-template-columns: 1fr;
           }
         }
