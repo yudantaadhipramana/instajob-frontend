@@ -1,380 +1,373 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { motion } from 'motion/react';
 import { z } from 'zod';
-import { useI18n } from '@/context/I18nContext';
-import { Mail, User, Phone, FileText, CheckCircle, AlertCircle, Loader } from 'lucide-react';
 
-const affiliateSignupSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  phone: z.string().min(10, 'Phone must be at least 10 characters'),
-  bio: z.string().optional(),
-  termsAccepted: z.boolean().refine((val) => val === true, 'You must accept the terms'),
+const InstagramSVG = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+  </svg>
+);
+
+const TikTokSVG = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+  </svg>
+);
+
+const ThreadsSVG = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M14.5 12.5a2.5 2.5 0 1 1-2.5-2.5h.5" />
+    <path d="M18.7 15.5c-1.3 2.7-4 4.5-7.2 4.5-4.4 0-8-3.6-8-8s3.6-8 8-8c3.9 0 7.2 2.8 7.9 6.5.1.7.2 1.4.2 2 0 3.3-2.7 6-6 6s-6-2.7-6-6" />
+  </svg>
+);
+
+const schema = z.object({
+  name: z.string().min(2, 'Nama wajib diisi'),
+  email: z.string().email('Format email tidak valid'),
+  password: z.string().min(8, 'Password minimal 8 karakter'),
+  phone: z.string().min(10, 'Nomor WhatsApp tidak valid'),
+  instagram: z.string().min(3, 'Instagram wajib diisi untuk verifikasi'),
+  tiktok: z.string().optional(),
+  threads: z.string().optional(),
+  fypLink: z.string().optional(),
+  agreed: z.boolean().refine(v => v, 'Setujui syarat & ketentuan'),
 });
 
-type SignupFormData = z.infer<typeof affiliateSignupSchema>;
+type Form = z.infer<typeof schema>;
 
-export default function AffiliateSignupPage() {
+export default function AffiliateDaftarPage() {
   const router = useRouter();
-  const { lang } = useI18n();
-
-  const [formData, setFormData] = useState<SignupFormData>({
-    name: '',
-    email: '',
-    phone: '',
-    bio: '',
-    termsAccepted: false,
+  const [form, setForm] = useState<Form>({
+    name: '', email: '', password: '', phone: '',
+    instagram: '', tiktok: '', threads: '', fypLink: '',
+    agreed: false,
   });
-
-  const [errors, setErrors] = useState<Partial<Record<keyof SignupFormData, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof Form, string>>>({});
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
 
-  const t = {
-    id: {
-      title: 'Daftar Sebagai Affiliate',
-      subtitle: 'Mulai hasilkan komisi dengan mereferensikan InstaJob kepada teman-teman Anda',
-      name: 'Nama Lengkap',
-      namePlaceholder: 'Masukkan nama Anda',
-      email: 'Email',
-      emailPlaceholder: 'contoh@email.com',
-      phone: 'Nomor Telepon',
-      phonePlaceholder: '+62...',
-      bio: 'Bio / Deskripsi Singkat',
-      bioPlaceholder: 'Ceritakan tentang Anda (opsional)',
-      terms: 'Saya setuju dengan Syarat & Ketentuan Affiliate Program',
-      submit: 'Daftar Sekarang',
-      submitting: 'Mendaftar...',
-      success: 'Pendaftaran Berhasil!',
-      successMessage: 'Akun affiliate Anda telah dibuat. Silakan login untuk memulai.',
-      backToLogin: 'Kembali ke Login',
-      backToLanding: 'Kembali ke Landing Page',
-      error: 'Terjadi kesalahan. Silakan coba lagi.',
-      validationError: 'Mohon periksa kembali data Anda',
-      loginLink: 'Sudah punya akun? Login di sini',
-    },
-    en: {
-      title: 'Sign Up as Affiliate',
-      subtitle: 'Start earning commissions by referring InstaJob to your friends',
-      name: 'Full Name',
-      namePlaceholder: 'Enter your name',
-      email: 'Email',
-      emailPlaceholder: 'example@email.com',
-      phone: 'Phone Number',
-      phonePlaceholder: '+62...',
-      bio: 'Bio / Short Description',
-      bioPlaceholder: 'Tell us about yourself (optional)',
-      terms: 'I agree to the Affiliate Program Terms & Conditions',
-      submit: 'Sign Up Now',
-      submitting: 'Signing up...',
-      success: 'Sign Up Successful!',
-      successMessage: 'Your affiliate account has been created. Please login to get started.',
-      backToLogin: 'Back to Login',
-      backToLanding: 'Back to Landing Page',
-      error: 'An error occurred. Please try again.',
-      validationError: 'Please check your information',
-      loginLink: 'Already have an account? Login here',
-    },
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setForm(p => ({ ...p, [name]: type === 'checkbox' ? checked : value }));
+    if (errors[name as keyof Form]) setErrors(p => ({ ...p, [name]: undefined }));
   };
 
-  const strings = t[lang as keyof typeof t] || t.en;
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value, type } = e.target;
-    const fieldValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: fieldValue,
-    }));
-    // Clear error for this field
-    if (errors[name as keyof SignupFormData]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: undefined,
-      }));
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
     setLoading(true);
-
     try {
-      // Validate form
-      const validated = affiliateSignupSchema.parse(formData);
-
-      // Call backend API
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/affiliate/signup`, {
+      const v = schema.parse(form);
+      const bio = `IG:${v.instagram}|TT:${v.tiktok||'-'}|TH:${v.threads||'-'}|FYP:${v.fypLink||'-'}`;
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(validated),
+        body: JSON.stringify({ name: v.name, email: v.email, password: v.password, phone: v.phone, role: 'AFFILIATE', bio }),
       });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || strings.error);
-      }
-
-      setSuccess(true);
-      setTimeout(() => {
-        router.push('/affiliate/login');
-      }, 2000);
+      if (!res.ok) throw new Error((await res.json()).message || 'Pendaftaran gagal');
+      router.push('/affiliate/login');
     } catch (err: any) {
       if (err instanceof z.ZodError) {
-        const fieldErrors: Partial<Record<keyof SignupFormData, string>> = {};
-        err.issues.forEach((error) => {
-          if (error.path) {
-            fieldErrors[error.path[0] as keyof SignupFormData] = error.message;
-          }
-        });
-        setErrors(fieldErrors);
+        const fe: any = {};
+        err.issues.forEach((i: any) => { if (i.path[0]) fe[i.path[0]] = i.message; });
+        setErrors(fe);
       } else {
-        setErrors({ name: err.message || strings.error });
+        setErrors({ agreed: err.message });
       }
       setLoading(false);
     }
   };
 
-  if (success) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-4">
-        {/* Background glow effects */}
-        <div
-          className="fixed inset-0 pointer-events-none z-0"
-          style={{
-            background: 'radial-gradient(circle at top right, rgba(30, 64, 255, 0.1), transparent 50%)',
-            filter: 'blur(120px)',
-          }}
-        />
-        <div
-          className="fixed inset-0 pointer-events-none z-0"
-          style={{
-            background: 'radial-gradient(circle at bottom left, rgba(30, 64, 255, 0.1), transparent 50%)',
-            filter: 'blur(120px)',
-          }}
-        />
+  const fieldStyle = (err?: string): React.CSSProperties => ({
+    width: '100%',
+    padding: '12px 12px 12px 40px',
+    border: `1px solid ${err ? '#FECACA' : 'rgba(0,0,0,0.1)'}`,
+    borderRadius: '12px',
+    fontSize: '15px',
+    fontFamily: 'var(--font-body)',
+    outline: 'none',
+    transition: 'border-color 0.2s',
+    background: err ? '#FEF2F2' : 'white',
+    boxSizing: 'border-box' as const,
+  });
 
-        {/* Success card */}
-        <motion.div
-          className="relative z-10 max-w-md w-full"
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          <div className="bg-white rounded-lg border border-gray-200 p-8 text-center shadow-sm">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-              className="flex justify-center mb-4"
-            >
-              <CheckCircle size={48} className="text-green-600" />
-            </motion.div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">{strings.success}</h2>
-            <p className="text-gray-600 mb-6">{strings.successMessage}</p>
-            <Link
-              href="/affiliate/login"
-              className="inline-flex items-center justify-center px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              {strings.backToLogin}
-            </Link>
-          </div>
-        </motion.div>
-      </div>
-    );
-  }
+  const noIconFieldStyle = (err?: string): React.CSSProperties => ({
+    ...fieldStyle(err),
+    padding: '12px',
+  });
+
+  const labelStyle: React.CSSProperties = {
+    fontSize: '14px',
+    fontWeight: '600',
+    color: 'var(--color-foreground)',
+    fontFamily: 'var(--font-body)',
+  };
+
+  const iconWrap: React.CSSProperties = {
+    position: 'absolute',
+    left: '12px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    color: '#94A3B8',
+    display: 'flex',
+    alignItems: 'center',
+    pointerEvents: 'none',
+  };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      {/* Background glow effects */}
-      <div
-        className="fixed inset-0 pointer-events-none z-0"
-        style={{
-          background: 'radial-gradient(circle at top right, rgba(30, 64, 255, 0.1), transparent 50%)',
-          filter: 'blur(120px)',
-        }}
-      />
-      <div
-        className="fixed inset-0 pointer-events-none z-0"
-        style={{
-          background: 'radial-gradient(circle at bottom left, rgba(30, 64, 255, 0.1), transparent 50%)',
-          filter: 'blur(120px)',
-        }}
-      />
-
-      {/* Header */}
-      <header className="relative z-10 border-b border-gray-200 bg-white/80 backdrop-blur-sm">
-        <div className="max-w-1200 mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <Link href="/affiliate" className="text-xl font-bold text-gray-900">
-            InstaJob
-          </Link>
-          <Link
-            href="/affiliate"
-            className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            {strings.backToLanding}
-          </Link>
-        </div>
+    <div style={{ minHeight: '100vh', background: '#FFFFFF', display: 'flex', flexDirection: 'column' }}>
+      {/* Header — same pattern as login page */}
+      <header style={{
+        padding: '24px 48px',
+        borderBottom: '1px solid rgba(0,0,0,0.06)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      }}>
+        <Link href="/affiliate" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', cursor: 'pointer' }}>
+          <img src="/logo-instajob.png" alt="InstaJob Logo" style={{ height: '40px', width: 'auto' }} />
+        </Link>
+        <Link href="/affiliate/login" style={{ fontSize: '14px', color: 'var(--color-primary)', fontFamily: 'var(--font-body)', textDecoration: 'none', fontWeight: '600' }}>
+          Sudah punya akun? Login →
+        </Link>
       </header>
 
-      {/* Main content */}
-      <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
+      {/* Body */}
+      <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '48px 24px 64px' }}>
         <motion.div
-          className="w-full max-w-md"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.4 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          style={{ width: '100%', maxWidth: '520px' }}
         >
-          {/* Form header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">{strings.title}</h1>
-            <p className="text-gray-600">{strings.subtitle}</p>
+          {/* Title */}
+          <div style={{ marginBottom: '32px', textAlign: 'center' }}>
+            <h1 style={{
+              fontSize: '32px',
+              fontWeight: '800',
+              color: 'var(--color-foreground)',
+              marginBottom: '12px',
+              fontFamily: 'var(--font-heading)',
+            }}>
+              Daftar Akun Afiliator
+            </h1>
+            <p style={{ fontSize: '16px', color: '#64748B', fontFamily: 'var(--font-body)', lineHeight: '1.6' }}>
+              Akun dengan <strong>followers besar</strong> atau konten FYP akan diprioritaskan untuk Tier tinggi.
+            </p>
           </div>
 
-          {/* Form card */}
-          <div className="bg-white rounded-lg border border-gray-200 p-8 shadow-sm backdrop-blur-sm">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Name field */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                  <User size={16} />
-                  {strings.name}
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder={strings.namePlaceholder}
-                  className={`w-full px-4 py-3 border rounded-lg text-gray-900 placeholder-gray-400 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.name ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                  }`}
-                  disabled={loading}
-                />
-                {errors.name && (
-                  <div className="flex items-center gap-2 mt-1 text-red-600 text-sm">
-                    <AlertCircle size={14} />
-                    {errors.name}
+          {/* Card */}
+          <div style={{
+            background: 'white',
+            borderRadius: '20px',
+            border: '1px solid rgba(0,0,0,0.06)',
+            padding: '40px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
+          }}>
+            <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+
+              {/* === SECTION 1: INFORMASI PRIBADI === */}
+              <div style={{ marginBottom: '32px' }}>
+                <p style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#94A3B8', marginBottom: '20px', fontFamily: 'var(--font-body)' }}>
+                  Informasi Pribadi
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+                  {/* Nama */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label style={labelStyle}>Nama Lengkap</label>
+                    <div style={{ position: 'relative' }}>
+                      <span style={iconWrap}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                      </span>
+                      <input name="name" type="text" value={form.name} onChange={onChange} placeholder="Nama lengkap kamu"
+                        style={fieldStyle(errors.name)}
+                        onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
+                        onBlur={e => e.target.style.borderColor = errors.name ? '#FECACA' : 'rgba(0,0,0,0.1)'} />
+                    </div>
+                    {errors.name && <span style={{ fontSize: '13px', color: '#DC2626', fontFamily: 'var(--font-body)' }}>{errors.name}</span>}
                   </div>
-                )}
-              </div>
 
-              {/* Email field */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                  <Mail size={16} />
-                  {strings.email}
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder={strings.emailPlaceholder}
-                  className={`w-full px-4 py-3 border rounded-lg text-gray-900 placeholder-gray-400 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.email ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                  }`}
-                  disabled={loading}
-                />
-                {errors.email && (
-                  <div className="flex items-center gap-2 mt-1 text-red-600 text-sm">
-                    <AlertCircle size={14} />
-                    {errors.email}
+                  {/* Email + Phone in grid */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <label style={labelStyle}>Email</label>
+                      <div style={{ position: 'relative' }}>
+                        <span style={iconWrap}>
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        </span>
+                        <input name="email" type="email" value={form.email} onChange={onChange} placeholder="email@kamu.com"
+                          style={fieldStyle(errors.email)}
+                          onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
+                          onBlur={e => e.target.style.borderColor = errors.email ? '#FECACA' : 'rgba(0,0,0,0.1)'} />
+                      </div>
+                      {errors.email && <span style={{ fontSize: '12px', color: '#DC2626', fontFamily: 'var(--font-body)' }}>{errors.email}</span>}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <label style={labelStyle}>No WhatsApp</label>
+                      <div style={{ position: 'relative' }}>
+                        <span style={iconWrap}>
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.42 6.18a2 2 0 012-2.18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L9.91 12a16 16 0 006.09 6.09l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                        </span>
+                        <input name="phone" type="tel" value={form.phone} onChange={onChange} placeholder="08xxxxxxxxxx"
+                          style={fieldStyle(errors.phone)}
+                          onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
+                          onBlur={e => e.target.style.borderColor = errors.phone ? '#FECACA' : 'rgba(0,0,0,0.1)'} />
+                      </div>
+                      {errors.phone && <span style={{ fontSize: '12px', color: '#DC2626', fontFamily: 'var(--font-body)' }}>{errors.phone}</span>}
+                    </div>
                   </div>
-                )}
-              </div>
 
-              {/* Phone field */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                  <Phone size={16} />
-                  {strings.phone}
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder={strings.phonePlaceholder}
-                  className={`w-full px-4 py-3 border rounded-lg text-gray-900 placeholder-gray-400 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.phone ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                  }`}
-                  disabled={loading}
-                />
-                {errors.phone && (
-                  <div className="flex items-center gap-2 mt-1 text-red-600 text-sm">
-                    <AlertCircle size={14} />
-                    {errors.phone}
+                  {/* Password */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label style={labelStyle}>Password</label>
+                    <div style={{ position: 'relative' }}>
+                      <span style={iconWrap}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                      </span>
+                      <input name="password" type="password" value={form.password} onChange={onChange} placeholder="Min 8 karakter"
+                        style={fieldStyle(errors.password)}
+                        onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
+                        onBlur={e => e.target.style.borderColor = errors.password ? '#FECACA' : 'rgba(0,0,0,0.1)'} />
+                    </div>
+                    {errors.password && <span style={{ fontSize: '13px', color: '#DC2626', fontFamily: 'var(--font-body)' }}>{errors.password}</span>}
                   </div>
-                )}
-              </div>
-
-              {/* Bio field */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                  <FileText size={16} />
-                  {strings.bio}
-                </label>
-                <textarea
-                  name="bio"
-                  value={formData.bio}
-                  onChange={handleChange}
-                  placeholder={strings.bioPlaceholder}
-                  rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                  disabled={loading}
-                />
-              </div>
-
-              {/* Terms checkbox */}
-              <div className="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  name="termsAccepted"
-                  checked={formData.termsAccepted}
-                  onChange={handleChange}
-                  className="mt-1 w-5 h-5 accent-blue-600 rounded cursor-pointer"
-                  disabled={loading}
-                />
-                <label className="text-sm text-gray-600 cursor-pointer">
-                  {strings.terms}
-                </label>
-              </div>
-              {errors.termsAccepted && (
-                <div className="flex items-center gap-2 text-red-600 text-sm">
-                  <AlertCircle size={14} />
-                  {errors.termsAccepted}
                 </div>
-              )}
+              </div>
 
-              {/* Submit button */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors flex items-center justify-center gap-2"
-              >
-                {loading && <Loader size={18} className="animate-spin" />}
-                {loading ? strings.submitting : strings.submit}
-              </button>
+              {/* Divider */}
+              <div style={{ height: '1px', background: 'rgba(0,0,0,0.06)', marginBottom: '32px' }} />
+
+              {/* === SECTION 2: SOSIAL MEDIA === */}
+              <div style={{ marginBottom: '32px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+                  <p style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#94A3B8', fontFamily: 'var(--font-body)', margin: 0 }}>
+                    Otoritas Sosial Media
+                  </p>
+                  <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--color-primary)', background: '#EFF6FF', padding: '3px 10px', borderRadius: '20px', fontFamily: 'var(--font-body)' }}>
+                    Syarat Approval
+                  </span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+                  {/* Instagram — Wajib */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <InstagramSVG /> Instagram <span style={{ fontSize: '12px', color: '#DC2626' }}>*</span>
+                    </label>
+                    <input name="instagram" type="text" value={form.instagram} onChange={onChange} placeholder="@username atau link profil Instagram"
+                      style={noIconFieldStyle(errors.instagram)}
+                      onFocus={e => { e.target.style.borderColor = '#EC4899'; e.target.style.boxShadow = '0 0 0 3px rgba(236,72,153,0.1)'; }}
+                      onBlur={e => { e.target.style.borderColor = errors.instagram ? '#FECACA' : 'rgba(0,0,0,0.1)'; e.target.style.boxShadow = 'none'; }} />
+                    {errors.instagram && <span style={{ fontSize: '13px', color: '#DC2626', fontFamily: 'var(--font-body)' }}>{errors.instagram}</span>}
+                  </div>
+
+                  {/* TikTok + Threads */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <label style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <TikTokSVG /> TikTok <span style={{ fontSize: '11px', color: '#94A3B8', fontWeight: '400' }}>(opsional)</span>
+                      </label>
+                      <input name="tiktok" type="text" value={form.tiktok} onChange={onChange} placeholder="@username"
+                        style={noIconFieldStyle()}
+                        onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
+                        onBlur={e => e.target.style.borderColor = 'rgba(0,0,0,0.1)'} />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <label style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <ThreadsSVG /> Threads <span style={{ fontSize: '11px', color: '#94A3B8', fontWeight: '400' }}>(opsional)</span>
+                      </label>
+                      <input name="threads" type="text" value={form.threads} onChange={onChange} placeholder="@username"
+                        style={noIconFieldStyle()}
+                        onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
+                        onBlur={e => e.target.style.borderColor = 'rgba(0,0,0,0.1)'} />
+                    </div>
+                  </div>
+
+                  {/* FYP Link */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label style={{ ...labelStyle, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                      Link Konten FYP / Viral <span style={{ fontSize: '11px', color: '#94A3B8', fontWeight: '400' }}>(opsional)</span>
+                    </label>
+                    <input name="fypLink" type="url" value={form.fypLink} onChange={onChange} placeholder="https://tiktok.com/... atau https://instagram.com/p/..."
+                      style={noIconFieldStyle()}
+                      onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
+                      onBlur={e => e.target.style.borderColor = 'rgba(0,0,0,0.1)'} />
+
+                  </div>
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div style={{ height: '1px', background: 'rgba(0,0,0,0.06)', marginBottom: '24px' }} />
+
+              {/* === SECTION 3: AGREE + SUBMIT === */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                  <input type="checkbox" name="agreed" checked={form.agreed} onChange={onChange}
+                    style={{ marginTop: '2px', width: '16px', height: '16px', accentColor: 'var(--color-primary)', cursor: 'pointer', flexShrink: 0 }} />
+                  <label style={{ fontSize: '14px', color: '#64748B', fontFamily: 'var(--font-body)', lineHeight: '1.6', cursor: 'pointer' }}>
+                    Saya menyatakan data benar dan setuju dengan{' '}
+                    <Link href="/terms" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontWeight: '600' }}>Syarat & Ketentuan</Link>
+                    {' '}InstaJob Creator Network.
+                  </label>
+                </div>
+
+                {errors.agreed && (
+                  <div style={{ background: '#FEE2E2', border: '1px solid #FECACA', borderRadius: '12px', padding: '14px 16px', fontSize: '14px', color: '#DC2626', fontFamily: 'var(--font-body)' }}>
+                    {errors.agreed}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  style={{
+                    padding: '14px',
+                    background: loading ? 'rgba(30,64,255,0.5)' : 'linear-gradient(135deg, #1E40FF 0%, #3B82F6 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    fontSize: '16px',
+                    fontWeight: '700',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    fontFamily: 'var(--font-body)',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                  }}
+                  onMouseOver={e => { if (!loading) { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 16px rgba(30,64,255,0.3)'; } }}
+                  onMouseOut={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
+                >
+                  {loading ? (
+                    <div style={{ width: '16px', height: '16px', border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+                  ) : 'Kirim Pendaftaran Afiliator'}
+                </button>
+              </div>
+
             </form>
 
-            {/* Login link */}
-            <div className="mt-6 text-center text-sm text-gray-600">
-              {strings.loginLink}
-              <Link href="/affiliate/login" className="ml-1 text-blue-600 hover:underline font-medium">
-                Login
+            {/* Footer links */}
+            <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: '1px solid rgba(0,0,0,0.06)', textAlign: 'center' }}>
+              <Link href="/affiliate" style={{ fontSize: '14px', color: '#64748B', textDecoration: 'none', fontFamily: 'var(--font-body)', transition: 'color 0.2s' }}
+                onMouseOver={e => (e.currentTarget.style.color = 'var(--color-primary)')}
+                onMouseOut={e => (e.currentTarget.style.color = '#64748B')}>
+                ← Kembali ke halaman affiliate
               </Link>
             </div>
           </div>
         </motion.div>
-      </main>
+      </div>
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
