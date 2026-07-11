@@ -66,7 +66,7 @@ export default function LoginPage() {
       const response = await fetch(`${apiBase}/api/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: credentialResponse.credential }),
+        body: JSON.stringify({ credential: credentialResponse.credential }),
       });
 
       const data = await response.json();
