@@ -77,12 +77,15 @@ export default function JobsPage() {
   const [filterWorkType, setFilterWorkType] = useState('all');
   const [user, setUser] = useState<User | null>(null);
   const [toast, setToast] = useState<{msg:string,type:'success'|'error'}|null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalJobs, setTotalJobs] = useState(0);
 
   const showToast = (msg:string, type:'success'|'error'='success') => { setToast({msg,type}); setTimeout(()=>setToast(null),3000); };
 
   // Auth & Fetch Jobs
   useEffect(() => {
-    const checkAuthAndFetchJobs = async () => {
+    const checkAuthAndFetchJobs = async (page = 1) => {
       const token = localStorage.getItem('instajob_token');
       const userData = localStorage.getItem('instajob_user');
 
@@ -92,10 +95,16 @@ export default function JobsPage() {
       }
 
       setUser(JSON.parse(userData));
+      setLoading(true);
 
       try {
         const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
-        const response = await fetch(`${apiBase}/api/jobs`, {
+        const params = new URLSearchParams();
+        params.set('page', String(page));
+        if (searchQuery.trim()) params.set('search', searchQuery.trim());
+        if (filterWorkType === 'remote') params.set('remote', 'true');
+
+        const response = await fetch(`${apiBase}/api/jobs?${params.toString()}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -108,6 +117,9 @@ export default function JobsPage() {
           const jobsList = data.data || data.jobs || data;
           setJobs(jobsList);
           setFilteredJobs(jobsList);
+          setTotalPages(data.pagination?.pages || 1);
+          setTotalJobs(data.pagination?.total || jobsList.length);
+          setCurrentPage(page);
         } else {
           setError('Failed to load jobs');
         }
@@ -118,31 +130,36 @@ export default function JobsPage() {
       }
     };
 
-    checkAuthAndFetchJobs();
+    checkAuthAndFetchJobs(1);
   }, [router]);
 
-  // Apply Filters
+  // Re-fetch when filters change (reset to page 1)
   useEffect(() => {
-    let filtered = jobs;
-
-    if (searchQuery.trim()) {
-      filtered = filtered.filter(job =>
-        job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.description.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    if (filterLocation !== 'all') {
-      filtered = filtered.filter(job => job.location === filterLocation);
-    }
-
-    if (filterWorkType !== 'all') {
-      filtered = filtered.filter(job => job.workType?.toLowerCase() === filterWorkType.toLowerCase());
-    }
-
-    setFilteredJobs(filtered);
-  }, [searchQuery, filterLocation, filterWorkType, jobs]);
+    const token = localStorage.getItem('instajob_token');
+    if (!token) return;
+    const fetchWithFilters = async () => {
+      setLoading(true);
+      try {
+        const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
+        const params = new URLSearchParams();
+        params.set('page', '1');
+        if (searchQuery.trim()) params.set('search', searchQuery.trim());
+        if (filterWorkType === 'remote') params.set('remote', 'true');
+        const r = await fetch(`${apiBase}/api/jobs?${params}`, { headers: { 'Authorization': `Bearer ${token}` } });
+        if (r.ok) {
+          const data = await r.json();
+          const list = data.data || data.jobs || data;
+          setJobs(list);
+          setFilteredJobs(list);
+          setTotalPages(data.pagination?.pages || 1);
+          setTotalJobs(data.pagination?.total || list.length);
+          setCurrentPage(1);
+        }
+      } finally { setLoading(false); }
+    };
+    const debounce = setTimeout(fetchWithFilters, 400);
+    return () => clearTimeout(debounce);
+  }, [searchQuery, filterLocation, filterWorkType]);
 
   const handleApply = async (jobId: string) => {
     const token = localStorage.getItem('instajob_token');
@@ -504,7 +521,7 @@ export default function JobsPage() {
                   fontWeight: '600',
                   fontSize: '0.875rem',
                 }}>
-                  {filteredJobs.length} / {jobs.length}
+                  {filteredJobs.length} / {totalJobs}
                 </div>
               </div>
             </div>
@@ -682,6 +699,37 @@ export default function JobsPage() {
                 </ScrollAnimation>
               );
             })}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '32px', paddingBottom: '24px' }}>
+            <button
+              onClick={() => { if (currentPage > 1) { const t = localStorage.getItem('instajob_token'); if (t) { setLoading(true); const apiBase = process.env.NEXT_PUBLIC_API_URL||'https://instajob-backend-production.up.railway.app'; const p=new URLSearchParams(); p.set('page',String(currentPage-1)); if(searchQuery.trim())p.set('search',searchQuery.trim()); if(filterWorkType==='remote')p.set('remote','true'); fetch(`${apiBase}/api/jobs?${p}`,{headers:{'Authorization':`Bearer ${t}`}}).then(r=>r.json()).then(d=>{const l=d.data||[];setJobs(l);setFilteredJobs(l);setCurrentPage(currentPage-1);setTotalPages(d.pagination?.pages||1);setTotalJobs(d.pagination?.total||l.length);}).finally(()=>setLoading(false)); } } }}
+              disabled={currentPage <= 1}
+              style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #E2E8F0', background: currentPage<=1?'#F8FAFC':'#FFFFFF', color: currentPage<=1?'#94A3B8':'#1E293B', cursor: currentPage<=1?'not-allowed':'pointer', fontWeight: '600', fontSize: '14px' }}
+            >← Prev</button>
+
+            {Array.from({length: Math.min(5, totalPages)}, (_, i) => {
+              const start = Math.max(1, currentPage - 2);
+              const page = start + i;
+              if (page > totalPages) return null;
+              return (
+                <button key={page}
+                  onClick={() => { const t = localStorage.getItem('instajob_token'); if (!t) return; setLoading(true); const apiBase = process.env.NEXT_PUBLIC_API_URL||'https://instajob-backend-production.up.railway.app'; const p=new URLSearchParams(); p.set('page',String(page)); if(searchQuery.trim())p.set('search',searchQuery.trim()); if(filterWorkType==='remote')p.set('remote','true'); fetch(`${apiBase}/api/jobs?${p}`,{headers:{'Authorization':`Bearer ${t}`}}).then(r=>r.json()).then(d=>{const l=d.data||[];setJobs(l);setFilteredJobs(l);setCurrentPage(page);setTotalPages(d.pagination?.pages||1);setTotalJobs(d.pagination?.total||l.length);}).finally(()=>setLoading(false)); }}
+                  style={{ padding: '8px 14px', borderRadius: '8px', border: page===currentPage?'2px solid #0051FF':'1px solid #E2E8F0', background: page===currentPage?'#0051FF':'#FFFFFF', color: page===currentPage?'#FFFFFF':'#1E293B', cursor: 'pointer', fontWeight: '600', fontSize: '14px' }}
+                >{page}</button>
+              );
+            })}
+
+            <button
+              onClick={() => { if (currentPage < totalPages) { const t = localStorage.getItem('instajob_token'); if (t) { setLoading(true); const apiBase = process.env.NEXT_PUBLIC_API_URL||'https://instajob-backend-production.up.railway.app'; const p=new URLSearchParams(); p.set('page',String(currentPage+1)); if(searchQuery.trim())p.set('search',searchQuery.trim()); if(filterWorkType==='remote')p.set('remote','true'); fetch(`${apiBase}/api/jobs?${p}`,{headers:{'Authorization':`Bearer ${t}`}}).then(r=>r.json()).then(d=>{const l=d.data||[];setJobs(l);setFilteredJobs(l);setCurrentPage(currentPage+1);setTotalPages(d.pagination?.pages||1);setTotalJobs(d.pagination?.total||l.length);}).finally(()=>setLoading(false)); } } }}
+              disabled={currentPage >= totalPages}
+              style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #E2E8F0', background: currentPage>=totalPages?'#F8FAFC':'#FFFFFF', color: currentPage>=totalPages?'#94A3B8':'#1E293B', cursor: currentPage>=totalPages?'not-allowed':'pointer', fontWeight: '600', fontSize: '14px' }}
+            >Next →</button>
+
+            <span style={{ fontSize: '13px', color: '#64748B', marginLeft: '8px' }}>Hal {currentPage} / {totalPages}</span>
           </div>
         )}
       </main>
