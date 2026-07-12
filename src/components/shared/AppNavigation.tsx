@@ -27,15 +27,20 @@ export default function AppNavigation() {
   const [user, setUser] = useState<{ fullName: string; email: string } | null>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [notifCount, setNotifCount] = useState(0);
 
   useEffect(() => {
     const userData = sessionStorage.getItem('instajob_user');
+    const token = localStorage.getItem('instajob_token') || sessionStorage.getItem('instajob_token');
     if (userData) {
-      try {
-        setUser(JSON.parse(userData));
-      } catch (e) {
-        console.error('Failed to parse user data');
-      }
+      try { setUser(JSON.parse(userData)); } catch (e) {}
+    }
+    if (token) {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
+      fetch(`${apiBase}/api/notifications`, { headers: { 'Authorization': `Bearer ${token}` } })
+        .then(r => r.ok ? r.json() : null)
+        .then(d => { if (d) setNotifCount((d.notifications || d.data || []).filter((n: any) => !n.read).length); })
+        .catch(() => {});
     }
   }, []);
 
@@ -81,6 +86,18 @@ export default function AppNavigation() {
               className="hidden sm:block px-3 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 transition-all"
             >
               Upgrade to Pro
+            </Link>
+
+            {/* Notification Bell */}
+            <Link href="/settings" className="relative p-2 rounded-md text-gray-600 hover:bg-gray-100 transition-colors" title="Notifications">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              {notifCount > 0 && (
+                <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                  {notifCount > 9 ? '9+' : notifCount}
+                </span>
+              )}
             </Link>
 
             <div className="relative">
