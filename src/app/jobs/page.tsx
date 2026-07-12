@@ -52,18 +52,11 @@ const formatPostDate = (dateString: string): string => {
   }
 };
 
-// Get work type badge color
-const getWorkTypeBadgeColor = (workType?: string): { bg: string; text: string; label: string } => {
-  switch (workType?.toLowerCase()) {
-    case 'remote':
-      return { bg: '#EFF6FF', text: '#0369A1', label: '🌐 Remote' };
-    case 'onsite':
-      return { bg: '#FEF3C7', text: '#92400E', label: '🏢 Onsite' };
-    case 'hybrid':
-      return { bg: '#F3E8FF', text: '#6B21A8', label: '🔄 Hybrid' };
-    default:
-      return { bg: '#F1F5F9', text: '#64748B', label: '📍 Location' };
-  }
+// Get work type badge color — derived from remote boolean (no workType field in DB)
+const getWorkTypeBadge = (remote?: boolean): { bg: string; text: string; label: string } => {
+  return remote
+    ? { bg: '#EFF6FF', text: '#0369A1', label: '🌐 Remote' }
+    : { bg: '#FEF3C7', text: '#92400E', label: '🏢 Onsite' };
 };
 
 export default function JobsPage() {
@@ -209,7 +202,6 @@ export default function JobsPage() {
   };
 
   const uniqueLocations = Array.from(new Set(jobs.map(job => job.location)));
-  const uniqueWorkTypes = Array.from(new Set(jobs.map(job => job.workType).filter(Boolean)));
 
   // Loading State
   if (loading) {
@@ -575,7 +567,7 @@ export default function JobsPage() {
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '24px' }}>
             {filteredJobs.map((job, idx) => {
-              const workTypeBadge = getWorkTypeBadgeColor(job.workType);
+              const workTypeBadge = getWorkTypeBadge(job.remote);
               return (
                 <ScrollAnimation key={job.id} delay={idx * 50}>
                   <div style={{
