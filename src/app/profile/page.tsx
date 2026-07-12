@@ -39,8 +39,11 @@ export default function ProfilePage() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isParsingCV, setIsParsingCV] = useState(false);
   const [cvParseSuccess, setCvParseSuccess] = useState(false);
+  const [cvParseError, setCvParseError] = useState('');
   const [profileImageUrl, setProfileImageUrl] = useState<string | undefined>(undefined);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  // Separate raw string state for skills input to prevent cursor jump
+  const [skillsInput, setSkillsInput] = useState('');
   const cvFileInputRef = useRef<HTMLInputElement>(null);
   const profilePicInputRef = useRef<HTMLInputElement>(null);
 
@@ -52,7 +55,7 @@ export default function ProfilePage() {
       return;
     }
 
-    fetch('${process.env.NEXT_PUBLIC_API_URL}/api/user/profile', {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/profile`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -85,6 +88,7 @@ export default function ProfilePage() {
         };
         setUser(profileData);
         setFormData(profileData);
+        setSkillsInput((profileData.skills || []).join(', '));
         if (profile.profilePicture) {
           setProfileImageUrl(profile.profilePicture);
         }
@@ -108,35 +112,52 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const token = localStorage.getItem('instajob_token');
+    if (!token) { router.push('/login'); return; }
+
     setIsParsingCV(true);
-    
-    // Simulate API call to backend untuk CV parsing
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Mock data dari CV parsing (dalam real implementation, ini dari backend API)
-    const parsedData = {
-      fullName: 'John Developer Doe',
-      email: 'john.doe@example.com',
-      phone: '+62-821-9876-5432',
-      location: 'Bandung, West Java, Indonesia',
-      bio: 'Full-stack developer with expertise in modern web technologies. Passionate about creating scalable and performant applications.',
-      experience: '7+ years in full-stack development with focus on React, Node.js, and cloud architecture. Led multiple high-impact projects.',
-      education: 'Master of Computer Science from Bandung Institute of Technology (ITB)',
-      skills: ['React', 'Next.js', 'TypeScript', 'Node.js', 'Express', 'PostgreSQL', 'MongoDB', 'Docker', 'AWS', 'GraphQL'],
-    };
+    setCvParseError('');
 
-    setFormData(prev => ({
-      ...prev,
-      ...parsedData,
-    }));
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
 
-    setIsParsingCV(false);
-    setCvParseSuccess(true);
-    setTimeout(() => setCvParseSuccess(false), 3000);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/resume/parse`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData,
+      });
 
-    // Reset file input
-    if (cvFileInputRef.current) {
-      cvFileInputRef.current.value = '';
+      if (res.status === 401) { router.push('/login'); return; }
+
+      const json = await res.json();
+      if (!res.ok) {
+        setCvParseError(json.error || 'Failed to parse CV');
+        return;
+      }
+
+      const parsed = json.data || {};
+      setFormData(prev => ({
+        ...prev,
+        ...(parsed.fullName && { fullName: parsed.fullName }),
+        ...(parsed.phone && { phone: parsed.phone }),
+        ...(parsed.location && { location: parsed.location }),
+        ...(parsed.bio && { bio: parsed.bio }),
+        ...(parsed.experience && { experience: parsed.experience }),
+        ...(parsed.education && { education: parsed.education }),
+        ...(Array.isArray(parsed.skills) && parsed.skills.length > 0 && { skills: parsed.skills }),
+      }));
+      if (Array.isArray(parsed.skills) && parsed.skills.length > 0) {
+        setSkillsInput(parsed.skills.join(', '));
+      }
+
+      setCvParseSuccess(true);
+      setTimeout(() => setCvParseSuccess(false), 3000);
+    } catch (err) {
+      setCvParseError('Network error. Please try again.');
+    } finally {
+      setIsParsingCV(false);
+      if (cvFileInputRef.current) cvFileInputRef.current.value = '';
     }
   };
 
@@ -187,7 +208,7 @@ export default function ProfilePage() {
     setSaveSuccess(false);
 
     try {
-      const res = await fetch('${process.env.NEXT_PUBLIC_API_URL}/api/user/profile', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/profile`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -473,7 +494,19 @@ export default function ProfilePage() {
               <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: '600', color: '#475569', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 ⭐ Skills (comma-separated)
               </label>
-              <input type="text" value={formData.skills?.join(', ') || ''} onChange={(e) => setFormData(prev => ({ ...prev, skills: e.target.value.split(',').map(s => s.trim()).filter(Boolean) }))} style={{ width: '100%', padding: '12px 14px', fontSize: '15px', border: '1px solid rgba(0, 0, 0, 0.1)', borderRadius: '8px', background: '#FFFFFF', fontFamily: 'inherit', boxSizing: 'border-box' }} placeholder="React, Node.js, TypeScript, Python..." onFocus={(e) => e.currentTarget.style.borderColor = '#0051FF'} onBlur={(e) => e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.1)'} />
+              <input
+                type="text"
+                value={skillsInput}
+                onChange={(e) => setSkillsInput(e.target.value)}
+                onBlur={(e) => {
+                  const skills = e.target.value.split(',').map(s => s.trim()).filter(Boolean);
+                  setFormData(prev => ({ ...prev, skills }));
+                  e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.1)';
+                }}
+                style={{ width: '100%', padding: '12px 14px', fontSize: '15px', border: '1px solid rgba(0, 0, 0, 0.1)', borderRadius: '8px', background: '#FFFFFF', fontFamily: 'inherit', boxSizing: 'border-box' }}
+                placeholder="React, Node.js, TypeScript, Python..."
+                onFocus={(e) => e.currentTarget.style.borderColor = '#0051FF'}
+              />
             </div>
 
             {/* Experience */}
