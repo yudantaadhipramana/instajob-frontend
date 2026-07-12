@@ -312,7 +312,7 @@ export default function ProfilePage() {
             color: '#0051FF',
             textDecoration: 'none',
             fontSize: '15px',
-            fontWeight: '500',
+            fontWeight: '600',
             transition: 'color 0.2s',
           }}>
             <ArrowLeft size={18} />
@@ -338,7 +338,7 @@ export default function ProfilePage() {
             borderRadius: '8px',
             color: '#059669',
             fontSize: '14px',
-            fontWeight: '500',
+            fontWeight: '600',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
@@ -357,7 +357,7 @@ export default function ProfilePage() {
             borderRadius: '8px',
             color: '#1D4ED8',
             fontSize: '14px',
-            fontWeight: '500',
+            fontWeight: '600',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',

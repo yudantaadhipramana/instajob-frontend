@@ -180,7 +180,7 @@ export default function DashboardPage() {
             padding: '16px 24px',
             textDecoration: 'none',
             color: '#64748B',
-            fontWeight: '500',
+            fontWeight: '600',
             fontSize: '14px',
             borderBottom: '2px solid transparent',
             transition: 'all 0.3s ease',
@@ -205,7 +205,7 @@ export default function DashboardPage() {
             padding: '16px 24px',
             textDecoration: 'none',
             color: '#64748B',
-            fontWeight: '500',
+            fontWeight: '600',
             fontSize: '14px',
             borderBottom: '2px solid transparent',
             transition: 'all 0.3s ease',
@@ -230,7 +230,7 @@ export default function DashboardPage() {
             padding: '16px 24px',
             textDecoration: 'none',
             color: '#64748B',
-            fontWeight: '500',
+            fontWeight: '600',
             fontSize: '14px',
             borderBottom: '2px solid transparent',
             transition: 'all 0.3s ease',
@@ -274,7 +274,7 @@ export default function DashboardPage() {
             color: '#64748B',
             margin: 0,
             fontSize: '16px',
-            fontWeight: '500'
+            fontWeight: '600'
           }}>
             Kelola otomasi pencarian kerja Anda dengan dashboard premium kami.
           </p>
@@ -289,7 +289,7 @@ export default function DashboardPage() {
             borderRadius: '12px',
             marginBottom: '24px',
             fontSize: '14px',
-            fontWeight: '500',
+            fontWeight: '600',
             animation: 'slideDown 0.3s ease-out',
           }}>
             ⚠️ {error}

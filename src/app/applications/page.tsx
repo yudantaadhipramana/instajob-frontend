@@ -202,7 +202,7 @@ export default function ApplicationsPage() {
             padding: '16px 24px',
             textDecoration: 'none',
             color: '#64748B',
-            fontWeight: '500',
+            fontWeight: '600',
             fontSize: '14px',
             borderBottom: '2px solid transparent',
             transition: 'all 0.3s ease',
@@ -227,7 +227,7 @@ export default function ApplicationsPage() {
             padding: '16px 24px',
             textDecoration: 'none',
             color: '#64748B',
-            fontWeight: '500',
+            fontWeight: '600',
             fontSize: '14px',
             borderBottom: '2px solid transparent',
             transition: 'all 0.3s ease',
@@ -271,7 +271,7 @@ export default function ApplicationsPage() {
             padding: '16px 24px',
             textDecoration: 'none',
             color: '#64748B',
-            fontWeight: '500',
+            fontWeight: '600',
             fontSize: '14px',
             borderBottom: '2px solid transparent',
             transition: 'all 0.3s ease',
@@ -329,7 +329,7 @@ export default function ApplicationsPage() {
             borderRadius: '8px',
             color: '#991B1B',
             fontSize: '14px',
-            fontWeight: '500',
+            fontWeight: '600',
           }}>
             {error}
           </div>
@@ -361,7 +361,7 @@ export default function ApplicationsPage() {
                 fontSize: '12px',
                 color: '#64748B',
                 margin: '0 0 8px 0',
-                fontWeight: '500',
+                fontWeight: '600',
               }}>
                 {stat.label}
               </p>

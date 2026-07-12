@@ -517,7 +517,7 @@ export default function AffiliateDashboardPage() {
                 color: '#6B7280',
                 marginBottom: '6px',
                 fontFamily: 'var(--font-body)',
-                fontWeight: '500'
+                fontWeight: '600'
               }}>
                 {section.message}
               </p>

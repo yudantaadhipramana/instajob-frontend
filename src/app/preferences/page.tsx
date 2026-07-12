@@ -260,7 +260,7 @@ export default function PreferencesPage() {
             color: '#0051FF',
             textDecoration: 'none',
             fontSize: '15px',
-            fontWeight: '500',
+            fontWeight: '600',
             transition: 'color 0.2s',
           }}>
             <ArrowLeft size={18} />
@@ -286,7 +286,7 @@ export default function PreferencesPage() {
             borderRadius: '8px',
             color: '#059669',
             fontSize: '14px',
-            fontWeight: '500',
+            fontWeight: '600',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
@@ -306,7 +306,7 @@ export default function PreferencesPage() {
             borderRadius: '8px',
             color: '#DC2626',
             fontSize: '14px',
-            fontWeight: '500',
+            fontWeight: '600',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
@@ -576,7 +576,7 @@ export default function PreferencesPage() {
                     border: '1px solid rgba(0, 81, 255, 0.3)',
                     borderRadius: '20px',
                     fontSize: '13px',
-                    fontWeight: '500',
+                    fontWeight: '600',
                     color: '#0051FF',
                   }}>
                     <MapPin size={14} />
@@ -788,7 +788,7 @@ export default function PreferencesPage() {
                   <span style={{
                     marginLeft: '8px',
                     fontSize: '14px',
-                    fontWeight: '500',
+                    fontWeight: '600',
                     color: '#1E293B',
                   }}>
                     {type}
@@ -915,7 +915,7 @@ export default function PreferencesPage() {
                 <span style={{
                   marginLeft: '8px',
                   fontSize: '14px',
-                  fontWeight: '500',
+                  fontWeight: '600',
                   color: '#1E293B',
                 }}>
                   Enable job notifications
@@ -951,7 +951,7 @@ export default function PreferencesPage() {
                 <span style={{
                   marginLeft: '8px',
                   fontSize: '14px',
-                  fontWeight: '500',
+                  fontWeight: '600',
                   color: '#1E293B',
                 }}>
                   Email notifications
@@ -987,7 +987,7 @@ export default function PreferencesPage() {
                 <span style={{
                   marginLeft: '8px',
                   fontSize: '14px',
-                  fontWeight: '500',
+                  fontWeight: '600',
                   color: '#1E293B',
                 }}>
                   Telegram notifications

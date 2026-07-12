@@ -303,7 +303,7 @@ export default function SettingsPage() {
             padding: '16px 24px',
             textDecoration: 'none',
             color: '#64748B',
-            fontWeight: '500',
+            fontWeight: '600',
             fontSize: '14px',
             borderBottom: '2px solid transparent',
             transition: 'all 0.3s ease',
@@ -328,7 +328,7 @@ export default function SettingsPage() {
             padding: '16px 24px',
             textDecoration: 'none',
             color: '#64748B',
-            fontWeight: '500',
+            fontWeight: '600',
             fontSize: '14px',
             borderBottom: '2px solid transparent',
             transition: 'all 0.3s ease',
@@ -353,7 +353,7 @@ export default function SettingsPage() {
             padding: '16px 24px',
             textDecoration: 'none',
             color: '#64748B',
-            fontWeight: '500',
+            fontWeight: '600',
             fontSize: '14px',
             borderBottom: '2px solid transparent',
             transition: 'all 0.3s ease',
@@ -378,7 +378,7 @@ export default function SettingsPage() {
             padding: '16px 24px',
             textDecoration: 'none',
             color: '#64748B',
-            fontWeight: '500',
+            fontWeight: '600',
             fontSize: '14px',
             borderBottom: '2px solid transparent',
             transition: 'all 0.3s ease',
@@ -436,7 +436,7 @@ export default function SettingsPage() {
             borderRadius: '8px',
             color: '#166534',
             fontSize: '14px',
-            fontWeight: '500',
+            fontWeight: '600',
             display: 'flex',
             alignItems: 'center',
             gap: '12px',
@@ -456,7 +456,7 @@ export default function SettingsPage() {
             borderRadius: '8px',
             color: '#991B1B',
             fontSize: '14px',
-            fontWeight: '500',
+            fontWeight: '600',
             display: 'flex',
             alignItems: 'center',
             gap: '12px',
@@ -719,7 +719,7 @@ export default function SettingsPage() {
                 <div style={{
                   flex: 1, padding: '10px 16px', borderRadius: '8px', 
                   backgroundColor: '#D1FAE5', color: '#065F46', 
-                  display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500'
+                  display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600'
                 }}>
                   <CheckCircle size={18} /> Linked to Telegram
                 </div>
@@ -750,7 +750,7 @@ export default function SettingsPage() {
                   onClick={handleCopyTelegramCode}
                   style={{
                     padding: '10px 20px', backgroundColor: copySuccess ? '#10B981' : '#2563EB', color: 'white',
-                    border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '500', cursor: 'pointer',
+                    border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer',
                     transition: 'background-color 0.2s'
                   }}
                 >
@@ -763,7 +763,7 @@ export default function SettingsPage() {
                     rel="noreferrer"
                     style={{
                       padding: '10px 20px', backgroundColor: '#0088cc', color: 'white', textDecoration: 'none',
-                      border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '500'
+                      border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '600'
                     }}
                   >
                     Open Bot
@@ -803,7 +803,7 @@ export default function SettingsPage() {
                 <div style={{
                   flex: 1, padding: '10px 16px', borderRadius: '8px',
                   backgroundColor: '#D1FAE5', color: '#065F46',
-                  display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500'
+                  display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600'
                 }}>
                   <CheckCircle size={18} /> Terhubung ke Gmail
                 </div>
@@ -1112,7 +1112,7 @@ export default function SettingsPage() {
             borderRadius: '8px',
             marginBottom: '24px',
           }}>
-            <p style={{ fontSize: '12px', color: '#64748B', margin: '0 0 4px 0', fontWeight: '500' }}>
+            <p style={{ fontSize: '12px', color: '#64748B', margin: '0 0 4px 0', fontWeight: '600' }}>
               Current Plan
             </p>
             <p style={{ fontSize: '18px', fontWeight: '800', margin: '0 0 4px 0', color: '#0051FF', textTransform: 'capitalize' }}>
@@ -1199,7 +1199,7 @@ export default function SettingsPage() {
           </div>
 
           <div style={{ marginBottom: '20px', padding: '16px', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: '8px' }}>
-            <p style={{ fontSize: '13px', color: '#0369A1', fontWeight: '500', margin: 0 }}>
+            <p style={{ fontSize: '13px', color: '#0369A1', fontWeight: '600', margin: 0 }}>
               📋 Your data is encrypted and secure. We never share your personal information with third parties.
             </p>
           </div>
