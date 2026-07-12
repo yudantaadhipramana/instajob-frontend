@@ -59,18 +59,18 @@ export default function AnalyticsPage() {
   }, [router]);
 
   const fetchAnalytics = async () => {
-    const token = sessionStorage.getItem('instajob_token');
+    const token = localStorage.getItem('instajob_token');
     const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
 
     try {
       const [metricRes, summaryRes, successRateRes] = await Promise.all([
-        fetch(`${apiBase}/api/analytics`, {
+        fetch(`${apiBase}/api/analytics/overview`, {
           headers: { 'Authorization': `Bearer ${token}` },
         }),
-        fetch(`${apiBase}/api/analytics/summary`, {
+        fetch(`${apiBase}/api/analytics/timeline`, {
           headers: { 'Authorization': `Bearer ${token}` },
         }),
-        fetch(`${apiBase}/api/analytics/success-rate`, {
+        fetch(`${apiBase}/api/analytics/industries`, {
           headers: { 'Authorization': `Bearer ${token}` },
         }),
       ]);

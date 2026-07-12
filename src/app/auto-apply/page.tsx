@@ -48,8 +48,9 @@ export default function AutoApplyPage() {
   }, [token, router]);
 
   const fetchQueue = async () => {
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
     try {
-      const response = await fetch('/api/auto-apply/queue', {
+      const response = await fetch(`${apiBase}/api/auto-apply/queue`, {
         headers: { 'Authorization': `Bearer ${token}` },
       });
 
@@ -84,14 +85,15 @@ export default function AutoApplyPage() {
   };
 
   const toggleAutoApply = async () => {
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
     try {
-      const response = await fetch('/api/auto-apply/toggle', {
+      const endpoint = autoApplyEnabled ? '/api/bot/stop' : '/api/bot/start';
+      const response = await fetch(`${apiBase}${endpoint}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ enabled: !autoApplyEnabled }),
       });
 
       if (response.ok) {

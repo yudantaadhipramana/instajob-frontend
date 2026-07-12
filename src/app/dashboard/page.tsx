@@ -43,7 +43,8 @@ export default function DashboardPage() {
       try {
         setUser(JSON.parse(userData));
         
-        const response = await fetch(`/api/dashboard/stats`, {
+        const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
+        const response = await fetch(`${apiBase}/api/dashboard/stats`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
