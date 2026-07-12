@@ -70,6 +70,7 @@ export default function JobsPage() {
   const [filterWorkType, setFilterWorkType] = useState('all');
   const [user, setUser] = useState<User | null>(null);
   const [toast, setToast] = useState<{msg:string,type:'success'|'error'}|null>(null);
+  const [allLocations, setAllLocations] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalJobs, setTotalJobs] = useState(0);
@@ -126,6 +127,13 @@ export default function JobsPage() {
     };
 
     checkAuthAndFetchJobs(1);
+
+    // Fetch all distinct locations for dropdown
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
+    fetch(`${apiBase}/api/jobs/locations`)
+      .then(r => r.json())
+      .then(setAllLocations)
+      .catch(() => {});
   }, [router]);
 
   // Re-fetch when filters change (reset to page 1)
@@ -200,9 +208,6 @@ export default function JobsPage() {
     localStorage.removeItem('instajob_user');
     router.push('/');
   };
-
-  const uniqueLocations = Array.from(new Set(jobs.map(job => job.location)));
-
   // Loading State
   if (loading) {
     return (
@@ -463,7 +468,7 @@ export default function JobsPage() {
                   }}
                 >
                   <option value="all">All Locations</option>
-                  {uniqueLocations.map(location => (
+                  {allLocations.map(location => (
                     <option key={location} value={location}>{location}</option>
                   ))}
                 </select>
