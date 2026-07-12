@@ -14,10 +14,19 @@ export default function SubscriptionPage() {
   const [selectedPlan, setSelectedPlan] = useState('monthly');
   const [isProcessing, setIsProcessing] = useState(false);
 
+  const [subscriptionStatus, setSubscriptionStatus] = useState<any>(null);
+
   useEffect(() => {
     const userData = localStorage.getItem('instajob_user');
-    if (userData) {
-      setUser(JSON.parse(userData));
+    const token = localStorage.getItem('instajob_token');
+    if (userData) setUser(JSON.parse(userData));
+    if (token) {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/subscription/status`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      })
+        .then(r => r.ok ? r.json() : null)
+        .then(d => { if (d) setSubscriptionStatus(d); })
+        .catch(() => {});
     }
     setIsLoading(false);
   }, []);

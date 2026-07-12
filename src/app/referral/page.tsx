@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Copy, Check, Share2, Users, TrendingUp, Award, Gift, Trophy, ExternalLink } from 'lucide-react';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
 
 interface ReferralUser {
   id: string;
@@ -13,39 +15,132 @@ interface ReferralUser {
   rank: number;
 }
 
+interface UserStats {
+  referralsSent: number;
+  conversions: number;
+  conversionRate: number;
+  earningsTotal: number;
+  earningsThisMonth: number;
+  currentRank: number;
+}
+
+interface Reward {
+  tier: string;
+  reward: string;
+  desc: string;
+  icon: string;
+  color: string;
+  required: number;
+  achieved: boolean;
+}
+
 export default function ReferralPage() {
-  const [referralLink, setReferralLink] = useState('https://instajob.my.id/ref/USER123ABC');
+  const [referralLink, setReferralLink] = useState('');
+  const [referralCode, setReferralCode] = useState('');
   const [copied, setCopied] = useState(false);
   const [shareMethod, setShareMethod] = useState<'link' | 'email' | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
-  // User referral stats
-  const userStats = {
-    referralsSent: 12,
-    conversions: 4,
-    conversionRate: 33,
-    earningsTotal: 1200000,
-    earningsThisMonth: 400000,
-    currentRank: 8,
-  };
+  const [userStats, setUserStats] = useState<UserStats>({
+    referralsSent: 0,
+    conversions: 0,
+    conversionRate: 0,
+    earningsTotal: 0,
+    earningsThisMonth: 0,
+    currentRank: 0,
+  });
 
-  // Top referrers leaderboard
-  const topReferrers: ReferralUser[] = [
-    { id: '1', name: 'Ahmad Sudarja', referralsCount: 48, conversionsCount: 24, earningsTotal: 12000000, rank: 1 },
-    { id: '2', name: 'Siti Nurhaliza', referralsCount: 35, conversionsCount: 17, earningsTotal: 8500000, rank: 2 },
-    { id: '3', name: 'Budi Santoso', referralsCount: 28, conversionsCount: 12, earningsTotal: 6000000, rank: 3 },
-    { id: '4', name: 'Dewi Kusuma', referralsCount: 22, conversionsCount: 9, earningsTotal: 4500000, rank: 4 },
-    { id: '5', name: 'Rinto Harahap', referralsCount: 18, conversionsCount: 8, earningsTotal: 4000000, rank: 5 },
-  ];
+  const [topReferrers, setTopReferrers] = useState<ReferralUser[]>([]);
+  const [rewards, setRewards] = useState<Reward[]>([]);
+
+  useEffect(() => {
+    const load = async () => {
+      const token = localStorage.getItem('instajob_token');
+      if (!token) {
+        setLoadError('Token tidak ditemukan. Silakan login ulang.');
+        setIsLoading(false);
+        return;
+      }
+
+      const headers = { Authorization: `Bearer ${token}` };
+
+      try {
+        const [codeRes, leaderboardRes, rewardsRes] = await Promise.all([
+          fetch(`${API_BASE}/api/referral/my-code`, { headers }),
+          fetch(`${API_BASE}/api/referral/leaderboard`, { headers }),
+          fetch(`${API_BASE}/api/referral/rewards`, { headers }),
+        ]);
+
+        if (codeRes.status === 401 || leaderboardRes.status === 401 || rewardsRes.status === 401) {
+          setLoadError('Sesi berakhir. Silakan login ulang.');
+          setIsLoading(false);
+          return;
+        }
+
+        // Parse my-code response
+        if (codeRes.ok) {
+          const codeData = await codeRes.json();
+          const code = codeData.data?.code || codeData.code || '';
+          const stats = codeData.data?.stats || codeData.stats || codeData.data || codeData;
+          setReferralCode(code);
+          setReferralLink(`https://instajob.my.id/ref/${code}`);
+          setUserStats({
+            referralsSent: stats.referralsSent ?? stats.totalReferrals ?? 0,
+            conversions: stats.conversions ?? stats.totalConversions ?? 0,
+            conversionRate: stats.conversionRate ?? 0,
+            earningsTotal: stats.earningsTotal ?? stats.totalEarnings ?? 0,
+            earningsThisMonth: stats.earningsThisMonth ?? stats.monthlyEarnings ?? 0,
+            currentRank: stats.currentRank ?? stats.rank ?? 0,
+          });
+        }
+
+        // Parse leaderboard response
+        if (leaderboardRes.ok) {
+          const lbData = await leaderboardRes.json();
+          const list: ReferralUser[] = (lbData.data || lbData.leaderboard || lbData || []).map((item: any, idx: number) => ({
+            id: item.id || String(idx + 1),
+            name: item.name || item.fullName || item.userName || 'Pengguna',
+            referralsCount: item.referralsCount ?? item.totalReferrals ?? 0,
+            conversionsCount: item.conversionsCount ?? item.totalConversions ?? 0,
+            earningsTotal: item.earningsTotal ?? item.totalEarnings ?? 0,
+            rank: item.rank ?? idx + 1,
+          }));
+          setTopReferrers(list);
+        }
+
+        // Parse rewards response
+        if (rewardsRes.ok) {
+          const rwData = await rewardsRes.json();
+          const list: Reward[] = (rwData.data || rwData.rewards || rwData || []).map((item: any) => ({
+            tier: item.tier || item.name || '',
+            reward: item.reward || item.rewardDescription || '',
+            desc: item.desc || item.description || '',
+            icon: item.icon || '🎁',
+            color: item.color || '#0051FF',
+            required: item.required ?? item.requiredReferrals ?? 0,
+            achieved: item.achieved ?? false,
+          }));
+          setRewards(list);
+        }
+      } catch (err) {
+        setLoadError('Gagal memuat data referral. Periksa koneksi internet.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    load();
+  }, []);
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(referralLink);
+    navigator.clipboard.writeText(referralLink || `https://instajob.my.id/ref/${referralCode}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleShare = (method: 'link' | 'email') => {
     setShareMethod(method);
-    // Implement share logic here
     setTimeout(() => setShareMethod(null), 1500);
   };
 
@@ -76,97 +171,64 @@ export default function ReferralPage() {
         borderRadius: '50%',
         bottom: '-200px',
         left: '-100px',
-        background: 'radial-gradient(circle, rgba(0, 81, 255, 0.15) 0%, transparent 70%)',
+        background: 'radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%)',
         filter: 'blur(120px)',
         pointerEvents: 'none',
         zIndex: 0,
       }} />
 
-      {/* Main Content */}
-      <div style={{
-        position: 'relative',
-        zIndex: 1,
-        maxWidth: '900px',
-        margin: '0 auto',
-        padding: '40px 24px',
-      }}>
-        {/* Header with Back Link */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: '40px',
-        }}>
+      <div style={{ position: 'relative', zIndex: 1, maxWidth: '900px', margin: '0 auto', padding: '40px 24px' }}>
+
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
           <Link href="/dashboard" style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            color: '#0051FF',
-            textDecoration: 'none',
-            fontSize: '15px',
-            fontWeight: '500',
-            transition: 'color 0.2s',
+            display: 'flex', alignItems: 'center', gap: '8px',
+            color: '#64748B', textDecoration: 'none', fontSize: '14px',
           }}>
-            <ArrowLeft size={18} />
-            Back to Dashboard
+            <ArrowLeft size={16} />
+            Kembali ke Dashboard
           </Link>
-          <h1 style={{
-            fontSize: '32px',
-            fontWeight: '800',
-            margin: 0,
-          }}>
-            Referral Program
-          </h1>
-          <div style={{ width: '140px' }} />
         </div>
 
-        {/* Hero Section */}
-        <div style={{
-          background: 'linear-gradient(135deg, rgba(0, 81, 255, 0.1) 0%, rgba(0, 81, 255, 0.05) 100%)',
-          borderRadius: '16px',
-          padding: '40px',
-          marginBottom: '40px',
-          border: '1px solid rgba(0, 81, 255, 0.2)',
-          textAlign: 'center',
-        }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            marginBottom: '20px',
-          }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '60px',
-              height: '60px',
-              background: 'linear-gradient(135deg, #0051FF 0%, #003AA3 100%)',
-              borderRadius: '12px',
-            }}>
-              <Gift size={32} color="#FFFFFF" />
-            </div>
-          </div>
-          <h2 style={{
-            fontSize: '28px',
-            fontWeight: '800',
-            margin: '0 0 12px 0',
-            color: '#1E293B',
-          }}>
-            Refer Friends & Earn Rewards
-          </h2>
-          <p style={{
-            fontSize: '16px',
-            color: '#64748B',
-            margin: 0,
-            maxWidth: '600px',
-            marginLeft: 'auto',
-            marginRight: 'auto',
-          }}>
-            Share your unique referral link with friends. When they join and upgrade to premium, you both earn rewards!
+        <div style={{ marginBottom: '32px' }}>
+          <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#1E293B', margin: '0 0 8px 0' }}>
+            Program Referral
+          </h1>
+          <p style={{ fontSize: '15px', color: '#64748B', margin: 0 }}>
+            Undang teman dan dapatkan komisi untuk setiap konversi berhasil.
           </p>
         </div>
 
-        {/* Referral Link Section */}
+        {/* Loading/Error Banner */}
+        {isLoading && (
+          <div style={{
+            background: 'rgba(0, 81, 255, 0.05)',
+            border: '1px solid rgba(0, 81, 255, 0.2)',
+            borderRadius: '12px',
+            padding: '16px 20px',
+            marginBottom: '24px',
+            color: '#0051FF',
+            fontSize: '14px',
+          }}>
+            ⏳ Memuat data referral...
+          </div>
+        )}
+
+        {loadError && (
+          <div style={{
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.2)',
+            borderRadius: '12px',
+            padding: '16px 20px',
+            marginBottom: '24px',
+            color: '#DC2626',
+            fontSize: '14px',
+          }}>
+            ⚠️ {loadError}
+          </div>
+        )}
+
+        {/* Referral Link Card */}
         <div style={{
           background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
           backdropFilter: 'blur(12px)',
@@ -174,257 +236,135 @@ export default function ReferralPage() {
           padding: '32px',
           boxShadow: '0 2px 12px rgba(0, 81, 255, 0.06)',
           border: '1px solid rgba(255, 255, 255, 0.6)',
-          marginBottom: '32px',
+          marginBottom: '24px',
         }}>
-          <h2 style={{
-            fontSize: '18px',
-            fontWeight: '700',
-            margin: '0 0 20px 0',
-            color: '#1E293B',
-          }}>
-            Your Referral Link
-          </h2>
-          
-          {/* Referral Link Display */}
-          <div style={{
-            display: 'flex',
-            gap: '8px',
-            marginBottom: '20px',
-          }}>
-            <input
-              type="text"
-              readOnly
-              value={referralLink}
-              style={{
-                flex: 1,
-                padding: '12px',
-                fontSize: '14px',
-                border: '1px solid #E2E8F0',
-                borderRadius: '8px',
-                background: '#F8FAFC',
-                color: '#0051FF',
-                fontWeight: '500',
-              }}
-            />
-            <button onClick={handleCopyLink} style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '6px',
-              padding: '12px 16px',
-              fontSize: '13px',
-              fontWeight: '600',
-              color: copied ? '#059669' : '#0051FF',
-              background: copied ? 'rgba(16, 185, 129, 0.1)' : 'rgba(0, 81, 255, 0.1)',
-              border: `1px solid ${copied ? 'rgba(16, 185, 129, 0.3)' : '#0051FF'}`,
-              borderRadius: '8px',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+            <div style={{
+              width: '40px', height: '40px', borderRadius: '10px',
+              background: 'linear-gradient(135deg, #0051FF 0%, #6366F1 100%)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              {copied ? (
-                <>
-                  <Check size={16} />
-                  Copied!
-                </>
-              ) : (
-                <>
-                  <Copy size={16} />
-                  Copy Link
-                </>
-              )}
+              <Share2 size={20} color="#FFFFFF" />
+            </div>
+            <div>
+              <h2 style={{ fontSize: '16px', fontWeight: '700', margin: 0, color: '#1E293B' }}>Link Referral Kamu</h2>
+              <p style={{ fontSize: '13px', color: '#64748B', margin: 0 }}>Bagikan link ini untuk mendapatkan komisi</p>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <div style={{
+              flex: 1,
+              background: '#F8FAFC',
+              border: '1px solid #E2E8F0',
+              borderRadius: '10px',
+              padding: '12px 16px',
+              fontSize: '14px',
+              color: '#1E293B',
+              fontFamily: 'monospace',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}>
+              {referralLink || (isLoading ? 'Memuat...' : 'Tidak tersedia')}
+            </div>
+            <button
+              onClick={handleCopyLink}
+              disabled={!referralLink}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                padding: '12px 20px',
+                fontSize: '14px', fontWeight: '600',
+                color: copied ? '#16A34A' : '#0051FF',
+                background: copied ? 'rgba(22, 163, 74, 0.1)' : 'rgba(0, 81, 255, 0.08)',
+                border: `1px solid ${copied ? 'rgba(22, 163, 74, 0.3)' : 'rgba(0, 81, 255, 0.2)'}`,
+                borderRadius: '10px',
+                cursor: referralLink ? 'pointer' : 'not-allowed',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap',
+                opacity: referralLink ? 1 : 0.5,
+              }}
+            >
+              {copied ? <Check size={16} /> : <Copy size={16} />}
+              {copied ? 'Tersalin!' : 'Salin Link'}
             </button>
           </div>
 
-          {/* Share Buttons */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, 1fr)',
-            gap: '12px',
-          }}>
-            <button onClick={() => handleShare('email')} style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              padding: '12px',
-              fontSize: '14px',
-              fontWeight: '600',
-              color: '#FFFFFF',
-              background: '#0051FF',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
-            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}>
-              <Share2 size={16} />
-              Share via Email
+          {referralCode && (
+            <div style={{ marginTop: '12px', fontSize: '13px', color: '#64748B' }}>
+              Kode referral kamu: <span style={{ fontWeight: '700', color: '#0051FF', fontFamily: 'monospace' }}>{referralCode}</span>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+            <button
+              onClick={() => handleShare('link')}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                padding: '10px 16px', fontSize: '13px', fontWeight: '600',
+                color: '#FFFFFF',
+                background: shareMethod === 'link' ? '#0040CC' : '#0051FF',
+                border: 'none', borderRadius: '8px', cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <ExternalLink size={14} />
+              Bagikan via WhatsApp
             </button>
-            <button onClick={() => handleShare('link')} style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              padding: '12px',
-              fontSize: '14px',
-              fontWeight: '600',
-              color: '#0051FF',
-              background: 'rgba(0, 81, 255, 0.1)',
-              border: '1px solid #0051FF',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
-            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}>
-              <ExternalLink size={16} />
-              Share Link
+            <button
+              onClick={() => handleShare('email')}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                padding: '10px 16px', fontSize: '13px', fontWeight: '600',
+                color: '#0051FF',
+                background: 'transparent',
+                border: '1px solid rgba(0, 81, 255, 0.3)',
+                borderRadius: '8px', cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              Bagikan via Email
             </button>
           </div>
         </div>
 
-        {/* How It Works Section */}
-        <div style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
-          backdropFilter: 'blur(12px)',
-          borderRadius: '16px',
-          padding: '32px',
-          boxShadow: '0 2px 12px rgba(0, 81, 255, 0.06)',
-          border: '1px solid rgba(255, 255, 255, 0.6)',
-          marginBottom: '32px',
-        }}>
-          <h2 style={{
-            fontSize: '18px',
-            fontWeight: '700',
-            margin: '0 0 24px 0',
-            color: '#1E293B',
-          }}>
-            How It Works
-          </h2>
-          
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '16px',
-          }}>
-            {[
-              { step: 1, title: 'Share Link', desc: 'Send your referral link to friends' },
-              { step: 2, title: 'Friend Joins', desc: 'They sign up using your link' },
-              { step: 3, title: 'Upgrade Plan', desc: 'They upgrade to Premium' },
-              { step: 4, title: 'Earn Reward', desc: 'You both get rewards!' },
-            ].map((item) => (
-              <div key={item.step} style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                textAlign: 'center',
-              }}>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '48px',
-                  height: '48px',
-                  background: 'linear-gradient(135deg, #0051FF 0%, #003AA3 100%)',
-                  borderRadius: '50%',
-                  fontSize: '20px',
-                  fontWeight: '800',
-                  color: '#FFFFFF',
-                  marginBottom: '12px',
-                }}>
-                  {item.step}
-                </div>
-                <h3 style={{
-                  fontSize: '13px',
-                  fontWeight: '700',
-                  margin: '0 0 6px 0',
-                  color: '#1E293B',
-                }}>
-                  {item.title}
-                </h3>
-                <p style={{
-                  fontSize: '12px',
-                  color: '#64748B',
-                  margin: 0,
-                }}>
-                  {item.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Referral Stats Section */}
+        {/* Stats Grid */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
           gap: '16px',
-          marginBottom: '32px',
+          marginBottom: '24px',
         }}>
           {[
-            { icon: Users, label: 'Referrals Sent', value: userStats.referralsSent, suffix: '' },
-            { icon: TrendingUp, label: 'Conversions', value: userStats.conversions, suffix: `(${userStats.conversionRate}%)` },
-            { icon: Award, label: 'Total Earnings', value: `Rp ${(userStats.earningsTotal / 1000000).toFixed(1)}M`, suffix: '' },
-          ].map((stat, idx) => {
-            const Icon = stat.icon;
-            return (
-              <div key={idx} style={{
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
-                backdropFilter: 'blur(12px)',
-                borderRadius: '16px',
-                padding: '24px',
-                boxShadow: '0 2px 12px rgba(0, 81, 255, 0.06)',
-                border: '1px solid rgba(255, 255, 255, 0.6)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                textAlign: 'center',
+            { label: 'Total Referral', value: userStats.referralsSent, icon: <Users size={20} />, color: '#0051FF' },
+            { label: 'Konversi', value: userStats.conversions, icon: <TrendingUp size={20} />, color: '#16A34A' },
+            { label: 'Tingkat Konversi', value: `${userStats.conversionRate}%`, icon: <Award size={20} />, color: '#F59E0B' },
+          ].map((stat, i) => (
+            <div key={i} style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
+              backdropFilter: 'blur(12px)',
+              borderRadius: '16px',
+              padding: '24px',
+              boxShadow: '0 2px 12px rgba(0, 81, 255, 0.06)',
+              border: '1px solid rgba(255, 255, 255, 0.6)',
+            }}>
+              <div style={{
+                width: '40px', height: '40px', borderRadius: '10px',
+                background: `${stat.color}18`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: stat.color, marginBottom: '12px',
               }}>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '40px',
-                  height: '40px',
-                  background: 'rgba(0, 81, 255, 0.1)',
-                  borderRadius: '8px',
-                  marginBottom: '12px',
-                }}>
-                  <Icon size={20} color="#0051FF" />
-                </div>
-                <p style={{
-                  fontSize: '12px',
-                  color: '#64748B',
-                  margin: '0 0 8px 0',
-                  fontWeight: '500',
-                }}>
-                  {stat.label}
-                </p>
-                <h3 style={{
-                  fontSize: '24px',
-                  fontWeight: '800',
-                  margin: '0 0 4px 0',
-                  color: '#1E293B',
-                }}>
-                  {typeof stat.value === 'number' ? stat.value : stat.value}
-                </h3>
-                {stat.suffix && (
-                  <p style={{
-                    fontSize: '12px',
-                    color: '#0051FF',
-                    margin: 0,
-                    fontWeight: '600',
-                  }}>
-                    {stat.suffix}
-                  </p>
-                )}
+                {stat.icon}
               </div>
-            );
-          })}
+              <p style={{ fontSize: '24px', fontWeight: '800', color: '#1E293B', margin: '0 0 4px 0' }}>
+                {isLoading ? '—' : stat.value}
+              </p>
+              <p style={{ fontSize: '13px', color: '#64748B', margin: 0 }}>{stat.label}</p>
+            </div>
+          ))}
         </div>
 
-        {/* Rewards Section */}
+        {/* Earnings Card */}
         <div style={{
           background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
           backdropFilter: 'blur(12px)',
@@ -432,70 +372,81 @@ export default function ReferralPage() {
           padding: '32px',
           boxShadow: '0 2px 12px rgba(0, 81, 255, 0.06)',
           border: '1px solid rgba(255, 255, 255, 0.6)',
-          marginBottom: '32px',
+          marginBottom: '24px',
         }}>
-          <h2 style={{
-            fontSize: '18px',
-            fontWeight: '700',
-            margin: '0 0 24px 0',
-            color: '#1E293B',
-          }}>
-            Referral Rewards
+          <h2 style={{ fontSize: '18px', fontWeight: '700', margin: '0 0 20px 0', color: '#1E293B' }}>
+            Pendapatan Referral
           </h2>
-          
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, 1fr)',
-            gap: '16px',
-          }}>
-            {[
-              { tier: 'Friend Joins', reward: 'Free 1-month access', desc: 'For both you and your friend' },
-              { tier: 'Friend Upgrades', reward: 'Rp 500.000 commission', desc: 'When they upgrade to Premium' },
-              { tier: '5 Conversions', reward: 'Bonus Rp 1.000.000', desc: 'Get 5 friends to upgrade' },
-              { tier: '10 Conversions', reward: 'VIP Status', desc: 'Unlock exclusive benefits' },
-            ].map((reward, idx) => (
-              <div key={idx} style={{
-                background: 'linear-gradient(135deg, rgba(0, 81, 255, 0.05) 0%, rgba(0, 81, 255, 0.02) 100%)',
-                borderRadius: '12px',
-                padding: '20px',
-                border: '1px solid rgba(0, 81, 255, 0.15)',
-              }}>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '12px',
-                }}>
-                  <Gift size={20} color="#0051FF" style={{ marginTop: '2px', flexShrink: 0 }} />
-                  <div>
-                    <h3 style={{
-                      fontSize: '13px',
-                      fontWeight: '700',
-                      margin: '0 0 4px 0',
-                      color: '#1E293B',
-                    }}>
-                      {reward.tier}
-                    </h3>
-                    <p style={{
-                      fontSize: '13px',
-                      fontWeight: '600',
-                      color: '#0051FF',
-                      margin: '0 0 4px 0',
-                    }}>
-                      {reward.reward}
-                    </p>
-                    <p style={{
-                      fontSize: '12px',
-                      color: '#64748B',
-                      margin: 0,
-                    }}>
-                      {reward.desc}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
+            <div>
+              <p style={{ fontSize: '13px', color: '#64748B', margin: '0 0 4px 0' }}>Total Pendapatan</p>
+              <p style={{ fontSize: '22px', fontWeight: '800', color: '#1E293B', margin: 0 }}>
+                {isLoading ? '—' : `Rp ${(userStats.earningsTotal / 1000).toFixed(0)}K`}
+              </p>
+            </div>
+            <div>
+              <p style={{ fontSize: '13px', color: '#64748B', margin: '0 0 4px 0' }}>Bulan Ini</p>
+              <p style={{ fontSize: '22px', fontWeight: '800', color: '#16A34A', margin: 0 }}>
+                {isLoading ? '—' : `Rp ${(userStats.earningsThisMonth / 1000).toFixed(0)}K`}
+              </p>
+            </div>
+            <div>
+              <p style={{ fontSize: '13px', color: '#64748B', margin: '0 0 4px 0' }}>Peringkat Saat Ini</p>
+              <p style={{ fontSize: '22px', fontWeight: '800', color: '#F59E0B', margin: 0 }}>
+                {isLoading ? '—' : (userStats.currentRank > 0 ? `#${userStats.currentRank}` : '—')}
+              </p>
+            </div>
           </div>
         </div>
+
+        {/* Rewards Section */}
+        {rewards.length > 0 && (
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
+            backdropFilter: 'blur(12px)',
+            borderRadius: '16px',
+            padding: '32px',
+            boxShadow: '0 2px 12px rgba(0, 81, 255, 0.06)',
+            border: '1px solid rgba(255, 255, 255, 0.6)',
+            marginBottom: '32px',
+          }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '700', margin: '0 0 24px 0', color: '#1E293B' }}>
+              Reward Program
+            </h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
+              {rewards.map((reward, idx) => (
+                <div key={idx} style={{
+                  padding: '20px',
+                  borderRadius: '12px',
+                  border: `1px solid ${reward.achieved ? 'rgba(22, 163, 74, 0.3)' : '#E2E8F0'}`,
+                  background: reward.achieved ? 'rgba(22, 163, 74, 0.05)' : 'transparent',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                    <div style={{
+                      width: '36px', height: '36px', borderRadius: '8px',
+                      background: `${reward.color}18`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '18px',
+                    }}>
+                      {reward.icon}
+                    </div>
+                    <div>
+                      <h3 style={{ fontSize: '14px', fontWeight: '700', margin: '0 0 4px 0', color: '#1E293B' }}>
+                        {reward.tier}
+                      </h3>
+                      <p style={{ fontSize: '13px', fontWeight: '600', color: '#0051FF', margin: '0 0 4px 0' }}>
+                        {reward.reward}
+                      </p>
+                      <p style={{ fontSize: '12px', color: '#64748B', margin: 0 }}>
+                        {reward.desc}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Leaderboard Section */}
         <div style={{
@@ -515,224 +466,108 @@ export default function ReferralPage() {
           }}>
             Top Referrers Leaderboard
           </h2>
-          
-          <div style={{
-            display: 'grid',
-            gap: '12px',
-          }}>
-            {topReferrers.map((referrer, idx) => (
-              <div key={referrer.id} style={{
-                display: 'grid',
-                gridTemplateColumns: '60px 1fr 1fr 1fr 1fr',
-                gap: '16px',
-                alignItems: 'center',
-                padding: '16px',
-                background: referrer.rank <= 3 ? 'rgba(0, 81, 255, 0.05)' : 'transparent',
-                borderRadius: '12px',
-                border: `1px solid ${referrer.rank <= 3 ? 'rgba(0, 81, 255, 0.2)' : '#E2E8F0'}`,
-              }}>
-                <div style={{
-                  display: 'flex',
+
+          {isLoading ? (
+            <p style={{ fontSize: '14px', color: '#64748B' }}>Memuat leaderboard...</p>
+          ) : topReferrers.length === 0 ? (
+            <p style={{ fontSize: '14px', color: '#64748B' }}>Belum ada data leaderboard.</p>
+          ) : (
+            <div style={{ display: 'grid', gap: '12px' }}>
+              {topReferrers.map((referrer) => (
+                <div key={referrer.id} style={{
+                  display: 'grid',
+                  gridTemplateColumns: '60px 1fr 1fr 1fr 1fr',
+                  gap: '16px',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
+                  padding: '16px',
+                  background: referrer.rank <= 3 ? 'rgba(0, 81, 255, 0.05)' : 'transparent',
+                  borderRadius: '12px',
+                  border: `1px solid ${referrer.rank <= 3 ? 'rgba(0, 81, 255, 0.2)' : '#E2E8F0'}`,
                 }}>
-                  {referrer.rank <= 3 ? (
-                    <Trophy size={20} color={referrer.rank === 1 ? '#F59E0B' : referrer.rank === 2 ? '#A1A1A1' : '#CD7F32'} />
-                  ) : (
-                    <span style={{
-                      fontSize: '14px',
-                      fontWeight: '700',
-                      color: '#64748B',
-                    }}>
-                      #{referrer.rank}
-                    </span>
-                  )}
+                  <div style={{
+                    display: 'flex', alignItems: 'center',
+                    justifyContent: 'center', gap: '8px',
+                  }}>
+                    {referrer.rank <= 3 ? (
+                      <Trophy size={20} color={referrer.rank === 1 ? '#F59E0B' : referrer.rank === 2 ? '#A1A1A1' : '#CD7F32'} />
+                    ) : (
+                      <span style={{ fontSize: '14px', fontWeight: '700', color: '#64748B' }}>
+                        #{referrer.rank}
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '14px', fontWeight: '700', margin: 0, color: '#1E293B' }}>
+                      {referrer.name}
+                    </p>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <p style={{ fontSize: '12px', color: '#64748B', margin: '0 0 2px 0' }}>Referral</p>
+                    <p style={{ fontSize: '14px', fontWeight: '700', color: '#1E293B', margin: 0 }}>
+                      {referrer.referralsCount}
+                    </p>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <p style={{ fontSize: '12px', color: '#64748B', margin: '0 0 2px 0' }}>Konversi</p>
+                    <p style={{ fontSize: '14px', fontWeight: '700', color: '#16A34A', margin: 0 }}>
+                      {referrer.conversionsCount}
+                    </p>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <p style={{ fontSize: '12px', color: '#64748B', margin: '0 0 2px 0' }}>Pendapatan</p>
+                    <p style={{ fontSize: '14px', fontWeight: '700', color: '#0051FF', margin: 0 }}>
+                      Rp {(referrer.earningsTotal / 1000000).toFixed(1)}jt
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p style={{
-                    fontSize: '14px',
-                    fontWeight: '700',
-                    margin: 0,
-                    color: '#1E293B',
-                  }}>
-                    {referrer.name}
-                  </p>
-                </div>
-                <div style={{
-                  textAlign: 'center',
-                }}>
-                  <p style={{
-                    fontSize: '12px',
-                    color: '#64748B',
-                    margin: '0 0 4px 0',
-                  }}>
-                    Referrals
-                  </p>
-                  <p style={{
-                    fontSize: '16px',
-                    fontWeight: '800',
-                    margin: 0,
-                    color: '#0051FF',
-                  }}>
-                    {referrer.referralsCount}
-                  </p>
-                </div>
-                <div style={{
-                  textAlign: 'center',
-                }}>
-                  <p style={{
-                    fontSize: '12px',
-                    color: '#64748B',
-                    margin: '0 0 4px 0',
-                  }}>
-                    Conversions
-                  </p>
-                  <p style={{
-                    fontSize: '16px',
-                    fontWeight: '800',
-                    margin: 0,
-                    color: '#059669',
-                  }}>
-                    {referrer.conversionsCount}
-                  </p>
-                </div>
-                <div style={{
-                  textAlign: 'center',
-                }}>
-                  <p style={{
-                    fontSize: '12px',
-                    color: '#64748B',
-                    margin: '0 0 4px 0',
-                  }}>
-                    Earnings
-                  </p>
-                  <p style={{
-                    fontSize: '14px',
-                    fontWeight: '800',
-                    margin: 0,
-                    color: '#1E293B',
-                  }}>
-                    Rp {(referrer.earningsTotal / 1000000).toFixed(1)}M
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Your Rank Info */}
-          <div style={{
-            marginTop: '24px',
-            padding: '16px',
-            background: 'linear-gradient(135deg, rgba(0, 81, 255, 0.08) 0%, rgba(0, 81, 255, 0.04) 100%)',
-            borderRadius: '12px',
-            border: '1px solid rgba(0, 81, 255, 0.2)',
-            textAlign: 'center',
-          }}>
-            <p style={{
-              fontSize: '13px',
-              color: '#64748B',
-              margin: '0 0 8px 0',
-              fontWeight: '500',
-            }}>
-              Your Current Rank
-            </p>
-            <p style={{
-              fontSize: '18px',
-              fontWeight: '800',
-              margin: 0,
-              color: '#0051FF',
-            }}>
-              #8 on Leaderboard
-            </p>
-            <p style={{
-              fontSize: '12px',
-              color: '#64748B',
-              margin: '8px 0 0 0',
-            }}>
-              Keep referring to climb higher!
-            </p>
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* This Month Earnings Card */}
+        {/* CTA Bottom */}
         <div style={{
-          background: 'linear-gradient(135deg, #0051FF 0%, #003AA3 100%)',
+          background: 'linear-gradient(135deg, #0051FF 0%, #6366F1 100%)',
           borderRadius: '16px',
-          padding: '32px',
-          marginBottom: '32px',
+          padding: '40px',
+          textAlign: 'center',
           color: '#FFFFFF',
-          textAlign: 'center',
         }}>
-          <p style={{
-            fontSize: '13px',
-            margin: '0 0 8px 0',
-            opacity: 0.9,
-            fontWeight: '500',
-          }}>
-            This Month's Earnings
-          </p>
-          <h2 style={{
-            fontSize: '36px',
-            fontWeight: '800',
-            margin: '0 0 12px 0',
-          }}>
-            Rp {(userStats.earningsThisMonth / 1000000).toFixed(2)}M
-          </h2>
-          <p style={{
-            fontSize: '13px',
-            margin: 0,
-            opacity: 0.9,
-          }}>
-            {userStats.conversions} conversions this month
-          </p>
-        </div>
-
-        {/* CTA Section */}
-        <div style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
-          backdropFilter: 'blur(12px)',
-          borderRadius: '16px',
-          padding: '32px',
-          boxShadow: '0 2px 12px rgba(0, 81, 255, 0.06)',
-          border: '1px solid rgba(255, 255, 255, 0.6)',
-          textAlign: 'center',
-        }}>
-          <h2 style={{
-            fontSize: '18px',
-            fontWeight: '700',
-            margin: '0 0 12px 0',
-            color: '#1E293B',
-          }}>
-            Ready to Start Earning?
+          <Gift size={40} style={{ margin: '0 auto 16px', display: 'block' }} />
+          <h2 style={{ fontSize: '22px', fontWeight: '800', margin: '0 0 12px 0' }}>
+            Mulai Hasilkan Komisi Sekarang!
           </h2>
           <p style={{
             fontSize: '14px',
-            color: '#64748B',
+            color: 'rgba(255,255,255,0.8)',
             margin: '0 0 24px 0',
           }}>
             Share your referral link now and start earning rewards today!
           </p>
-          <button style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '12px 24px',
-            fontSize: '14px',
-            fontWeight: '700',
-            color: '#FFFFFF',
-            background: '#0051FF',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
-          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}>
+          <button
+            onClick={handleCopyLink}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 24px',
+              fontSize: '14px',
+              fontWeight: '700',
+              color: '#0051FF',
+              background: '#FFFFFF',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
+            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+          >
             <Share2 size={16} />
             Copy & Share Link Now
           </button>
         </div>
+
       </div>
     </div>
   );
