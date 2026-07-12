@@ -101,6 +101,11 @@ body {
 }
 
 /* ===== TYPOGRAPHY ===== */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
+  font-weight: 800;
+}
+
 .hero-text {
   font-size: 3.5rem;
   font-weight: 800;
