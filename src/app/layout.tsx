@@ -33,7 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${plusJakarta.variable} ${inter.variable}`} suppressHydrationWarning>
-      <body suppressHydrationWarning>
+      <body className={`${plusJakarta.variable} ${inter.variable}`} suppressHydrationWarning>
         <I18nProvider>
           <AuthProvider>
             {children}

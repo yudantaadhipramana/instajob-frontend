@@ -22,7 +22,7 @@
   
   /* Typography */
   --font-heading: var(--font-plus-jakarta);
-  --font-body: var(--font-inter);
+  --font-body: var(--font-plus-jakarta);
   
   /* Legacy support (dashboard dark mode) */
   --blue-primary: #2563EB;

@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Logo } from '@/components/Logo';
-import { JobsIcon, ApplicationsIcon, ProfileIcon } from '@/components/DashboardIcons';
+import { JobsIcon, ApplicationsIcon, HomeIcon } from '@/components/DashboardIcons';
+import { Settings } from 'lucide-react';
 import ProfileDropdown from '@/components/ProfileDropdown';
 
 interface Application {
@@ -217,7 +218,7 @@ export default function ApplicationsPage() {
             e.currentTarget.style.color = '#64748B';
           }}
         >
-          <JobsIcon size={18} color="currentColor" />
+          <HomeIcon size={18} color="currentColor" />
           Dashboard
         </Link>
         <Link
@@ -265,7 +266,7 @@ export default function ApplicationsPage() {
           Applications
         </Link>
         <Link
-          href="/profile"
+          href="/preferences"
           style={{
             padding: '16px 24px',
             textDecoration: 'none',
@@ -286,8 +287,8 @@ export default function ApplicationsPage() {
             e.currentTarget.style.color = '#64748B';
           }}
         >
-          <ProfileIcon size={18} color="currentColor" />
-          Profile
+          <Settings size={18} color="currentColor" />
+          Preferences
         </Link>
       </div>
 

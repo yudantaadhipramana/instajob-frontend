@@ -82,11 +82,7 @@ export default function NavigationBar() {
     >
       {/* Logo */}
       <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-        <img 
-          src="/logo-instajob.png" 
-          alt="InstaJob Logo" 
-          style={{ height: '48px', width: 'auto' }}
-        />
+        <Logo size={40} showText={true} />
       </a>
 
       {/* Desktop Menu - Nav Links */}
