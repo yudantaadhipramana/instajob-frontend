@@ -96,7 +96,7 @@ export default function JobsPage() {
 
         if (response.ok) {
           const data = await response.json();
-          const jobsList = data.jobs || data;
+          const jobsList = data.data || data.jobs || data;
           setJobs(jobsList);
           setFilteredJobs(jobsList);
         } else {
