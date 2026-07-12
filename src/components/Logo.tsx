@@ -20,7 +20,7 @@ export function Logo({ size = 32, showText = true }: { size?: number; showText?:
           fontWeight: 800,
           color: '#1E293B',
           letterSpacing: '-0.02em',
-          fontFamily: 'system-ui, -apple-system, sans-serif',
+          fontFamily: 'var(--font-plus-jakarta, "Plus Jakarta Sans", sans-serif)',
         }}>
           InstaJob
         </span>
