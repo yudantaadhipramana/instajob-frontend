@@ -128,7 +128,7 @@ export default function Sidebar() {
             borderRadius: '8px',
             marginBottom: '12px',
           }}>
-            <p style={{ color: '#F8FAFC', fontSize: '14px', fontWeight: '500' }}>
+            <p style={{ color: '#F8FAFC', fontSize: '14px', fontWeight: '600' }}>
               {user?.fullName || 'User'}
             </p>
             <p style={{ color: '#64748B', fontSize: '12px' }}>

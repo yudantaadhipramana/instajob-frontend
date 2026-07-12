@@ -199,7 +199,7 @@ export default function SubscriptionPage() {
             fontSize: '12px',
             color: '#64748B',
             margin: '0',
-            fontWeight: '500',
+            fontWeight: '600',
             lineHeight: '1.4',
             maxWidth: '500px',
             marginLeft: 'auto',
@@ -273,7 +273,7 @@ export default function SubscriptionPage() {
                 fontSize: '10px',
                 color: plan.recommended ? 'rgba(255, 255, 255, 0.7)' : '#64748B',
                 margin: '0 0 10px 0',
-                fontWeight: '500',
+                fontWeight: '600',
               }}>
                 {plan.description}
               </p>
@@ -312,7 +312,7 @@ export default function SubscriptionPage() {
                     fontSize: '9px',
                     color: plan.recommended ? 'rgba(255, 255, 255, 0.65)' : '#64748B',
                     margin: '3px 0 0 0',
-                    fontWeight: '500',
+                    fontWeight: '600',
                   }}>
                     {plan.period}
                   </p>
@@ -333,7 +333,7 @@ export default function SubscriptionPage() {
                     <Check size={11} color={plan.recommended ? '#34D399' : '#10B981'} strokeWidth={3} style={{ marginTop: '0.5px', flexShrink: 0 }} />
                     <span style={{
                       fontSize: '9px',
-                      fontWeight: '500',
+                      fontWeight: '600',
                       color: plan.recommended ? '#FFFFFF' : '#1E293B',
                       lineHeight: '1.2',
                     }}>

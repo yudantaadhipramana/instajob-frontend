@@ -108,7 +108,7 @@ export default function ProfileDropdown({ user }: ProfileDropdownProps) {
           }}>
             <div style={{
               fontSize: '13px',
-              fontWeight: '500',
+              fontWeight: '600',
               color: '#030303',
               marginBottom: '4px',
               letterSpacing: '-0.3px',

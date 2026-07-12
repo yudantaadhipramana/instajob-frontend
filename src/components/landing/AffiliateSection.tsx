@@ -141,7 +141,7 @@ export default function AffiliateSection() {
                   <span
                     style={{
                       fontSize: '16px',
-                      fontWeight: '500',
+                      fontWeight: '600',
                       color: 'var(--color-foreground)',
                       fontFamily: 'var(--font-body)',
                     }}

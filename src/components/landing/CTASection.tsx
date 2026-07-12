@@ -205,7 +205,7 @@ export default function CTASection() {
                       gap: '8px',
                       color: 'rgba(255, 255, 255, 0.85)',
                       fontSize: '14px',
-                      fontWeight: '500',
+                      fontWeight: '600',
                       fontFamily: 'var(--font-body)',
                     }}
                   >

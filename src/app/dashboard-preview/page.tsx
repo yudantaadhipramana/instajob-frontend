@@ -74,7 +74,7 @@ export default function DashboardPreviewPage() {
             borderRadius: '10px',
             fontSize: '14px',
             color: '#64748B',
-            fontWeight: '500',
+            fontWeight: '600',
           }}>
             <span style={{ 
               width: '8px', 
@@ -143,7 +143,7 @@ export default function DashboardPreviewPage() {
             padding: '16px 24px',
             textDecoration: 'none',
             color: '#64748B',
-            fontWeight: '500',
+            fontWeight: '600',
             fontSize: '14px',
             borderBottom: '2px solid transparent',
             transition: 'all 0.3s ease',
@@ -187,7 +187,7 @@ export default function DashboardPreviewPage() {
             color: '#64748B', 
             margin: 0, 
             fontSize: '16px',
-            fontWeight: '500'
+            fontWeight: '600'
           }}>
             Kelola otomasi pencarian kerja Anda dengan dashboard premium kami.
           </p>

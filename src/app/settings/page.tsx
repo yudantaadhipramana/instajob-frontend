@@ -728,7 +728,7 @@ export default function SettingsPage() {
                   disabled={telegramLoading}
                   style={{
                     padding: '10px 20px', backgroundColor: '#EF4444', color: 'white', border: 'none',
-                    borderRadius: '8px', fontSize: '14px', fontWeight: '500', cursor: telegramLoading ? 'not-allowed' : 'pointer',
+                    borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: telegramLoading ? 'not-allowed' : 'pointer',
                     opacity: telegramLoading ? 0.7 : 1
                   }}
                 >
@@ -812,7 +812,7 @@ export default function SettingsPage() {
                   disabled={gmailLoading}
                   style={{
                     padding: '10px 20px', backgroundColor: '#EF4444', color: 'white',
-                    border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '500',
+                    border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '600',
                     cursor: gmailLoading ? 'not-allowed' : 'pointer', opacity: gmailLoading ? 0.7 : 1
                   }}
                 >
