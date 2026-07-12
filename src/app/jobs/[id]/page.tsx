@@ -36,6 +36,8 @@ export default function JobDetailPage() {
   const [appStatus, setAppStatus] = useState<ApplicationStatus>({ applied: false });
   const [isApplying, setIsApplying] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
+  const [toast, setToast] = useState<{msg:string,type:'success'|'error'}|null>(null);
+  const showToast = (msg:string, type:'success'|'error'='success') => { setToast({msg,type}); setTimeout(()=>setToast(null),3000); };
 
   useEffect(() => {
     if (!token) {
@@ -78,7 +80,7 @@ export default function JobDetailPage() {
 
   const handleApply = async () => {
     if (appStatus.applied) {
-      alert('You already applied to this job');
+      showToast('You already applied to this job', 'error');
       return;
     }
 
@@ -99,14 +101,14 @@ export default function JobDetailPage() {
 
       if (response.ok) {
         setAppStatus({ applied: true, status: 'pending' });
-        alert('Application submitted successfully!');
+        showToast('Application submitted successfully!');
       } else {
         const errData = await response.json();
-        alert('Failed to apply: ' + (errData.error || 'Unknown error'));
+        showToast('Failed to apply: ' + (errData.error || 'Unknown error'), 'error');
       }
     } catch (err) {
       console.error(err);
-      alert('Error submitting application');
+      showToast('Error submitting application', 'error');
     } finally {
       setIsApplying(false);
     }
@@ -139,6 +141,7 @@ export default function JobDetailPage() {
   }
 
   return (
+    <>
     <div style={{ minHeight: '100vh', backgroundColor: '#0B1120', color: '#F8FAFC' }}>
       {/* Header */}
       <header style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '16px 24px' }}>
@@ -222,7 +225,7 @@ export default function JobDetailPage() {
               jobId={job.id}
               jobTitle={job.title}
               company={job.company}
-              onSuccess={() => alert('Added to auto-apply queue!')}
+              onSuccess={() => showToast('Added to auto-apply queue!')}
             />
           </div>
         </div>
@@ -243,5 +246,7 @@ export default function JobDetailPage() {
         )}
       </main>
     </div>
+      {toast && <div style={{position:'fixed',bottom:'24px',right:'24px',padding:'12px 20px',borderRadius:'8px',background:toast.type==='success'?'#10B981':'#EF4444',color:'white',fontWeight:'600',fontSize:'14px',zIndex:9999,boxShadow:'0 4px 12px rgba(0,0,0,0.15)'}}>{toast.msg}</div>}
+    </>
   );
 }

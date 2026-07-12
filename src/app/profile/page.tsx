@@ -243,7 +243,9 @@ export default function ProfilePage() {
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err) {
       console.error('Save profile error:', err);
-      alert('Failed to save profile. Please try again.');
+      setSaveSuccess(false);
+      setCvParseError('Failed to save profile. Please try again.');
+      setTimeout(() => setCvParseError(''), 3000);
     } finally {
       setIsSaving(false);
     }

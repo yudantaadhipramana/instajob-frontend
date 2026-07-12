@@ -33,6 +33,8 @@ export default function AutoApplyPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [autoApplyEnabled, setAutoApplyEnabled] = useState(false);
+  const [toast, setToast] = useState<{msg:string,type:'success'|'error'}|null>(null);
+  const showToast = (msg:string, type:'success'|'error'='success') => { setToast({msg,type}); setTimeout(()=>setToast(null),3000); };
 
   useEffect(() => {
     if (!token) {
@@ -135,6 +137,7 @@ export default function AutoApplyPage() {
   }
 
   return (
+    <>
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#0B1120', color: '#F8FAFC' }}>
       <Sidebar />
 
@@ -220,7 +223,7 @@ export default function AutoApplyPage() {
                 <button 
                   onClick={() => {
                     if (confirm(`Remove "${item.jobTitle}" from queue?`)) {
-                      alert('Remove from queue feature coming soon.');
+                      showToast('Remove from queue feature coming soon.', 'error');
                     }
                   }}
                   style={{ padding: '6px 12px', backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: '#EF4444', cursor: 'pointer', fontSize: '12px', fontWeight: '600' }}
@@ -233,5 +236,7 @@ export default function AutoApplyPage() {
         </div>
       </main>
     </div>
+      {toast && <div style={{position:'fixed',bottom:'24px',right:'24px',padding:'12px 20px',borderRadius:'8px',background:toast.type==='success'?'#10B981':'#EF4444',color:'white',fontWeight:'600',fontSize:'14px',zIndex:9999,boxShadow:'0 4px 12px rgba(0,0,0,0.15)'}}>{toast.msg}</div>}
+    </>
   );
 }

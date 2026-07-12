@@ -76,6 +76,9 @@ export default function JobsPage() {
   const [filterLocation, setFilterLocation] = useState('all');
   const [filterWorkType, setFilterWorkType] = useState('all');
   const [user, setUser] = useState<User | null>(null);
+  const [toast, setToast] = useState<{msg:string,type:'success'|'error'}|null>(null);
+
+  const showToast = (msg:string, type:'success'|'error'='success') => { setToast({msg,type}); setTimeout(()=>setToast(null),3000); };
 
   // Auth & Fetch Jobs
   useEffect(() => {
@@ -168,13 +171,13 @@ export default function JobsPage() {
       });
 
       if (response.ok) {
-        alert('Application submitted successfully!');
+        showToast('Application submitted successfully!', 'success');
       } else {
         const responseText = await response.text();
-        alert('Failed to submit application: ' + responseText);
+        showToast('Failed to submit application: ' + responseText, 'error');
       }
     } catch (err) {
-      alert('Error submitting application');
+      showToast('Error submitting application', 'error');
     }
   };
 
@@ -682,6 +685,7 @@ export default function JobsPage() {
           </div>
         )}
       </main>
+      {toast && <div style={{position:'fixed',bottom:'24px',right:'24px',padding:'12px 20px',borderRadius:'8px',background:toast.type==='success'?'#10B981':'#EF4444',color:'white',fontWeight:'600',fontSize:'14px',zIndex:9999,boxShadow:'0 4px 12px rgba(0,0,0,0.15)'}}>{toast.msg}</div>}
     </div>
   );
 }
