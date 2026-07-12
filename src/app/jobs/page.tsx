@@ -103,6 +103,7 @@ export default function JobsPage() {
         params.set('page', String(page));
         if (searchQuery.trim()) params.set('search', searchQuery.trim());
         if (filterWorkType === 'remote') params.set('remote', 'true');
+        if (filterLocation !== 'all') params.set('location', filterLocation);
 
         const response = await fetch(`${apiBase}/api/jobs?${params.toString()}`, {
           method: 'GET',
@@ -145,6 +146,7 @@ export default function JobsPage() {
         params.set('page', '1');
         if (searchQuery.trim()) params.set('search', searchQuery.trim());
         if (filterWorkType === 'remote') params.set('remote', 'true');
+        if (filterLocation !== 'all') params.set('location', filterLocation);
         const r = await fetch(`${apiBase}/api/jobs?${params}`, { headers: { 'Authorization': `Bearer ${token}` } });
         if (r.ok) {
           const data = await r.json();
