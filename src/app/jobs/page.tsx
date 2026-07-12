@@ -103,6 +103,7 @@ export default function JobsPage() {
         params.set('page', String(page));
         if (searchQuery.trim()) params.set('search', searchQuery.trim());
         if (filterWorkType === 'remote') params.set('remote', 'true');
+        if (filterWorkType === 'onsite') params.set('remote', 'false');
         if (filterLocation !== 'all') params.set('location', filterLocation);
 
         const response = await fetch(`${apiBase}/api/jobs?${params.toString()}`, {
@@ -146,6 +147,7 @@ export default function JobsPage() {
         params.set('page', '1');
         if (searchQuery.trim()) params.set('search', searchQuery.trim());
         if (filterWorkType === 'remote') params.set('remote', 'true');
+        if (filterWorkType === 'onsite') params.set('remote', 'false');
         if (filterLocation !== 'all') params.set('location', filterLocation);
         const r = await fetch(`${apiBase}/api/jobs?${params}`, { headers: { 'Authorization': `Bearer ${token}` } });
         if (r.ok) {
@@ -506,7 +508,6 @@ export default function JobsPage() {
                   <option value="all">All Work Types</option>
                   <option value="remote">Remote</option>
                   <option value="onsite">Onsite</option>
-                  <option value="hybrid">Hybrid</option>
                 </select>
               </div>
 
