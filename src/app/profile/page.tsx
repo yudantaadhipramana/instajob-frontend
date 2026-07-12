@@ -499,7 +499,7 @@ export default function ProfilePage() {
                 value={skillsInput}
                 onChange={(e) => setSkillsInput(e.target.value)}
                 onBlur={(e) => {
-                  const skills = e.target.value.split(',').map(s => s.trim()).filter(Boolean);
+                  const skills = e.target.value.split(/[,\s]+/).map(s => s.trim()).filter(Boolean);
                   setFormData(prev => ({ ...prev, skills }));
                   e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.1)';
                 }}

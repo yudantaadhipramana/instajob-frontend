@@ -15,9 +15,15 @@ interface Job {
   description: string;
   company: string;
   location: string;
-  salary: string;
-  createdAt: string;
-  workType?: string; // 'remote', 'onsite', 'hybrid'
+  remote?: boolean;
+  salaryMin?: number;
+  salaryMax?: number;
+  postedAt?: string;
+  postedDate?: string;
+  createdAt?: string;
+  workType?: string;
+  industry?: string;
+  tags?: string;
 }
 
 interface User {
@@ -607,7 +613,7 @@ export default function JobsPage() {
                         fontSize: '0.75rem',
                         fontWeight: '600',
                       }}>
-                        ⏱️ {formatPostDate(job.createdAt)}
+                        ⏱️ {formatPostDate(job.postedAt || job.postedDate || job.createdAt)}
                       </span>
                     </div>
 
@@ -623,7 +629,7 @@ export default function JobsPage() {
                         <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
                           <path d="M8.5 13a3.5 3.5 0 01-.369-6.98 4 4 0 117.753 1.977A4.5 4.5 0 1113.5 13H11V9.413l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13H8.5z" />
                         </svg>
-                        {job.salary}
+                        {job.salaryMin ? `Rp ${(job.salaryMin/1000000).toFixed(0)}jt${job.salaryMax ? ` - ${(job.salaryMax/1000000).toFixed(0)}jt` : '+'}` : 'Negotiable'}
                       </div>
                     </div>
 
