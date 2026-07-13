@@ -29,6 +29,7 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [completeness, setCompleteness] = useState<{score:number,missing:string[]}|null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -65,6 +66,13 @@ export default function DashboardPage() {
             recentApplications: []
           });
         }
+
+        // Fetch profile completeness
+        fetch(`${apiBase}/api/user/completeness`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }).then(r => r.json()).then(d => {
+          if (d.score !== undefined) setCompleteness(d);
+        }).catch(() => {});
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load dashboard');
       } finally {
@@ -293,6 +301,25 @@ export default function DashboardPage() {
             animation: 'slideDown 0.3s ease-out',
           }}>
             ⚠️ {error}
+          </div>
+        )}
+
+        {/* Profile Completeness Widget */}
+        {completeness && completeness.score < 100 && (
+          <div style={{ background: '#fff', borderRadius: '12px', padding: '20px 24px', marginBottom: '24px', border: '1px solid #E2E8F0', animation: 'fadeIn 0.6s ease-out 0.15s both' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <span style={{ fontWeight: '700', fontSize: '15px', color: '#1E293B' }}>📋 Kelengkapan Profil</span>
+              <span style={{ fontWeight: '800', fontSize: '18px', color: completeness.score >= 70 ? '#16A34A' : completeness.score >= 40 ? '#D97706' : '#DC2626' }}>{completeness.score}%</span>
+            </div>
+            <div style={{ background: '#F1F5F9', borderRadius: '8px', height: '8px', overflow: 'hidden', marginBottom: '12px' }}>
+              <div style={{ background: completeness.score >= 70 ? '#16A34A' : completeness.score >= 40 ? '#F59E0B' : '#EF4444', height: '100%', width: `${completeness.score}%`, borderRadius: '8px', transition: 'width 0.6s ease' }} />
+            </div>
+            {completeness.missing.length > 0 && (
+              <p style={{ fontSize: '13px', color: '#64748B', margin: '0 0 8px' }}>
+                Lengkapi: {completeness.missing.slice(0, 3).join(', ')}{completeness.missing.length > 3 ? ` +${completeness.missing.length - 3} lainnya` : ''}
+              </p>
+            )}
+            <a href="/preferences" style={{ fontSize: '13px', color: '#1E40FF', fontWeight: '600', textDecoration: 'none' }}>Lengkapi Profil →</a>
           </div>
         )}
 
