@@ -70,6 +70,7 @@ export default function JobsPage() {
   const [filterWorkType, setFilterWorkType] = useState('all');
   const [user, setUser] = useState<User | null>(null);
   const [toast, setToast] = useState<{msg:string,type:'success'|'error'}|null>(null);
+  const [completenessScore, setCompletenessScore] = useState<number>(100);
   const [allLocations, setAllLocations] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -134,6 +135,15 @@ export default function JobsPage() {
       .then(r => r.json())
       .then(setAllLocations)
       .catch(() => {});
+
+    // Fetch profile completeness to gate Apply button
+    const token = localStorage.getItem('instajob_token');
+    if (token) {
+      fetch(`${apiBase}/api/user/completeness`, { headers: { 'Authorization': `Bearer ${token}` } })
+        .then(r => r.json())
+        .then(d => { if (d.score !== undefined) setCompletenessScore(d.score); })
+        .catch(() => {});
+    }
   }, [router]);
 
   // Re-fetch when filters change (reset to page 1)
@@ -168,32 +178,24 @@ export default function JobsPage() {
 
   const handleApply = async (jobId: string) => {
     const token = localStorage.getItem('instajob_token');
-    const userData = localStorage.getItem('instajob_user');
+    if (!token) { router.push('/login'); return; }
 
-    if (!token || !userData) {
-      router.push('/login');
+    // Block if profile not complete enough
+    if (completenessScore < 60) {
+      showToast(`Lengkapi profil dulu (${completenessScore}% dari 60% minimum). Buka Preferences.`, 'error');
       return;
     }
 
-    const user = JSON.parse(userData);
-
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
-      const response = await fetch(`${apiBase}/api/applications`, {
+      const response = await fetch(`${apiBase}/api/auto-apply/queue`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          jobId: jobId,
-          status: 'pending',
-        }),
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobId }),
       });
 
       if (response.ok) {
-        showToast('Application submitted successfully!', 'success');
+        showToast('Lamaran dikirim via email! Cek inbox kamu.', 'success');
       } else {
         const responseText = await response.text();
         showToast('Failed to submit application: ' + responseText, 'error');
@@ -671,29 +673,24 @@ export default function JobsPage() {
                     {/* Apply Button */}
                     <button
                       onClick={() => handleApply(job.id)}
+                      disabled={completenessScore < 60}
+                      title={completenessScore < 60 ? `Lengkapi profil dulu (${completenessScore}%)` : 'Apply via email otomatis'}
                       style={{
                         width: '100%',
                         padding: '12px 16px',
-                        background: 'linear-gradient(135deg, #0051FF, #003AA3)',
+                        background: completenessScore < 60 ? '#94A3B8' : 'linear-gradient(135deg, #0051FF, #003AA3)',
                         color: '#FFFFFF',
                         border: 'none',
                         borderRadius: '8px',
                         fontWeight: '600',
                         fontSize: '0.875rem',
-                        cursor: 'pointer',
+                        cursor: completenessScore < 60 ? 'not-allowed' : 'pointer',
                         transition: 'all 0.3s ease',
-                        boxShadow: '0 4px 12px rgba(0, 81, 255, 0.15)',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                        e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 81, 255, 0.25)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 81, 255, 0.15)';
+                        boxShadow: completenessScore < 60 ? 'none' : '0 4px 12px rgba(0, 81, 255, 0.15)',
+                        opacity: completenessScore < 60 ? 0.7 : 1,
                       }}
                     >
-                      Apply Now
+                      {completenessScore < 60 ? `⚠️ Profil ${completenessScore}%` : 'Apply Now'}
                     </button>
                   </div>
                 </ScrollAnimation>
