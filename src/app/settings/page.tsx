@@ -210,9 +210,36 @@ export default function SettingsPage() {
         throw new Error(err.error || 'Failed to save notification settings');
       }
 
-      // ponytail: fullName update + password change → no backend endpoint yet, simulate only
-      if (fullName || newPassword) {
-        await new Promise(resolve => setTimeout(resolve, 300));
+      // Wire fullName update → PUT /api/user/update-name
+      const storedUser = JSON.parse(localStorage.getItem('instajob_user') || '{}');
+      if (fullName && fullName !== storedUser.fullName) {
+        const nameRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/update-name`, {
+          method: 'PUT',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fullName }),
+        });
+        if (!nameRes.ok) {
+          const err = await nameRes.json().catch(() => ({}));
+          throw new Error(err.error || 'Failed to update name');
+        }
+        // Update localStorage so navbar reflects new name immediately
+        localStorage.setItem('instajob_user', JSON.stringify({ ...storedUser, fullName }));
+      }
+
+      // Wire password change → POST /api/user/change-password
+      if (newPassword) {
+        const pwRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/change-password`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ currentPassword, newPassword }),
+        });
+        if (!pwRes.ok) {
+          const err = await pwRes.json().catch(() => ({}));
+          throw new Error(err.error || 'Failed to change password');
+        }
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
       }
 
       setSuccessMessage('Settings saved successfully!');
