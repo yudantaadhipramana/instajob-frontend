@@ -61,7 +61,14 @@ export default function ApplicationsPage() {
 
         if (response.ok) {
           const data = await response.json();
-          const appsList = data.applications || data;
+          const raw = data.applications || data;
+          // Map nested job relation to flat fields expected by UI
+          const appsList = raw.map((a: any) => ({
+            ...a,
+            jobTitle: a.jobTitle || a.job?.title || '',
+            company: a.company || a.job?.company || '',
+            location: a.location || a.job?.location || '',
+          }));
           setApplications(appsList);
           setFilteredApplications(appsList);
         } else {
@@ -106,6 +113,12 @@ export default function ApplicationsPage() {
     switch (status) {
       case 'pending':
         return { bg: '#FEF3C7', text: '#92400E', label: '⏳ Pending', icon: '⏳' };
+      case 'reviewed':
+        return { bg: '#DBEAFE', text: '#1E40AF', label: '👀 Reviewed', icon: '👀' };
+      case 'interviewed':
+        return { bg: '#EDE9FE', text: '#5B21B6', label: '🎤 Interview', icon: '🎤' };
+      case 'offered':
+        return { bg: '#DCFCE7', text: '#166534', label: '🎉 Offered', icon: '🎉' };
       case 'accepted':
         return { bg: '#DCFCE7', text: '#166534', label: '✅ Accepted', icon: '✅' };
       case 'rejected':
