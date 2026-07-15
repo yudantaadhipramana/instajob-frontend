@@ -55,7 +55,7 @@ export default function JobDetailPage() {
         if (response.ok) {
           const data = await response.json();
           setJob(data);
-          
+
           // Check if already applied
           const appResponse = await fetch(`${apiBase}/api/applications?jobId=${jobId}`, {
             headers: { 'Authorization': `Bearer ${token}` },
@@ -63,6 +63,15 @@ export default function JobDetailPage() {
           if (appResponse.ok) {
             const apps = await appResponse.json();
             setAppStatus({ applied: true, status: apps.status, appliedAt: apps.appliedAt });
+          }
+
+          // Check if already bookmarked
+          const bmResponse = await fetch(`${apiBase}/api/bookmarks`, {
+            headers: { 'Authorization': `Bearer ${token}` },
+          });
+          if (bmResponse.ok) {
+            const bookmarks = await bmResponse.json();
+            setBookmarked(bookmarks.some((b: any) => b.id === jobId));
           }
         } else {
           setError('Job not found');
@@ -114,9 +123,16 @@ export default function JobDetailPage() {
     }
   };
 
-  const toggleBookmark = () => {
-    setBookmarked(!bookmarked);
-    // TODO: Save to backend or localStorage
+  const toggleBookmark = async () => {
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
+    const method = bookmarked ? 'DELETE' : 'POST';
+    try {
+      await fetch(`${apiBase}/api/jobs/${jobId}/bookmark`, {
+        method,
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      setBookmarked(!bookmarked);
+    } catch { /* silent fail */ }
   };
 
   if (loading) {
