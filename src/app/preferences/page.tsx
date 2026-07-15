@@ -180,6 +180,7 @@ export default function PreferencesPage() {
           remoteOnly: formData.remoteOnly,
           skipAgencies: formData.skipAgencies,
           skipExpMismatch: formData.skipExpMismatch,
+          emailTemplate: formData.emailTemplate,
         }),
       });
 
