@@ -23,7 +23,7 @@ export default function AffiliateDashboardPage() {
 
     const fetchDashboard = async () => {
       try {
-        const response = await fetch('${process.env.NEXT_PUBLIC_API_URL}/api/affiliate/dashboard', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/affiliate/dashboard`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 
