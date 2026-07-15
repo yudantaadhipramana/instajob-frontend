@@ -1137,12 +1137,14 @@ export default function PreferencesPage() {
         </div>
 
         {/* Save Button */}
-        <div style={{
-          marginTop: '40px',
-          display: 'flex',
-          gap: '12px',
-          justifyContent: 'flex-end',
-        }}>
+        <div style={{ marginTop: '40px', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+          <button onClick={() => setFormData(preferences)} disabled={isSaving} style={{
+            padding: '12px 24px', fontSize: '14px', fontWeight: '600', color: '#64748B',
+            background: 'transparent', border: '1px solid #CBD5E1', borderRadius: '8px',
+            cursor: isSaving ? 'not-allowed' : 'pointer', transition: 'all 0.2s ease',
+          }}>
+            Reset
+          </button>
           <button onClick={handleSave} disabled={isSaving} style={{
             display: 'flex',
             alignItems: 'center',

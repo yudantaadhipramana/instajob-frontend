@@ -677,9 +677,28 @@ export default function SettingsPage() {
           </div>
 
           {/* Save Button */}
-          <button
-            onClick={handleSaveAccountSettings}
-            disabled={saveLoading}
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button
+              onClick={() => {
+                const u = JSON.parse(localStorage.getItem('instajob_user') || '{}');
+                setFullName(u.fullName || '');
+                setCurrentPassword('');
+                setNewPassword('');
+                setConfirmPassword('');
+              }}
+              disabled={saveLoading}
+              style={{
+                padding: '12px 24px', fontSize: '14px', fontWeight: '600',
+                color: '#64748B', background: 'transparent',
+                border: '1px solid #CBD5E1', borderRadius: '8px',
+                cursor: saveLoading ? 'not-allowed' : 'pointer',
+              }}
+            >
+              Reset
+            </button>
+            <button
+              onClick={handleSaveAccountSettings}
+              disabled={saveLoading}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -708,9 +727,7 @@ export default function SettingsPage() {
                 <Save size={16} />
                 Save Changes
               </>
-            )}
-          </button>
-        </div>
+            )}\n          </button>\n          </div>\n        </div>
 
         {/* Telegram Account Linking */}
         <div style={{
