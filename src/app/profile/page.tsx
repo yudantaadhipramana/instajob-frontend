@@ -12,6 +12,7 @@ interface PortfolioEntry { title: string; url: string; }
 interface ProfileUser {
   id: string; email: string; fullName: string;
   bio?: string; phone?: string; location?: string; profilePicture?: string;
+  website?: string; linkedIn?: string;
   skills?: string[];
   experience?: ExperienceEntry[];
   education?: EducationEntry[];
@@ -246,6 +247,12 @@ export default function ProfilePage() {
             </Field>
             <Field label="Lokasi" hint="Contoh: Jakarta Selatan, Indonesia">
               <input style={INPUT_STYLE} value={formData.location || ''} onChange={e => setField('location', e.target.value)} placeholder="Jakarta Selatan, Indonesia" onFocus={focusStyle} onBlur={blurStyle} />
+            </Field>
+            <Field label="LinkedIn URL" hint="Contoh: https://linkedin.com/in/namaanda">
+              <input style={INPUT_STYLE} value={formData.linkedIn || ''} onChange={e => setField('linkedIn', e.target.value)} placeholder="https://linkedin.com/in/namaanda" onFocus={focusStyle} onBlur={blurStyle} />
+            </Field>
+            <Field label="Website / Portfolio URL" hint="Contoh: https://namaanda.dev">
+              <input style={INPUT_STYLE} value={formData.website || ''} onChange={e => setField('website', e.target.value)} placeholder="https://namaanda.dev" onFocus={focusStyle} onBlur={blurStyle} />
             </Field>
           </div>
         </Section>
