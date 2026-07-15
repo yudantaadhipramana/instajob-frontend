@@ -63,6 +63,8 @@ export default function ProfilePage() {
           certifications: parseJson<CertEntry[]>(p.certifications, []),
           portfolio: parseJson<PortfolioEntry[]>(p.portfolio, []),
           profilePicture: p.profilePicture,
+          website: p.website || '',
+          linkedIn: p.linkedIn || '',
         };
         setUser(d); setFormData(d);
         setSkillsInput((d.skills || []).join(', '));
@@ -166,6 +168,8 @@ export default function ProfilePage() {
           education: formData.education || [],
           certifications: formData.certifications || [],
           portfolio: formData.portfolio || [],
+          website: formData.website || null,
+          linkedIn: formData.linkedIn || null,
         }),
       });
       if (res.status === 401) { router.push('/login'); return; }
