@@ -24,6 +24,7 @@ interface Job {
   workType?: string;
   industry?: string;
   tags?: string;
+  sourceUrl?: string;
 }
 
 interface User {
@@ -70,7 +71,6 @@ export default function JobsPage() {
   const [filterWorkType, setFilterWorkType] = useState('all');
   const [user, setUser] = useState<User | null>(null);
   const [toast, setToast] = useState<{msg:string,type:'success'|'error'}|null>(null);
-  const [completenessScore, setCompletenessScore] = useState<number>(100);
   const [allLocations, setAllLocations] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -136,14 +136,6 @@ export default function JobsPage() {
       .then(setAllLocations)
       .catch(() => {});
 
-    // Fetch profile completeness to gate Apply button
-    const token = localStorage.getItem('instajob_token');
-    if (token) {
-      fetch(`${apiBase}/api/user/completeness`, { headers: { 'Authorization': `Bearer ${token}` } })
-        .then(r => r.json())
-        .then(d => { if (d.score !== undefined) setCompletenessScore(d.score); })
-        .catch(() => {});
-    }
   }, [router]);
 
   // Re-fetch when filters change (reset to page 1)
@@ -176,32 +168,11 @@ export default function JobsPage() {
     return () => clearTimeout(debounce);
   }, [searchQuery, filterLocation, filterWorkType]);
 
-  const handleApply = async (jobId: string) => {
-    const token = localStorage.getItem('instajob_token');
-    if (!token) { router.push('/login'); return; }
-
-    // Block if profile not complete enough
-    if (completenessScore < 60) {
-      showToast(`Lengkapi profil dulu (${completenessScore}% dari 60% minimum). Buka Preferences.`, 'error');
-      return;
-    }
-
-    try {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
-      const response = await fetch(`${apiBase}/api/auto-apply/queue`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jobId }),
-      });
-
-      if (response.ok) {
-        showToast('Lamaran dikirim via email! Cek inbox kamu.', 'success');
-      } else {
-        const responseText = await response.text();
-        showToast('Failed to submit application: ' + responseText, 'error');
-      }
-    } catch (err) {
-      showToast('Error submitting application', 'error');
+  const handleViewJob = (job: Job) => {
+    if (job.sourceUrl) {
+      window.open(job.sourceUrl, '_blank');
+    } else {
+      showToast('Link lowongan tidak tersedia', 'error');
     }
   };
 
@@ -670,27 +641,25 @@ export default function JobsPage() {
                       {job.description}
                     </p>
 
-                    {/* Apply Button */}
+                    {/* View Job Button */}
                     <button
-                      onClick={() => handleApply(job.id)}
-                      disabled={completenessScore < 60}
-                      title={completenessScore < 60 ? `Lengkapi profil dulu (${completenessScore}%)` : 'Apply via email otomatis'}
+                      onClick={() => handleViewJob(job)}
+                      title="Buka lowongan di halaman asli"
                       style={{
                         width: '100%',
                         padding: '12px 16px',
-                        background: completenessScore < 60 ? '#94A3B8' : 'linear-gradient(135deg, #0051FF, #003AA3)',
+                        background: 'linear-gradient(135deg, #0051FF, #003AA3)',
                         color: '#FFFFFF',
                         border: 'none',
                         borderRadius: '8px',
                         fontWeight: '600',
                         fontSize: '0.875rem',
-                        cursor: completenessScore < 60 ? 'not-allowed' : 'pointer',
+                        cursor: 'pointer',
                         transition: 'all 0.3s ease',
-                        boxShadow: completenessScore < 60 ? 'none' : '0 4px 12px rgba(0, 81, 255, 0.15)',
-                        opacity: completenessScore < 60 ? 0.7 : 1,
+                        boxShadow: '0 4px 12px rgba(0, 81, 255, 0.15)',
                       }}
                     >
-                      {completenessScore < 60 ? `⚠️ Profil ${completenessScore}%` : 'Apply Now'}
+                      View Job →
                     </button>
                   </div>
                 </ScrollAnimation>
