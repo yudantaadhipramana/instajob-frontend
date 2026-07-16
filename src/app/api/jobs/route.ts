@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     const page = searchParams.get('page') || '1';
     
     const response = await fetch(
-      `https://instajob-backend-production.up.railway.app/api/jobs?limit=${limit}&page=${page}`,
+      `${process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app'}/api/jobs?limit=${limit}&page=${page}`,
       { method: 'GET' }
     );
 

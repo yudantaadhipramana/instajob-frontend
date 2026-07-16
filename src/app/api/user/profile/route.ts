@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     }
 
     const response = await fetch(
-      'https://instajob-backend-production.up.railway.app/api/user/profile',
+      (process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app') + '/api/user/profile',
       {
         method: 'GET',
         headers: { 
@@ -36,7 +36,7 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
 
     const response = await fetch(
-      'https://instajob-backend-production.up.railway.app/api/user/profile',
+      (process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app') + '/api/user/profile',
       {
         method: 'PUT',
         headers: { 

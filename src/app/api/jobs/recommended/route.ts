@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     }
 
     const response = await fetch(
-      `https://instajob-backend-production.up.railway.app/api/jobs/recommended?limit=${limit}`,
+      `${process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app'}/api/jobs/recommended?limit=${limit}`,
       {
         method: 'GET',
         headers: {
