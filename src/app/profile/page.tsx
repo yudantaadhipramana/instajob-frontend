@@ -43,8 +43,14 @@ export default function ProfilePage() {
   const [isParsingCV, setIsParsingCV] = useState(false);
   const [cvMsg, setCvMsg] = useState('');
   const [profileImageUrl, setProfileImageUrl] = useState<string | undefined>();
+  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
   const cvRef = useRef<HTMLInputElement>(null);
   const picRef = useRef<HTMLInputElement>(null);
+
+  const showToast = (msg: string, type: 'success' | 'error') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 4000);
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('instajob_token');
@@ -173,10 +179,21 @@ export default function ProfilePage() {
         }),
       });
       if (res.status === 401) { router.push('/login'); return; }
-      if (!res.ok) throw new Error('Gagal simpan profil');
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        const errMsg = errData.error || errData.message || `HTTP ${res.status}: Gagal simpan profil`;
+        showToast(errMsg, 'error');
+        console.error('Save error:', errMsg);
+        setIsSaving(false);
+        return;
+      }
       setUser(formData); setSaveSuccess(true);
+      showToast('Profil berhasil tersimpan! ✓', 'success');
       setTimeout(() => setSaveSuccess(false), 3000);
-    } catch (err) { console.error(err); }
+    } catch (err: any) {
+      console.error('Save error:', err);
+      showToast(err.message || 'Terjadi kesalahan saat simpan profil', 'error');
+    }
     finally { setIsSaving(false); }
   };
 
@@ -371,6 +388,13 @@ export default function ProfilePage() {
             {isSaving ? 'Menyimpan...' : saveSuccess ? 'Tersimpan!' : 'Simpan Profil'}
           </button>
         </div>
+
+        {/* Toast Notification */}
+        {toast && (
+          <div style={{ position: 'fixed', bottom: '24px', right: '24px', padding: '16px 20px', background: toast.type === 'success' ? '#10B981' : '#EF4444', color: '#FFFFFF', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', fontSize: '14px', fontWeight: '600', zIndex: 9999, maxWidth: '400px' }}>
+            {toast.msg}
+          </div>
+        )}
 
       </div>
     </div>
