@@ -43,6 +43,7 @@ export default function ProfilePage() {
   const [isParsingCV, setIsParsingCV] = useState(false);
   const [cvMsg, setCvMsg] = useState('');
   const [profileImageUrl, setProfileImageUrl] = useState<string | undefined>();
+  const [resumeUrl, setResumeUrl] = useState<string | null>(null);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
   const cvRef = useRef<HTMLInputElement>(null);
   const picRef = useRef<HTMLInputElement>(null);
@@ -75,6 +76,7 @@ export default function ProfilePage() {
         setUser(d); setFormData(d);
         setSkillsInput((d.skills || []).join(', '));
         if (p.profilePicture) setProfileImageUrl(p.profilePicture);
+        if (p.resumeUrl) setResumeUrl(p.resumeUrl);
       }).catch(console.error);
   }, [router]);
 
@@ -140,6 +142,7 @@ export default function ProfilePage() {
       }));
       if (Array.isArray(p.skills) && p.skills.length > 0) setSkillsInput(p.skills.join(', '));
       setCvMsg('CV berhasil diparsing! Cek dan lengkapi data di bawah.');
+                if (json.resumeUrl) setResumeUrl(json.resumeUrl);
     } catch { setCvMsg('Network error. Coba lagi.'); }
     finally { setIsParsingCV(false); if (cvRef.current) cvRef.current.value = ''; }
   };
@@ -224,14 +227,14 @@ export default function ProfilePage() {
             <div style={{ flex: 1 }}>
               <h3 style={{ margin: '0 0 2px 0', fontSize: '15px', fontWeight: '700', color: '#1E293B' }}>Upload CV / Resume</h3>
               <p style={{ margin: 0, fontSize: '13px', color: '#64748B' }}>
-                {isParsingCV ? 'Sedang parsing CV...' : 'Upload PDF — AI akan otomatis mengisi semua kolom di bawah'}
+                {isParsingCV ? 'Sedang parsing CV...' : resumeUrl ? `CV tersimpan: ${resumeUrl.split('/').pop()}` : 'Upload PDF — AI akan otomatis mengisi semua kolom di bawah'}
               </p>
               {cvMsg && <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: cvMsg.includes('berhasil') ? '#10B981' : '#EF4444' }}>{cvMsg}</p>}
             </div>
             <button onClick={() => cvRef.current?.click()} disabled={isParsingCV}
               style={{ padding: '10px 18px', fontSize: '14px', fontWeight: '600', color: '#FFFFFF', background: isParsingCV ? '#94A3B8' : '#0051FF', border: 'none', borderRadius: '8px', cursor: isParsingCV ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
               {isParsingCV ? <Loader size={15} /> : <Upload size={15} />}
-              {isParsingCV ? 'Parsing...' : 'Pilih File'}
+              {isParsingCV ? 'Parsing...' : resumeUrl ? 'Ganti CV' : 'Pilih File'}
             </button>
           </div>
           <input ref={cvRef} type="file" accept=".pdf" onChange={handleCVUpload} style={{ display: 'none' }} />
