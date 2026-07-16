@@ -30,8 +30,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Check for token on mount
-    const storedToken = sessionStorage.getItem('instajob_token');
-    const storedUser = sessionStorage.getItem('instajob_user');
+    const storedToken = localStorage.getItem('instajob_token');
+    const storedUser = localStorage.getItem('instajob_user');
     
     if (storedToken && storedUser) {
       setToken(storedToken);
@@ -56,8 +56,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const data = await response.json();
       
-      sessionStorage.setItem('instajob_token', data.token);
-      sessionStorage.setItem('instajob_user', JSON.stringify(data.user));
+      localStorage.setItem('instajob_token', data.token);
+      localStorage.setItem('instajob_user', JSON.stringify(data.user));
       
       setToken(data.token);
       setUser(data.user);
@@ -83,8 +83,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const data = await response.json();
       
-      sessionStorage.setItem('instajob_token', data.token);
-      sessionStorage.setItem('instajob_user', JSON.stringify(data.user));
+      localStorage.setItem('instajob_token', data.token);
+      localStorage.setItem('instajob_user', JSON.stringify(data.user));
       
       setToken(data.token);
       setUser(data.user);
@@ -110,8 +110,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const data = await response.json();
       
-      sessionStorage.setItem('instajob_token', data.token);
-      sessionStorage.setItem('instajob_user', JSON.stringify(data.user));
+      localStorage.setItem('instajob_token', data.token);
+      localStorage.setItem('instajob_user', JSON.stringify(data.user));
       
       setToken(data.token);
       setUser(data.user);
@@ -123,8 +123,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = () => {
-    sessionStorage.removeItem('instajob_token');
-    sessionStorage.removeItem('instajob_user');
+    localStorage.removeItem('instajob_token');
+    localStorage.removeItem('instajob_user');
     setToken(null);
     setUser(null);
     router.push('/login');

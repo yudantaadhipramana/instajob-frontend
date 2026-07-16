@@ -29,8 +29,8 @@ export default function AppNavigation() {
   const [notifCount, setNotifCount] = useState(0);
 
   useEffect(() => {
-    const userData = sessionStorage.getItem('instajob_user');
-    const token = localStorage.getItem('instajob_token') || sessionStorage.getItem('instajob_token');
+    const userData = localStorage.getItem('instajob_user');
+    const token = localStorage.getItem('instajob_token') || localStorage.getItem('instajob_token');
     if (userData) {
       try { setUser(JSON.parse(userData)); } catch (e) {}
     }
@@ -44,8 +44,8 @@ export default function AppNavigation() {
   }, []);
 
   const handleLogout = () => {
-    sessionStorage.removeItem('instajob_token');
-    sessionStorage.removeItem('instajob_user');
+    localStorage.removeItem('instajob_token');
+    localStorage.removeItem('instajob_user');
     router.push('/login');
   };
 
