@@ -316,10 +316,10 @@ export default function DashboardPage() {
             </div>
             {completeness.missing.length > 0 && (
               <p style={{ fontSize: '13px', color: '#64748B', margin: '0 0 8px' }}>
-                Lengkapi: {completeness.missing.slice(0, 3).join(', ')}{completeness.missing.length > 3 ? ` +${completeness.missing.length - 3} lainnya` : ''}
+                Lengkapi: {completeness.missing.slice(0, 3).map(m => ({fullName:'Nama',bio:'Bio',skills:'Skills',experience:'Pengalaman',education:'Pendidikan',location:'Lokasi',resumeUrl:'CV',phone:'Telepon',jobPreferences:'Preferensi Kerja'})[m]||m).join(', ')}{completeness.missing.length > 3 ? ` +${completeness.missing.length - 3} lainnya` : ''}
               </p>
             )}
-            <a href="/preferences" style={{ fontSize: '13px', color: '#1E40FF', fontWeight: '600', textDecoration: 'none' }}>Lengkapi Profil →</a>
+            <a href={completeness.missing.every(m => m === 'jobPreferences') ? '/preferences' : '/profile'} style={{ fontSize: '13px', color: '#1E40FF', fontWeight: '600', textDecoration: 'none' }}>Lengkapi Profil →</a>
           </div>
         )}
 

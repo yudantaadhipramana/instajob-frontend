@@ -525,37 +525,7 @@ export default function SettingsPage() {
             </h2>
           </div>
 
-          {/* Full Name Input */}
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '13px',
-              fontWeight: '600',
-              color: '#1E293B',
-              marginBottom: '8px',
-            }}>
-              Full Name
-            </label>
-            <input
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '12px 14px',
-                fontSize: '14px',
-                border: '1px solid #E2E8F0',
-                borderRadius: '8px',
-                outline: 'none',
-                transition: 'all 0.2s',
-                fontFamily: 'inherit',
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#0051FF'}
-              onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
-            />
-          </div>
-
-          {/* Email Display (Read-only) */}
+                    {/* Email Display (Read-only) */}
           <div style={{ marginBottom: '20px' }}>
             <label style={{
               display: 'block',

@@ -179,6 +179,7 @@ export default function ProfilePage() {
           portfolio: formData.portfolio || [],
           website: formData.website || null,
           linkedIn: formData.linkedIn || null,
+          profilePicture: formData.profilePicture || null,
         }),
       });
       if (res.status === 401) { router.push('/login'); return; }
@@ -227,7 +228,7 @@ export default function ProfilePage() {
             <div style={{ flex: 1 }}>
               <h3 style={{ margin: '0 0 2px 0', fontSize: '15px', fontWeight: '700', color: '#1E293B' }}>Upload CV / Resume</h3>
               <p style={{ margin: 0, fontSize: '13px', color: '#64748B' }}>
-                {isParsingCV ? 'Sedang parsing CV...' : resumeUrl ? `CV tersimpan: ${resumeUrl.split('/').pop()}` : 'Upload PDF — AI akan otomatis mengisi semua kolom di bawah'}
+                {isParsingCV ? 'Sedang parsing CV...' : resumeUrl ? `CV tersimpan: ${(resumeUrl.split('/').pop() || '').replace(/^[^_]+_[0-9]+_/, '')}` : 'Upload PDF — AI akan otomatis mengisi semua kolom di bawah'}
               </p>
               {cvMsg && <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: cvMsg.includes('berhasil') ? '#10B981' : '#EF4444' }}>{cvMsg}</p>}
             </div>
