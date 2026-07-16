@@ -16,7 +16,6 @@ const navItems: NavItem[] = [
   { name: 'Jobs', href: '/jobs' },
   { name: 'Applications', href: '/applications' },
   { name: 'Auto-Apply', href: '/auto-apply' },
-  { name: 'Monitor', href: '/monitor' },
   { name: 'Analytics', href: '/analytics' },
   { name: 'Preferences', href: '/preferences' },
 ];

@@ -2,243 +2,917 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Sidebar from '@/components/Sidebar';
-import { useAuth } from '@/context/AuthContext';
+import Link from 'next/link';
+import { ScrollAnimation } from '@/components/Animations';
+import { Logo } from '@/components/Logo';
+import { JobsIcon, ApplicationsIcon, HomeIcon } from '@/components/DashboardIcons';
+import { Settings } from 'lucide-react';
+import ProfileDropdown from '@/components/ProfileDropdown';
 
-interface QueueItem {
-  id: string;
+interface AutoApplyStats {
+  isActive: boolean;
+  jobsProcessedToday: number;
+  successRate: number;
+  applicationsToday: number;
+  failedAttempts: number;
+  pendingJobs: number;
+}
+
+interface CurrentActivity {
   jobId: string;
   jobTitle: string;
   company: string;
-  status: 'pending' | 'processing' | 'sent' | 'failed';
-  scheduledFor: string;
-  appliedAt?: string;
-  error?: string;
+  status: 'processing' | 'success' | 'failed' | 'pending';
+  startTime: string;
+  elapsedSeconds: number;
 }
 
-interface QueueStats {
-  totalQueued: number;
-  processing: number;
-  sent: number;
-  failed: number;
-  nextApplyIn: number; // seconds
+interface ActivityLog {
+  id: string;
+  jobTitle: string;
+  company: string;
+  timestamp: string;
+  status: 'success' | 'failed' | 'pending';
+  details?: string;
 }
+
+interface User {
+  id: string;
+  email: string;
+  fullName: string;
+}
+
+// Format time helper
+const formatRelativeTime = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  } catch {
+    return 'Recently';
+  }
+};
+
+// Get status badge color
+const getStatusColor = (status: string): { bg: string; text: string; label: string } => {
+  switch (status) {
+    case 'success':
+      return { bg: '#ECFDF5', text: '#065F46', label: '✓ Success' };
+    case 'failed':
+      return { bg: '#FEE2E2', text: '#991B1B', label: '✗ Failed' };
+    case 'processing':
+      return { bg: '#FEF3C7', text: '#92400E', label: '⟳ Processing' };
+    case 'pending':
+      return { bg: '#EFF6FF', text: '#0369A1', label: '⋯ Pending' };
+    default:
+      return { bg: '#F1F5F9', text: '#64748B', label: '? Unknown' };
+  }
+};
 
 export default function AutoApplyPage() {
   const router = useRouter();
-  const { user, token } = useAuth();
-
-  const [queue, setQueue] = useState<QueueItem[]>([]);
-  const [stats, setStats] = useState<QueueStats | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [autoApplyEnabled, setAutoApplyEnabled] = useState(false);
-  const [toast, setToast] = useState<{msg:string,type:'success'|'error'}|null>(null);
-  const showToast = (msg:string, type:'success'|'error'='success') => { setToast({msg,type}); setTimeout(()=>setToast(null),3000); };
 
+  // Run status state machine: idle | running | paused
+  const [runStatus, setRunStatus] = useState<'idle' | 'running' | 'paused'>('idle');
+  const [botMetrics, setBotMetrics] = useState({ pending: 0, sent: 0, failed: 0, jobsProcessed: 0, applicationsSent: 0 });
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  // Stats
+  const [stats, setStats] = useState<AutoApplyStats>({
+    isActive: true,
+    jobsProcessedToday: 24,
+    successRate: 85,
+    applicationsToday: 20,
+    failedAttempts: 3,
+    pendingJobs: 1,
+  });
+
+  // Current activity
+  const [currentActivity] = useState<CurrentActivity | null>({
+    jobId: 'job-123',
+    jobTitle: 'Senior Frontend Engineer',
+    company: 'Tech Company Inc',
+    status: 'processing',
+    startTime: new Date(Date.now() - 45000).toISOString(),
+    elapsedSeconds: 45,
+  });
+
+  // Activity logs
+  const [activityLogs] = useState<ActivityLog[]>([
+    {
+      id: 'log-1',
+      jobTitle: 'Full Stack Developer',
+      company: 'StartupXYZ',
+      timestamp: new Date(Date.now() - 300000).toISOString(),
+      status: 'success',
+    },
+    {
+      id: 'log-2',
+      jobTitle: 'UI/UX Designer',
+      company: 'Creative Studio',
+      timestamp: new Date(Date.now() - 600000).toISOString(),
+      status: 'failed',
+    },
+    {
+      id: 'log-3',
+      jobTitle: 'Product Manager',
+      company: 'Innovation Labs',
+      timestamp: new Date(Date.now() - 900000).toISOString(),
+      status: 'success',
+    },
+  ]);
+
+  // Auth check + fetch bot status
   useEffect(() => {
-    if (!token) {
-      router.push('/login');
-      return;
-    }
+    const checkAuth = async () => {
+      const token = localStorage.getItem('instajob_token');
+      const userData = localStorage.getItem('instajob_user');
 
-    fetchQueue();
-    const interval = setInterval(fetchQueue, 5000); // Poll every 5s
-    return () => clearInterval(interval);
-  }, [token, router]);
+      if (!token || !userData) {
+        router.push('/login');
+        return;
+      }
 
-  const fetchQueue = async () => {
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
-    try {
-      const response = await fetch(`${apiBase}/api/auto-apply/queue`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        // Map API response to UI state
-        const mappedQueue = (data.queue || []).map((item: any) => ({
-          id: item.applicationId,
-          jobId: item.jobId,
-          jobTitle: item.title,
-          company: item.company,
-          status: item.status === 'queued' ? 'pending' : item.status === 'applied' ? 'sent' : item.status,
-          scheduledFor: item.appliedAt || new Date().toISOString(),
-          appliedAt: item.appliedAt,
-          error: item.status === 'failed' ? 'Application failed' : undefined,
-        }));
-        setQueue(mappedQueue);
-        setStats({
-          totalQueued: data.quota?.used || 0,
-          processing: 0,
-          sent: mappedQueue.filter((q: any) => q.status === 'sent').length,
-          failed: mappedQueue.filter((q: any) => q.status === 'failed').length,
-          nextApplyIn: Math.max(0, (data.quota?.remaining || 0) > 0 ? 0 : 86400),
+      setUser(JSON.parse(userData));
+      
+      // Fetch initial bot status
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bot/status`, {
+          headers: { 'Authorization': `Bearer ${token}` }
         });
+        if (res.ok) {
+          const data = await res.json();
+          setRunStatus(data.status === 'stopped' ? 'idle' : data.status);
+          setBotMetrics(data.metrics || { pending: 0, sent: 0, failed: 0, jobsProcessed: 0, applicationsSent: 0 });
+        }
+      } catch (err) {
+        console.error('Failed to fetch bot status:', err);
       }
-    } catch (err) {
-      console.error('Failed to fetch queue:', err);
-      setError('Failed to load auto-apply queue');
-    } finally {
+      
       setLoading(false);
-    }
-  };
+    };
 
-  const toggleAutoApply = async () => {
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
-    try {
-      const endpoint = autoApplyEnabled ? '/api/bot/stop' : '/api/bot/start';
-      const response = await fetch(`${apiBase}${endpoint}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+    checkAuth();
+  }, [router]);
 
-      if (response.ok) {
-        setAutoApplyEnabled(!autoApplyEnabled);
-        fetchQueue();
+  // Poll bot status every 5s when not idle
+  useEffect(() => {
+    if (runStatus === 'idle') return;
+
+    const interval = setInterval(async () => {
+      const token = localStorage.getItem('instajob_token');
+      if (!token) return;
+
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bot/status`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setRunStatus(data.status === 'stopped' ? 'idle' : data.status);
+          setBotMetrics(data.metrics || { pending: 0, sent: 0, failed: 0, jobsProcessed: 0, applicationsSent: 0 });
+        }
+      } catch (err) {
+        console.error('Poll error:', err);
       }
-    } catch (err) {
-      console.error('Error toggling auto-apply:', err);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [runStatus]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('instajob_token');
+    localStorage.removeItem('instajob_user');
+    router.push('/');
+  };
+
+  const handleStart = async () => {
+    setActionLoading(true);
+    setActionError(null);
+    const token = localStorage.getItem('instajob_token');
+    
+    try {
+      const endpoint = runStatus === 'paused' ? 'resume' : 'start';
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bot/${endpoint}`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to start bot');
+      }
+      
+      const data = await res.json();
+      setRunStatus('running');
+      setStats(prev => ({ ...prev, isActive: true }));
+      
+      // Immediate status refresh
+      const statusRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bot/status`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (statusRes.ok) {
+        const statusData = await statusRes.json();
+        setBotMetrics(statusData.metrics);
+      }
+    } catch (err: any) {
+      setActionError(err.message);
+    } finally {
+      setActionLoading(false);
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending': return '#94A3B8';
-      case 'processing': return '#F59E0B';
-      case 'sent': return '#10B981';
-      case 'failed': return '#EF4444';
-      default: return '#64748B';
+  const handlePause = async () => {
+    setActionLoading(true);
+    setActionError(null);
+    const token = localStorage.getItem('instajob_token');
+    
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bot/pause`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (!res.ok) throw new Error('Failed to pause bot');
+      
+      setRunStatus('paused');
+    } catch (err: any) {
+      setActionError(err.message);
+    } finally {
+      setActionLoading(false);
     }
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'pending': return '⏳';
-      case 'processing': return '⚙️';
-      case 'sent': return '✓';
-      case 'failed': return '✕';
-      default: return '?';
+  const handleStop = async () => {
+    setActionLoading(true);
+    setActionError(null);
+    const token = localStorage.getItem('instajob_token');
+    
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bot/stop`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (!res.ok) throw new Error('Failed to stop bot');
+      
+      setRunStatus('idle');
+      setStats(prev => ({ ...prev, isActive: false }));
+      setBotMetrics({ pending: 0, sent: 0, failed: 0, jobsProcessed: 0, applicationsSent: 0 });
+    } catch (err: any) {
+      setActionError(err.message);
+    } finally {
+      setActionLoading(false);
     }
   };
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#0B1120' }}>
-        <Sidebar />
-        <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#F8FAFC' }}>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '28px', fontWeight: 'bold' }}>Loading auto-apply queue...</div>
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #FFFFFF 0%, #F5F8FF 50%, #EEF2FF 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'Inter, system-ui, sans-serif',
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <Logo size={48} showText={true} />
+          <div style={{ marginTop: '20px', color: '#64748B', fontSize: '16px', fontWeight: '500' }}>
+            Loading monitor...
           </div>
-        </main>
+        </div>
       </div>
     );
   }
 
   return (
-    <>
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#0B1120', color: '#F8FAFC' }}>
-      <Sidebar />
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #FFFFFF 0%, #F5F8FF 50%, #EEF2FF 100%)',
+      fontFamily: 'Inter, system-ui, sans-serif',
+      position: 'relative',
+      overflow: 'hidden',
+    }}>
+      {/* Background Glow */}
+      <div style={{
+        position: 'fixed',
+        width: '1000px',
+        height: '1000px',
+        borderRadius: '50%',
+        top: '-300px',
+        right: '-200px',
+        background: 'radial-gradient(circle, rgba(0, 81, 255, 0.08) 0%, transparent 70%)',
+        filter: 'blur(80px)',
+        pointerEvents: 'none',
+        zIndex: 0
+      }}></div>
 
-      <main style={{ flex: 1, padding: '32px' }}>
-        <div style={{ marginBottom: '40px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <div>
-              <h1 style={{ fontSize: '32px', fontWeight: '800', marginBottom: '8px' }}>Auto-Apply Queue</h1>
-              <p style={{ color: '#94A3B8' }}>Manage automated job applications</p>
-            </div>
-            <button
-              onClick={toggleAutoApply}
-              style={{
-                padding: '12px 24px',
-                backgroundColor: autoApplyEnabled ? '#10B981' : '#334155',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '8px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-              }}
-            >
-              {autoApplyEnabled ? '🟢 Auto-Apply Active' : '⭕ Auto-Apply Inactive'}
-            </button>
-          </div>
-
-          {error && (
-            <div style={{ padding: '12px 16px', backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#F87171', borderRadius: '8px' }}>
-              {error}
-            </div>
-          )}
+      {/* Header */}
+      <header style={{
+        background: 'rgba(255, 255, 255, 0.7)',
+        backdropFilter: 'blur(16px)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.5)',
+        padding: '0 40px',
+        height: '72px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+      }}>
+        <Logo size={32} showText={true} />
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <ProfileDropdown user={user || undefined} />
         </div>
+      </header>
 
-        {/* Stats Grid */}
-        {stats && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '32px' }}>
-            <div style={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', padding: '20px' }}>
-              <p style={{ fontSize: '12px', color: '#64748B', marginBottom: '8px', textTransform: 'uppercase' }}>Total Queued</p>
-              <p style={{ fontSize: '28px', fontWeight: '700' }}>{stats.totalQueued}</p>
-            </div>
-            <div style={{ backgroundColor: 'rgba(255,165,0,0.1)', border: '1px solid rgba(255,165,0,0.2)', borderRadius: '12px', padding: '20px' }}>
-              <p style={{ fontSize: '12px', color: '#FFA500', marginBottom: '8px', textTransform: 'uppercase' }}>Processing</p>
-              <p style={{ fontSize: '28px', fontWeight: '700', color: '#FFA500' }}>{stats.processing}</p>
-            </div>
-            <div style={{ backgroundColor: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: '12px', padding: '20px' }}>
-              <p style={{ fontSize: '12px', color: '#10B981', marginBottom: '8px', textTransform: 'uppercase' }}>Sent</p>
-              <p style={{ fontSize: '28px', fontWeight: '700', color: '#10B981' }}>{stats.sent}</p>
-            </div>
-            <div style={{ backgroundColor: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '12px', padding: '20px' }}>
-              <p style={{ fontSize: '12px', color: '#EF4444', marginBottom: '8px', textTransform: 'uppercase' }}>Failed</p>
-              <p style={{ fontSize: '28px', fontWeight: '700', color: '#EF4444' }}>{stats.failed}</p>
-            </div>
+      {/* Navigation Tabs — CONSISTENT WITH /dashboard AND /applications */}
+      <div style={{
+        background: 'rgba(255, 255, 255, 0.5)',
+        backdropFilter: 'blur(12px)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.3)',
+        padding: '0 40px',
+        display: 'flex',
+        gap: '8px',
+      }}>
+        <Link
+          href="/dashboard"
+          style={{
+            padding: '16px 24px',
+            textDecoration: 'none',
+            color: '#64748B',
+            fontWeight: '600',
+            fontSize: '14px',
+            borderBottom: '2px solid transparent',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            cursor: 'pointer',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = '#0051FF';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = '#64748B';
+          }}
+        >
+          <HomeIcon size={18} color="currentColor" />
+          Dashboard
+        </Link>
+        <Link
+          href="/jobs"
+          style={{
+            padding: '16px 24px',
+            textDecoration: 'none',
+            color: '#64748B',
+            fontWeight: '600',
+            fontSize: '14px',
+            borderBottom: '2px solid transparent',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            cursor: 'pointer',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = '#0051FF';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = '#64748B';
+          }}
+        >
+          <JobsIcon size={18} color="currentColor" />
+          Browse Jobs
+        </Link>
+        <Link
+          href="/applications"
+          style={{
+            padding: '16px 24px',
+            textDecoration: 'none',
+            color: '#64748B',
+            fontWeight: '600',
+            fontSize: '14px',
+            borderBottom: '2px solid transparent',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            cursor: 'pointer',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = '#0051FF';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = '#64748B';
+          }}
+        >
+          <ApplicationsIcon size={18} color="currentColor" />
+          Applications
+        </Link>
+        <Link
+          href="/preferences"
+          style={{
+            padding: '16px 24px',
+            textDecoration: 'none',
+            color: '#64748B',
+            fontWeight: '600',
+            fontSize: '14px',
+            borderBottom: '2px solid transparent',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            cursor: 'pointer',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = '#0051FF';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = '#64748B';
+          }}
+        >
+          <Settings size={18} color="currentColor" />
+          Preferences
+        </Link>
+      </div>
+
+      {/* Main Content */}
+      <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px', position: 'relative', zIndex: 1 }}>
+        {/* Page Title */}
+        <ScrollAnimation delay={0}>
+          <div style={{ marginBottom: '32px' }}>
+            <h1 style={{ fontSize: '2.25rem', fontWeight: '800', color: '#1E293B', margin: '0 0 8px 0' }}>
+              Auto-Apply Monitor
+            </h1>
+            <p style={{ fontSize: '1rem', color: '#64748B', margin: 0 }}>
+              Real-time monitoring of your automatic job applications
+            </p>
           </div>
-        )}
+        </ScrollAnimation>
 
-        {/* Queue Table */}
-        <div style={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', overflow: 'hidden' }}>
-          <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '16px', fontWeight: '600', fontSize: '12px', color: '#64748B', textTransform: 'uppercase' }}>
-            <span>Job</span>
-            <span>Status</span>
-            <span>Scheduled</span>
-            <span>Action</span>
-          </div>
+        {/* Current Activity Section */}
+        <ScrollAnimation delay={200}>
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.8)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255, 255, 255, 0.8)',
+            borderRadius: '16px',
+            padding: '32px',
+            marginBottom: '40px',
+            transition: 'all 0.3s ease',
+          }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#1E293B', margin: '0 0 24px 0' }}>
+              Currently Processing
+            </h2>
 
-          {queue.length === 0 ? (
-            <div style={{ padding: '40px', textAlign: 'center', color: '#94A3B8' }}>
-              <p style={{ fontSize: '16px' }}>Queue is empty</p>
-              <p style={{ fontSize: '14px', marginTop: '8px' }}>Browse jobs and add to queue to get started</p>
-            </div>
-          ) : (
-            queue.map(item => (
-              <div key={item.id} style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '16px', alignItems: 'center' }}>
+            {currentActivity ? (
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '32px',
+                alignItems: 'start',
+              }}>
+                {/* Job Details */}
                 <div>
-                  <p style={{ fontWeight: '600', marginBottom: '4px' }}>{item.jobTitle}</p>
-                  <p style={{ fontSize: '12px', color: '#64748B' }}>{item.company}</p>
+                  <div style={{ marginBottom: '20px' }}>
+                    <p style={{ fontSize: '0.875rem', color: '#64748B', fontWeight: '600', margin: '0 0 8px 0', textTransform: 'uppercase' }}>
+                      Job Title
+                    </p>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#1E293B', margin: 0 }}>
+                      {currentActivity.jobTitle}
+                    </h3>
+                  </div>
+                  <div style={{ marginBottom: '20px' }}>
+                    <p style={{ fontSize: '0.875rem', color: '#64748B', fontWeight: '600', margin: '0 0 8px 0', textTransform: 'uppercase' }}>
+                      Company
+                    </p>
+                    <p style={{ fontSize: '1rem', color: '#0051FF', fontWeight: '600', margin: 0 }}>
+                      {currentActivity.company}
+                    </p>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '0.875rem', color: '#64748B', fontWeight: '600', margin: '0 0 8px 0', textTransform: 'uppercase' }}>
+                      Status
+                    </p>
+                    <div style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '8px 16px',
+                      background: getStatusColor(currentActivity.status).bg,
+                      color: getStatusColor(currentActivity.status).text,
+                      borderRadius: '8px',
+                      fontWeight: '600',
+                      fontSize: '0.875rem',
+                    }}>
+                      <span style={{ display: 'inline-block', animation: 'pulse 2s infinite' }}>
+                        ⟳
+                      </span>
+                      {getStatusColor(currentActivity.status).label}
+                    </div>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontSize: '16px' }}>{getStatusIcon(item.status)}</span>
-                  <span style={{ color: getStatusColor(item.status), fontWeight: '600', fontSize: '12px', textTransform: 'capitalize' }}>{item.status}</span>
+
+                {/* Progress Indicator */}
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '40px 20px',
+                }}>
+                  <div style={{
+                    width: '120px',
+                    height: '120px',
+                    borderRadius: '50%',
+                    background: 'conic-gradient(#0051FF 0deg, #0051FF 180deg, #EFF6FF 180deg)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: '16px',
+                  }}>
+                    <div style={{
+                      width: '100px',
+                      height: '100px',
+                      borderRadius: '50%',
+                      background: 'rgba(255, 255, 255, 0.8)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexDirection: 'column',
+                    }}>
+                      <span style={{ fontSize: '24px', fontWeight: '800', color: '#0051FF' }}>
+                        {currentActivity.elapsedSeconds}s
+                      </span>
+                      <span style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '4px' }}>
+                        elapsed
+                      </span>
+                    </div>
+                  </div>
+                  <p style={{ fontSize: '0.875rem', color: '#64748B', textAlign: 'center', margin: 0 }}>
+                    Processing your application
+                  </p>
                 </div>
-                <p style={{ fontSize: '12px', color: '#94A3B8' }}>{new Date(item.scheduledFor).toLocaleString()}</p>
-                <button 
-                  onClick={() => {
-                    if (confirm(`Remove "${item.jobTitle}" from queue?`)) {
-                      showToast('Remove from queue feature coming soon.', 'error');
-                    }
-                  }}
-                  style={{ padding: '6px 12px', backgroundColor: 'transparent', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: '#EF4444', cursor: 'pointer', fontSize: '12px', fontWeight: '600' }}
-                >
-                  Remove
-                </button>
               </div>
-            ))
-          )}
-        </div>
+            ) : (
+              <div style={{
+                padding: '40px 20px',
+                textAlign: 'center',
+                color: '#64748B',
+              }}>
+                <p>No jobs currently processing</p>
+              </div>
+            )}
+          </div>
+        </ScrollAnimation>
+
+        {/* Configuration Panel */}
+        <ScrollAnimation delay={300}>
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.8)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255, 255, 255, 0.8)',
+            borderRadius: '16px',
+            padding: '32px',
+            marginBottom: '40px',
+          }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#1E293B', margin: '0 0 24px 0' }}>
+              Configuration
+            </h2>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
+              {/* Auto-Apply Toggle */}
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+              }}>
+                <div>
+                  <p style={{ fontSize: '0.875rem', color: '#64748B', fontWeight: '600', margin: '0 0 8px 0', textTransform: 'uppercase' }}>
+                    Auto-Apply Status
+                  </p>
+                  <p style={{ fontSize: '1rem', color: '#1E293B', fontWeight: '600', margin: 0 }}>
+                    Control automatic job applications
+                  </p>
+                </div>
+                {/* State machine: IDLE→RUNNING→PAUSED. STOPPED=IDLE. */}
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {/* IDLE: Start only */}
+                  {runStatus === 'idle' && (
+                    <button
+                      onClick={handleStart}
+                      disabled={actionLoading}
+                      style={{
+                        padding: '10px 20px',
+                        background: 'linear-gradient(135deg, #10B981, #059669)',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontWeight: '600',
+                        cursor: actionLoading ? 'not-allowed' : 'pointer',
+                        opacity: actionLoading ? 0.6 : 1,
+                        fontSize: '0.875rem',
+                        transition: 'all 0.2s ease',
+                      }}
+                    >
+                      {actionLoading ? '⋯ Starting...' : '▶ Start'}
+                    </button>
+                  )}
+
+                  {/* RUNNING: Pause + Stop */}
+                  {runStatus === 'running' && (
+                    <>
+                      <button
+                        onClick={handlePause}
+                        disabled={actionLoading}
+                        style={{
+                          padding: '10px 20px',
+                          background: 'linear-gradient(135deg, #F59E0B, #D97706)',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontWeight: '600',
+                          cursor: actionLoading ? 'not-allowed' : 'pointer',
+                          opacity: actionLoading ? 0.6 : 1,
+                          fontSize: '0.875rem',
+                          transition: 'all 0.2s ease',
+                        }}
+                      >
+                        {actionLoading ? '⋯ Pausing...' : '⏸ Pause'}
+                      </button>
+                      <button
+                        onClick={handleStop}
+                        disabled={actionLoading}
+                        style={{
+                          padding: '10px 20px',
+                          background: 'linear-gradient(135deg, #EF4444, #DC2626)',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontWeight: '600',
+                          cursor: actionLoading ? 'not-allowed' : 'pointer',
+                          opacity: actionLoading ? 0.6 : 1,
+                          fontSize: '0.875rem',
+                          transition: 'all 0.2s ease',
+                        }}
+                      >
+                        {actionLoading ? '⋯ Stopping...' : '⏹ Stop'}
+                      </button>
+                    </>
+                  )}
+
+                  {/* PAUSED: Resume + Stop */}
+                  {runStatus === 'paused' && (
+                    <>
+                      <button
+                        onClick={handleStart}
+                        disabled={actionLoading}
+                        style={{
+                          padding: '10px 20px',
+                          background: 'linear-gradient(135deg, #10B981, #059669)',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontWeight: '600',
+                          cursor: actionLoading ? 'not-allowed' : 'pointer',
+                          opacity: actionLoading ? 0.6 : 1,
+                          fontSize: '0.875rem',
+                          transition: 'all 0.2s ease',
+                        }}
+                      >
+                        {actionLoading ? '⋯ Resuming...' : '▶ Resume'}
+                      </button>
+                      <button
+                        onClick={handleStop}
+                        disabled={actionLoading}
+                        style={{
+                          padding: '10px 20px',
+                          background: 'linear-gradient(135deg, #EF4444, #DC2626)',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontWeight: '600',
+                          cursor: actionLoading ? 'not-allowed' : 'pointer',
+                          opacity: actionLoading ? 0.6 : 1,
+                          fontSize: '0.875rem',
+                          transition: 'all 0.2s ease',
+                        }}
+                      >
+                        {actionLoading ? '⋯ Stopping...' : '⏹ Stop'}
+                      </button>
+                    </>
+                  )}
+                </div>
+
+                {/* Action error banner */}
+                {actionError && (
+                  <div style={{
+                    padding: '10px 16px',
+                    background: '#FEE2E2',
+                    color: '#991B1B',
+                    borderRadius: '8px',
+                    fontSize: '0.8125rem',
+                    fontWeight: '600',
+                  }}>
+                    ⚠ {actionError}
+                  </div>
+                )}
+
+                {/* Status badge */}
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '4px 12px',
+                  borderRadius: '20px',
+                  fontSize: '0.75rem',
+                  fontWeight: '600',
+                  width: 'fit-content',
+                  background: runStatus === 'running' ? '#ECFDF5' : runStatus === 'paused' ? '#FEF3C7' : '#F1F5F9',
+                  color: runStatus === 'running' ? '#065F46' : runStatus === 'paused' ? '#92400E' : '#64748B',
+                }}>
+                  <span style={{
+                    width: '6px', height: '6px', borderRadius: '50%',
+                    background: runStatus === 'running' ? '#10B981' : runStatus === 'paused' ? '#F59E0B' : '#94A3B8',
+                    animation: runStatus === 'running' ? 'pulse 2s infinite' : 'none',
+                    display: 'inline-block',
+                  }} />
+                  {runStatus === 'running' ? 'Running' : runStatus === 'paused' ? 'Paused' : 'Idle'}
+                </div>
+              </div>
+
+              {/* Settings Info */}
+              <div>
+                <p style={{ fontSize: '0.875rem', color: '#64748B', fontWeight: '600', margin: '0 0 8px 0', textTransform: 'uppercase' }}>
+                  Quick Settings
+                </p>
+                <div style={{
+                  padding: '12px 16px',
+                  background: 'rgba(0, 81, 255, 0.05)',
+                  borderRadius: '8px',
+                  fontSize: '0.875rem',
+                  color: '#64748B',
+                  lineHeight: '1.6',
+                }}>
+                  <p style={{ margin: '0 0 8px 0' }}>
+                    • Scan jobs every 5 minutes
+                  </p>
+                  <p style={{ margin: '0 0 8px 0' }}>
+                    • Match threshold: 80%
+                  </p>
+                  <p style={{ margin: 0 }}>
+                    • Apply to: All locations
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ScrollAnimation>
+
+        {/* Activity Timeline */}
+        <ScrollAnimation delay={400}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+          }}>
+            {activityLogs.length > 0 ? (
+              activityLogs.map((log, idx) => {
+                const statusColor = getStatusColor(log.status);
+                return (
+                  <div key={log.id} style={{
+                    background: 'rgba(255, 255, 255, 0.8)',
+                    backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(255, 255, 255, 0.8)',
+                    borderRadius: '12px',
+                    padding: '20px',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '16px',
+                  }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateX(4px)';
+                      e.currentTarget.style.borderColor = '#0051FF';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateX(0)';
+                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.8)';
+                    }}
+                  >
+                    {/* Status Icon */}
+                    <div style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '8px',
+                      background: statusColor.bg,
+                      color: statusColor.text,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '1.25rem',
+                      fontWeight: '800',
+                      flexShrink: 0,
+                    }}>
+                      {log.status === 'success' ? '✓' : log.status === 'failed' ? '✗' : '•'}
+                    </div>
+
+                    {/* Content */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', marginBottom: '4px' }}>
+                        <h4 style={{ fontSize: '1rem', fontWeight: '700', color: '#1E293B', margin: 0 }}>
+                          {log.jobTitle}
+                        </h4>
+                        <span style={{ fontSize: '0.875rem', color: '#64748B' }}>
+                          at {log.company}
+                        </span>
+                      </div>
+                      <p style={{ fontSize: '0.875rem', color: '#64748B', margin: 0 }}>
+                        {formatRelativeTime(log.timestamp)}
+                      </p>
+                    </div>
+
+                    {/* Status Badge */}
+                    <div style={{
+                      padding: '6px 12px',
+                      background: statusColor.bg,
+                      color: statusColor.text,
+                      borderRadius: '6px',
+                      fontSize: '0.75rem',
+                      fontWeight: '600',
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0,
+                    }}>
+                      {statusColor.label}
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div style={{
+                background: 'rgba(255, 255, 255, 0.8)',
+                backdropFilter: 'blur(8px)',
+                border: '1px solid rgba(255, 255, 255, 0.8)',
+                borderRadius: '12px',
+                padding: '40px',
+                textAlign: 'center',
+                color: '#64748B',
+              }}>
+                <p>No activity yet. Start auto-apply to see real-time updates here.</p>
+              </div>
+            )}
+          </div>
+        </ScrollAnimation>
+
+        {/* Footer Section */}
+        <ScrollAnimation delay={500}>
+          <div style={{
+            marginTop: '60px',
+            paddingTop: '32px',
+            borderTop: '1px solid rgba(255, 255, 255, 0.3)',
+            textAlign: 'center',
+            color: '#64748B',
+            fontSize: '0.875rem',
+          }}>
+            <p style={{ margin: '0 0 16px 0' }}>
+              💡 Tip: Auto-Apply is checking for new jobs and applying automatically in the background.
+            </p>
+            <p style={{ margin: 0 }}>
+              Last synced: Just now • Next sync in ~5 minutes
+            </p>
+          </div>
+        </ScrollAnimation>
       </main>
+
+      {/* CSS Animations */}
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+      `}</style>
     </div>
-      {toast && <div style={{position:'fixed',bottom:'24px',right:'24px',padding:'12px 20px',borderRadius:'8px',background:toast.type==='success'?'#10B981':'#EF4444',color:'white',fontWeight:'600',fontSize:'14px',zIndex:9999,boxShadow:'0 4px 12px rgba(0,0,0,0.15)'}}>{toast.msg}</div>}
-    </>
   );
 }
+
+

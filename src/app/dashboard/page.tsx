@@ -601,7 +601,7 @@ export default function DashboardPage() {
                     </div>
                   </Link>
 
-                  <Link href="/monitor" style={{
+                  <Link href="/auto-apply" style={{
                     display: 'block',
                     padding: '24px',
                     background: 'rgba(0, 81, 255, 0.03)',
