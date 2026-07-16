@@ -46,7 +46,7 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const token = sessionStorage.getItem('instajob_token');
+      const token = localStorage.getItem('instajob_token');
       if (!token) {
         router.push('/login');
         return;

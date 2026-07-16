@@ -32,7 +32,7 @@ export default function QuotaWidget() {
 
   const fetchData = async () => {
     try {
-      const token = sessionStorage.getItem('instajob_token');
+      const token = localStorage.getItem('instajob_token');
       if (!token) return;
 
       const [quotaRes, queueRes] = await Promise.all([

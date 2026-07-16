@@ -48,7 +48,7 @@ export default function AutoApplyQueuePanel() {
 
   const fetchQueueAndQuota = async () => {
     try {
-      const token = sessionStorage.getItem('instajob_token');
+      const token = localStorage.getItem('instajob_token');
       if (!token) return;
 
       const [queueRes, quotaRes] = await Promise.all([

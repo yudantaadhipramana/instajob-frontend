@@ -25,7 +25,7 @@ export default function AutoApplyButton({
 
   const handleClick = async () => {
     try {
-      const token = sessionStorage.getItem('instajob_token');
+      const token = localStorage.getItem('instajob_token');
       if (!token) {
         setError('Please login first');
         return;
@@ -62,7 +62,7 @@ export default function AutoApplyButton({
     setError('');
 
     try {
-      const token = sessionStorage.getItem('instajob_token');
+      const token = localStorage.getItem('instajob_token');
       if (!token) {
         setError('Authentication failed');
         return;
