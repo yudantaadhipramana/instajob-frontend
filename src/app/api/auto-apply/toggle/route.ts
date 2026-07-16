@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     const response = await fetch(
-      (process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app')/api/auto-apply/toggle',
+      `${process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app'}/api/auto-apply/toggle`,
       {
         method: 'POST',
         headers: { 

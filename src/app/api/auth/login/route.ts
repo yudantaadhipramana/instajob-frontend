@@ -5,7 +5,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     
     const response = await fetch(
-      (process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app')/api/auth/login',
+      `${process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app'}/api/auth/login`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
