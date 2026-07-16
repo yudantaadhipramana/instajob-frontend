@@ -18,7 +18,7 @@ export async function PUT(
     const body = await request.json();
 
     const response = await fetch(
-      `https://instajob-backend-production.up.railway.app/api/applications/${id}/status`,
+      `${process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app'}/api/applications/${id}/status`,
       {
         method: 'PUT',
         headers: {
