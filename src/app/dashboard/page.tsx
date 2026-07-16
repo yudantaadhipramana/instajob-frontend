@@ -30,6 +30,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [completeness, setCompleteness] = useState<{score:number,missing:string[]}|null>(null);
+  const [recommendations, setRecommendations] = useState<any[]>([]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -72,6 +73,14 @@ export default function DashboardPage() {
           headers: { 'Authorization': `Bearer ${token}` }
         }).then(r => r.json()).then(d => {
           if (d.score !== undefined) setCompleteness(d);
+        }).catch(() => {});
+
+        // Fetch AI job recommendations
+        fetch(`${apiBase}/api/ai/recommendations?limit=5`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }).then(r => r.json()).then(d => {
+          if (Array.isArray(d)) setRecommendations(d);
+          else if (Array.isArray(d?.recommendations)) setRecommendations(d.recommendations);
         }).catch(() => {});
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load dashboard');
@@ -744,6 +753,40 @@ export default function DashboardPage() {
           }
         }
       `}</style>
+
+      {/* AI Job Recommendations */}
+      {recommendations.length > 0 && (
+        <div style={{ padding: '0 24px 24px' }}>
+          <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#1E293B', margin: '0 0 12px 0' }}>
+            ✨ Rekomendasi Untukmu
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {recommendations.slice(0, 5).map((job: any) => (
+              <a key={job.id} href={`/jobs`} style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: '12px 16px', background: '#F8FAFF', borderRadius: '10px',
+                border: '1px solid #E2E8F0', textDecoration: 'none', color: 'inherit'
+              }}>
+                <div>
+                  <div style={{ fontWeight: '600', fontSize: '14px', color: '#1E293B' }}>{job.title}</div>
+                  <div style={{ fontSize: '12px', color: '#64748B' }}>{job.company} · {job.location}</div>
+                </div>
+                {job.matchScore && (
+                  <span style={{
+                    background: job.matchScore >= 80 ? '#DCFCE7' : '#FEF9C3',
+                    color: job.matchScore >= 80 ? '#16A34A' : '#A16207',
+                    fontSize: '12px', fontWeight: '700', padding: '4px 8px', borderRadius: '6px'
+                  }}>
+                    {job.matchScore}% match
+                  </span>
+                )}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      
     </div>
   );
 }
