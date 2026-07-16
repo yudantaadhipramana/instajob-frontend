@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Save, Loader, CheckCircle, AlertCircle, MapPin, Briefcase, DollarSign, Clock, Bell, Globe, Link2, Filter, X } from 'lucide-react';
+import { ArrowLeft, Save, Loader, CheckCircle, AlertCircle, MapPin, Briefcase, DollarSign, Clock, Bell, Link2, Filter, X } from 'lucide-react';
 
 interface PreferencesData {
   jobTitles: string[];
@@ -15,8 +15,6 @@ interface PreferencesData {
   emailNotifications: boolean;
   telegramNotifications: boolean;
   emailTemplate: string;
-  website: string;
-  linkedIn: string;
   noticePeriod: string;
   remoteOnly: boolean;
   skipAgencies: boolean;
@@ -36,8 +34,6 @@ export default function PreferencesPage() {
     emailNotifications: true,
     telegramNotifications: false,
     emailTemplate: '',
-    website: '',
-    linkedIn: '',
     noticePeriod: 'Immediately',
     remoteOnly: false,
     skipAgencies: false,
@@ -84,8 +80,6 @@ export default function PreferencesPage() {
             emailNotifications: data.emailNotifications ?? defaultPrefs.emailNotifications,
             telegramNotifications: data.telegramNotifications ?? defaultPrefs.telegramNotifications,
             emailTemplate: data.emailTemplate ?? defaultPrefs.emailTemplate,
-            website: data.website ?? defaultPrefs.website,
-            linkedIn: data.linkedIn ?? defaultPrefs.linkedIn,
             noticePeriod: data.noticePeriod ?? defaultPrefs.noticePeriod,
             remoteOnly: data.remoteOnly ?? defaultPrefs.remoteOnly,
             skipAgencies: data.skipAgencies ?? defaultPrefs.skipAgencies,
@@ -174,8 +168,6 @@ export default function PreferencesPage() {
           notificationsEnabled: formData.notificationsEnabled,
           emailNotifications: formData.emailNotifications,
           telegramNotifications: formData.telegramNotifications,
-          website: formData.website,
-          linkedIn: formData.linkedIn,
           noticePeriod: formData.noticePeriod,
           remoteOnly: formData.remoteOnly,
           skipAgencies: formData.skipAgencies,
@@ -299,20 +291,7 @@ export default function PreferencesPage() {
 
         {/* Error Message */}
         {saveError && (
-          <div style={{
-            marginBottom: '24px',
-            padding: '12px 16px',
-            background: 'rgba(239, 68, 68, 0.1)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: '8px',
-            color: '#DC2626',
-            fontSize: '14px',
-            fontWeight: '600',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-          }}>
-            <AlertCircle size={18} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', background: 'rgba(239,68,68,0.1)', borderRadius: '8px', color: '#EF4444', fontSize: '14px' }}>
             Failed to save preferences. Please try again.
           </div>
         )}
@@ -324,131 +303,8 @@ export default function PreferencesPage() {
         }}>
 
           {/* Job Titles Section — FREE TEXT INPUTS */}
-          <div style={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
-            backdropFilter: 'blur(12px)',
-            borderRadius: '16px',
-            padding: '32px',
-            boxShadow: '0 2px 12px rgba(0, 81, 255, 0.06)',
-            border: '1px solid rgba(255, 255, 255, 0.6)',
-          }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              marginBottom: '20px',
-            }}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '36px',
-                height: '36px',
-                background: 'rgba(0, 81, 255, 0.1)',
-                borderRadius: '8px',
-              }}>
-                <Briefcase size={20} color="#0051FF" />
-              </div>
-              <h2 style={{
-                fontSize: '18px',
-                fontWeight: '700',
-                margin: 0,
-              }}>
-                Job Titles
-              </h2>
-            </div>
-            <p style={{
-              fontSize: '14px',
-              color: '#64748B',
-              margin: '0 0 20px 0',
-            }}>
-              Add job titles you're interested in applying for
-            </p>
-            <input
-              type="text"
-              placeholder="e.g., Senior Software Engineer"
-              value={formData.jobTitles[0] ?? ''}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                jobTitles: [e.target.value],
-              }))}
-              style={{
-                width: '100%',
-                padding: '12px',
-                fontSize: '14px',
-                border: '1px solid #E2E8F0',
-                borderRadius: '8px',
-                outline: 'none',
-                transition: 'border-color 0.2s',
-                boxSizing: 'border-box',
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#0051FF'}
-              onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
-            />
-          </div>
 
           {/* Personal Links Section */}
-          <div style={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
-            backdropFilter: 'blur(12px)',
-            borderRadius: '16px',
-            padding: '32px',
-            boxShadow: '0 2px 12px rgba(0, 81, 255, 0.06)',
-            border: '1px solid rgba(255, 255, 255, 0.6)',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-              <div style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                width: '36px', height: '36px',
-                background: 'rgba(0, 81, 255, 0.1)', borderRadius: '8px',
-              }}>
-                <Globe size={20} color="#0051FF" />
-              </div>
-              <h2 style={{ fontSize: '18px', fontWeight: '700', margin: 0 }}>Personal Links</h2>
-            </div>
-            <p style={{ fontSize: '14px', color: '#64748B', margin: '0 0 20px 0' }}>
-              Add your website and LinkedIn profile
-            </p>
-            <div style={{ display: 'grid', gap: '16px' }}>
-              <div>
-                <label style={{ fontSize: '13px', fontWeight: '600', color: '#475569', display: 'block', marginBottom: '8px' }}>
-                  Website
-                </label>
-                <input
-                  type="url"
-                  placeholder="https://yourwebsite.com"
-                  value={formData.website}
-                  onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
-                  style={{
-                    width: '100%', padding: '12px', fontSize: '14px',
-                    border: '1px solid #E2E8F0', borderRadius: '8px',
-                    outline: 'none', transition: 'border-color 0.2s', boxSizing: 'border-box',
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#0051FF'}
-                  onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
-                />
-              </div>
-              <div>
-                <label style={{ fontSize: '13px', fontWeight: '600', color: '#475569', display: 'block', marginBottom: '8px' }}>
-                  LinkedIn
-                </label>
-                <input
-                  type="url"
-                  placeholder="https://linkedin.com/in/yourprofile"
-                  value={formData.linkedIn}
-                  onChange={(e) => setFormData(prev => ({ ...prev, linkedIn: e.target.value }))}
-                  style={{
-                    width: '100%', padding: '12px', fontSize: '14px',
-                    border: '1px solid #E2E8F0', borderRadius: '8px',
-                    outline: 'none', transition: 'border-color 0.2s', boxSizing: 'border-box',
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#0051FF'}
-                  onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
-                />
-              </div>
-            </div>
-          </div>
-
           {/* Locations Section — GOOGLE MAPS STYLE AUTOCOMPLETE */}
           <div style={{
             background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
