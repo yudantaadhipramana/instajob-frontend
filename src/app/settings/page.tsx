@@ -54,7 +54,7 @@ export default function SettingsPage() {
     setGmailLoading(true);
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/integrations/gmail/auth-url`, {
-        method: 'POST', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+        method: 'POST', headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
       if (data.authUrl) window.open(data.authUrl, '_blank');
