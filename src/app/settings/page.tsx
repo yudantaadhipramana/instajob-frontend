@@ -1333,20 +1333,29 @@ export default function SettingsPage() {
               transition: 'all 0.2s ease',
               boxShadow: '0 2px 8px rgba(239, 68, 68, 0.3)',
             }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.opacity = '0.9';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.opacity = '1';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            <LogOut size={16} />
+            Sign Out
+          </button>
+
         {/* Language Settings Section */}
         <div style={{
           background: 'linear-gradient(135deg, rgba(239,246,255,0.95) 0%, rgba(219,234,254,0.8) 100%)',
           backdropFilter: 'blur(12px)',
           borderRadius: '16px',
           border: '1px solid rgba(191,219,254,0.4)',
-          boxShadow: '0 4px 20px -2px rgba(0,0,0,0.02)',
           padding: '24px',
-          marginBottom: '24px',
+          marginTop: '24px',
         }}>
-          <h2 style={{
-            fontSize: '18px', fontWeight: '600', color: '#1E40AF',
-            margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '10px'
-          }}>
+          <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1E40AF', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Settings size={20} color="#1E40AF" />
             Bahasa / Language
           </h2>
@@ -1361,13 +1370,10 @@ export default function SettingsPage() {
               const active = lang === opt.code;
               return (
                 <button key={opt.code} onClick={() => setLang(opt.code)} style={{
-                  flex: 1, padding: '16px',
-                  borderRadius: '12px',
+                  flex: 1, padding: '16px', borderRadius: '12px',
                   border: `2px solid ${active ? '#1E40FF' : '#E2E8F0'}`,
                   background: active ? 'rgba(30,64,255,0.06)' : '#fff',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'all 0.2s ease',
+                  cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s ease',
                 }}>
                   <p style={{ fontSize: '15px', fontWeight: '700', color: active ? '#1E40FF' : '#1E293B', margin: '0 0 4px' }}>
                     {opt.label}
@@ -1378,39 +1384,8 @@ export default function SettingsPage() {
               );
             })}
           </div>
-          <p style={{ fontSize: '12px', color: '#94A3B8', margin: '12px 0 0' }}>
-            Perubahan bahasa akan diterapkan setelah halaman di-refresh.
-          </p>
         </div>
 
-          <button
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              padding: '12px 24px',
-              fontSize: '14px',
-              fontWeight: '700',
-              color: '#FFFFFF',
-              background: 'linear-gradient(135deg, #EF4444, #DC2626)',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              boxShadow: '0 2px 8px rgba(239, 68, 68, 0.3)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.opacity = '0.9';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.opacity = '1';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-            <LogOut size={16} />
-            Sign Out
-          </button>
         </div>
       </main>
 
