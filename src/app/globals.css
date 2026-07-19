@@ -178,6 +178,11 @@ h1, h2, h3, h4, h5, h6 {
   .footer-bottom { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; }
   .cta-headline { font-size: 36px !important; }
   .section-padding { padding: 60px 20px !important; }
+  
+  /* Two-column grid responsive */
+  .landing-two-col-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
+  .landing-two-col-grid-reverse .grid-col-left { order: 2; }
+  .landing-two-col-grid-reverse .grid-col-right { order: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -105,6 +105,7 @@ export default function FeaturesSection() {
 
         {/* Carousel / Tabs Style Features */}
         <div
+          className="landing-two-col-grid landing-two-col-grid-reverse"
           style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
@@ -113,7 +114,7 @@ export default function FeaturesSection() {
           }}
         >
           {/* Left: Feature List */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div className="grid-col-left" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {features.map((feature, i) => (
               <motion.div
                 key={i}
@@ -176,6 +177,7 @@ export default function FeaturesSection() {
 
           {/* Right: Dynamic Feature Visualization */}
           <div
+            className="grid-col-right"
             style={{
               background: 'linear-gradient(135deg, #1E3A8A 0%, #1E40FF 55%, #3B82F6 100%)',
               borderRadius: '24px',

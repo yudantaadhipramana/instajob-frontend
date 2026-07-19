@@ -80,6 +80,7 @@ export default function HowItWorks() {
 
         {/* Interactive Demo Area */}
         <div
+          className="landing-two-col-grid landing-two-col-grid-reverse"
           style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
@@ -88,7 +89,7 @@ export default function HowItWorks() {
           }}
         >
           {/* Left: Step Indicators */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div className="grid-col-left" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             {[
               { num: '01', title: 'Set Preferences', desc: 'Job type, location, experience', icon: Icons.setup(28, 'var(--color-foreground-tertiary)'), iconActive: Icons.setup(28, '#fff') },
               { num: '02', title: 'Start AI Scout', desc: 'AI finds matching jobs', icon: Icons.search(28, 'var(--color-foreground-tertiary)'), iconActive: Icons.search(28, '#fff') },
@@ -167,6 +168,7 @@ export default function HowItWorks() {
 
           {/* Right: Animated Mockup */}
           <div
+            className="grid-col-right"
             style={{
               position: 'relative',
               background: 'linear-gradient(135deg, #1E3A8A 0%, #1E40FF 55%, #3B82F6 100%)',
