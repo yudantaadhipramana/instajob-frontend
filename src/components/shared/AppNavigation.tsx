@@ -4,6 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Logo } from '@/components/Logo';
+import { useI18n } from '@/context/I18nContext';
 
 interface NavItem {
   name: string;
@@ -23,14 +24,17 @@ const navItems: NavItem[] = [
 export default function AppNavigation() {
   const pathname = usePathname();
   const router = useRouter();
+  const { lang, setLang } = useI18n();
   const [user, setUser] = useState<{ fullName: string; email: string } | null>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notifCount, setNotifCount] = useState(0);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   useEffect(() => {
     const userData = localStorage.getItem('instajob_user');
-    const token = localStorage.getItem('instajob_token') || localStorage.getItem('instajob_token');
+    const token = localStorage.getItem('instajob_token');
     if (userData) {
       try { setUser(JSON.parse(userData)); } catch (e) {}
     }
@@ -38,7 +42,13 @@ export default function AppNavigation() {
       const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
       fetch(`${apiBase}/api/notifications`, { headers: { 'Authorization': `Bearer ${token}` } })
         .then(r => r.ok ? r.json() : null)
-        .then(d => { if (d) setNotifCount((d.notifications || d.data || []).filter((n: any) => !n.read).length); })
+        .then(d => {
+          if (d) {
+            const list = d.notifications || d.data || [];
+            setNotifications(list.slice(0, 10));
+            setNotifCount(list.filter((n: any) => !n.read).length);
+          }
+        })
         .catch(() => {});
     }
   }, []);
@@ -49,9 +59,7 @@ export default function AppNavigation() {
     router.push('/login');
   };
 
-  const isActive = (href: string) => {
-    return pathname === href;
-  };
+  const isActive = (href: string) => pathname === href;
 
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
@@ -79,7 +87,7 @@ export default function AppNavigation() {
             ))}
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
             <Link
               href="/subscription"
               className="hidden sm:block px-3 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 transition-all"
@@ -87,17 +95,50 @@ export default function AppNavigation() {
               Upgrade to Pro
             </Link>
 
+            {/* Lang Toggle */}
+            <div className="flex items-center gap-0.5 p-1 bg-gray-100 rounded-lg border border-gray-200">
+              <button onClick={() => setLang('id')} className={`px-2.5 py-1 rounded-md text-xs font-bold transition-all ${lang === 'id' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:text-gray-700'}`}>ID</button>
+              <button onClick={() => setLang('en')} className={`px-2.5 py-1 rounded-md text-xs font-bold transition-all ${lang === 'en' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:text-gray-700'}`}>EN</button>
+            </div>
+
             {/* Notification Bell */}
-            <Link href="/settings" className="relative p-2 rounded-md text-gray-600 hover:bg-gray-100 transition-colors" title="Notifications">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-              {notifCount > 0 && (
-                <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
-                  {notifCount > 9 ? '9+' : notifCount}
-                </span>
+            <div className="relative">
+              <button
+                onClick={() => setNotifOpen(!notifOpen)}
+                className="relative p-2 rounded-md text-gray-600 hover:bg-gray-100 transition-colors"
+                aria-label="Notifications"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                {notifCount > 0 && (
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                    {notifCount > 9 ? '9+' : notifCount}
+                  </span>
+                )}
+              </button>
+              {notifOpen && (
+                <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden">
+                  <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+                    <span className="font-semibold text-sm text-gray-800">Notifikasi</span>
+                    {notifCount > 0 && <span className="text-xs text-blue-600 font-semibold">{notifCount} belum dibaca</span>}
+                  </div>
+                  <div className="max-h-72 overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="px-4 py-8 text-center text-sm text-gray-400">Tidak ada notifikasi</div>
+                    ) : (
+                      notifications.map((n: any, i: number) => (
+                        <div key={i} className={`px-4 py-3 border-b border-gray-50 hover:bg-gray-50 cursor-pointer ${!n.read ? 'bg-blue-50' : ''}`}>
+                          <p className="text-sm font-medium text-gray-800">{n.title || n.message || 'Notifikasi'}</p>
+                          {n.body && <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{n.body}</p>}
+                          {n.createdAt && <p className="text-xs text-gray-400 mt-1">{new Date(n.createdAt).toLocaleDateString('id-ID')}</p>}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
               )}
-            </Link>
+            </div>
 
             <div className="relative">
               <button

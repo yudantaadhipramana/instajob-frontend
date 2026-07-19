@@ -133,32 +133,8 @@ export default function NavigationBar() {
         })}
       </div>
 
-      {/* Right: Notif + Language + Auth (Desktop) */}
+      {/* Right: Language + Auth (Desktop) */}
       <div className="nav-desktop-actions" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-        {/* Notification Bell */}
-        <button
-          aria-label="Notifications"
-          style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '8px',
-            border: '1px solid var(--color-border)',
-            background: 'var(--color-muted)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            position: 'relative',
-            flexShrink: 0,
-          }}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-          </svg>
-        </button>
-
-        {/* Language Toggle */}
         <div
           style={{
             display: 'flex',
@@ -301,18 +277,12 @@ export default function NavigationBar() {
             gap: '4px',
           }}
         >
-          {/* Lang Toggle + Notif — Mobile */}
+          {/* Lang Toggle — Mobile */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 0', borderBottom: '1px solid var(--color-border)', marginBottom: '4px' }}>
             <div style={{ display: 'flex', gap: '4px', padding: '4px', background: 'var(--color-muted)', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
               <button onClick={() => setLang('id')} style={{ padding: '6px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '700', background: lang === 'id' ? 'var(--color-primary)' : 'transparent', color: lang === 'id' ? '#fff' : '#64748B' }}>ID</button>
               <button onClick={() => setLang('en')} style={{ padding: '6px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '700', background: lang === 'en' ? 'var(--color-primary)' : 'transparent', color: lang === 'en' ? '#fff' : '#64748B' }}>EN</button>
             </div>
-            <button aria-label="Notifications" style={{ width: '36px', height: '36px', borderRadius: '8px', border: '1px solid var(--color-border)', background: 'var(--color-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-              </svg>
-            </button>
           </div>
 
           {navItems.map((item) => {
