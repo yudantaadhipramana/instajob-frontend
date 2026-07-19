@@ -32,7 +32,7 @@ export default function AffiliateLoginPage() {
       }
 
       localStorage.setItem('token', data.token);
-      router.push('/affiliate/dashboard');
+      router.push('/affiliate/affiliate-dashboard');
     } catch (err: any) {
       setError(err.message || 'Terjadi kesalahan');
     } finally {

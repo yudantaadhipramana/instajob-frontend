@@ -211,7 +211,7 @@ export default function ProfileDropdown({ user }: ProfileDropdownProps) {
 
             {/* Affiliate Dashboard */}
             <div
-              onClick={() => { router.push('/affiliate/dashboard'); setIsOpen(false); }}
+              onClick={() => { router.push('/affiliate/affiliate-dashboard'); setIsOpen(false); }}
               style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px 20px', color: '#030303', fontSize: '13px', fontWeight: '400', transition: 'background 0.15s ease', cursor: 'pointer' }}
               onMouseEnter={(e) => { e.currentTarget.style.background = '#f9f9f9'; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
