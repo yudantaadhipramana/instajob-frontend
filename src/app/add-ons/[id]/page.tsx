@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Logo } from '@/components/Logo';
 import ProfileDropdown from '@/components/ProfileDropdown';
+import HeaderActions from '@/components/HeaderActions';
 import { ArrowLeft, Calendar, CheckCircle, Tag, Loader } from 'lucide-react';
 
 interface User { id: string; email: string; fullName: string; }
@@ -204,7 +205,7 @@ export default function AddOnDetailPage({ params }: { params: Promise<{ id: stri
           <ArrowLeft size={16} /> Kembali
         </Link>
         <Logo size={28} showText={true} />
-        <ProfileDropdown user={user || undefined} />
+        <HeaderActions user={user || undefined} />
       </header>
 
       <main style={{ maxWidth: '960px', margin: '0 auto', padding: '40px 24px', display: 'grid', gridTemplateColumns: '1fr 380px', gap: '32px', alignItems: 'start' }}>

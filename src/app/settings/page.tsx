@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Logo } from '@/components/Logo';
 import { JobsIcon, ApplicationsIcon, ProfileIcon } from '@/components/DashboardIcons';
 import ProfileDropdown from '@/components/ProfileDropdown';
+import HeaderActions from '@/components/HeaderActions';
 import { Lock, Bell, Eye, Trash2, LogOut, Settings, Mail, Shield, Database, ArrowLeft, Save, Loader, CheckCircle, AlertCircle, Home } from 'lucide-react';
 
 interface User {
@@ -311,7 +312,7 @@ export default function SettingsPage() {
         <Logo size={32} showText={true} />
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <ProfileDropdown user={user || undefined} />
+          <HeaderActions user={user || undefined} />
         </div>
       </header>
 

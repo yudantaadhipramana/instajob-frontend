@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Logo } from '@/components/Logo';
 import ProfileDropdown from '@/components/ProfileDropdown';
+import HeaderActions from '@/components/HeaderActions';
 import { ArrowLeft, CreditCard, CheckCircle, AlertCircle, Loader, Clock } from 'lucide-react';
 
 interface User { id: string; email: string; fullName: string; }
@@ -106,7 +107,7 @@ export default function WithdrawalPage() {
           <ArrowLeft size={16} /> Dashboard
         </Link>
         <Logo size={28} showText={true} />
-        <ProfileDropdown user={user || undefined} />
+        <HeaderActions user={user || undefined} />
       </header>
 
       <main style={{ maxWidth: '800px', margin: '0 auto', padding: '40px 24px', display: 'flex', flexDirection: 'column', gap: '24px' }}>

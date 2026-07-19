@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Logo } from '@/components/Logo';
 import ProfileDropdown from '@/components/ProfileDropdown';
+import HeaderActions from '@/components/HeaderActions';
 import { useI18n } from '@/context/I18nContext';
 import { Home, Settings, Puzzle, CheckCircle, Lock, Clock, ArrowRight } from 'lucide-react';
 import { JobsIcon, ApplicationsIcon } from '@/components/DashboardIcons';
@@ -150,7 +151,7 @@ export default function AddOnsPage() {
               🎟️ {tokens}x Token Career Booster
             </div>
           )}
-          <ProfileDropdown user={user || undefined} />
+          <HeaderActions user={user || undefined} />
         </div>
       </header>
 

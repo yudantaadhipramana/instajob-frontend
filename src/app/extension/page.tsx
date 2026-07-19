@@ -7,6 +7,7 @@ import { Logo } from '@/components/Logo';
 import { HomeIcon, JobsIcon, ApplicationsIcon } from '@/components/DashboardIcons';
 import { Settings, Puzzle } from 'lucide-react';
 import ProfileDropdown from '@/components/ProfileDropdown';
+import HeaderActions from '@/components/HeaderActions';
 
 interface User { id: string; email: string; fullName: string; }
 
@@ -66,7 +67,7 @@ export default function ExtensionPage() {
             ))}
           </div>
         </div>
-        <ProfileDropdown user={user || undefined} />
+        <HeaderActions user={user || undefined} />
       </nav>
 
       <div style={{ maxWidth: '800px', margin: '0 auto', padding: '40px 24px' }}>

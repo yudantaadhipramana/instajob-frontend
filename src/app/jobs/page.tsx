@@ -7,6 +7,7 @@ import { ScrollAnimation } from '@/components/Animations';
 import { Logo } from '@/components/Logo';
 import { JobsIcon, ApplicationsIcon, ProfileIcon } from '@/components/DashboardIcons';
 import ProfileDropdown from '@/components/ProfileDropdown';
+import HeaderActions from '@/components/HeaderActions';
 import { Home, Settings } from 'lucide-react';
 
 interface Job {
@@ -241,7 +242,7 @@ export default function JobsPage() {
         <Logo size={32} showText={true} />
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <ProfileDropdown user={user || undefined} />
+          <HeaderActions user={user || undefined} />
         </div>
       </header>
 

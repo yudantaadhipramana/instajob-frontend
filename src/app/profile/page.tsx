@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { User, Mail, FileText, Upload, ArrowLeft, Save, X, Loader, CheckCircle, Camera, Plus, Trash2 } from 'lucide-react';
+import HeaderActions from '@/components/HeaderActions';
 
 interface ExperienceEntry { title: string; company: string; years: number; }
 interface EducationEntry { degree: string; field: string; }

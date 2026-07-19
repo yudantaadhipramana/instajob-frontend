@@ -8,6 +8,7 @@ import { Logo } from '@/components/Logo';
 import { JobsIcon, ApplicationsIcon, HomeIcon } from '@/components/DashboardIcons';
 import { Settings } from 'lucide-react';
 import ProfileDropdown from '@/components/ProfileDropdown';
+import HeaderActions from '@/components/HeaderActions';
 
 interface AutoApplyStats {
   isActive: boolean;
@@ -337,7 +338,7 @@ export default function MonitorPage() {
         <Logo size={32} showText={true} />
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <ProfileDropdown user={user || undefined} />
+          <HeaderActions user={user || undefined} />
         </div>
       </header>
 

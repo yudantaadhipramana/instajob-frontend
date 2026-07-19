@@ -7,6 +7,7 @@ import { ArrowLeft, Save, Loader, CheckCircle, AlertCircle, MapPin, Briefcase, D
 import { Logo } from '@/components/Logo';
 import { JobsIcon, ApplicationsIcon } from '@/components/DashboardIcons';
 import ProfileDropdown from '@/components/ProfileDropdown';
+import HeaderActions from '@/components/HeaderActions';
 
 interface PreferencesData {
   jobTitles: string[];
@@ -252,6 +253,7 @@ export default function PreferencesPage() {
             ))}
           </div>
         </div>
+        <HeaderActions />
       </nav>
 
       {/* Main Content */}
