@@ -163,7 +163,20 @@ export default function DashboardPage() {
       }}>
         <Logo size={32} showText={true} />
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {/* Inbox Button */}
+          <Link href="/inbox" style={{
+            width: '40px', height: '40px', borderRadius: '10px',
+            background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255,255,255,0.4)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            textDecoration: 'none', color: '#64748B', transition: 'all 0.2s ease',
+          }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
+              <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+            </svg>
+          </Link>
           <ProfileDropdown user={user || undefined} />
         </div>
       </header>
@@ -339,23 +352,54 @@ export default function DashboardPage() {
         )}
 
         {/* Profile Completeness Widget */}
-        {completeness && completeness.score < 100 && (
-          <div style={{ background: '#fff', borderRadius: '12px', padding: '20px 24px', marginBottom: '24px', border: '1px solid #E2E8F0', animation: 'fadeIn 0.6s ease-out 0.15s both' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <span style={{ fontWeight: '700', fontSize: '15px', color: '#1E293B' }}>📋 Kelengkapan Profil</span>
-              <span style={{ fontWeight: '800', fontSize: '18px', color: completeness.score >= 70 ? '#16A34A' : completeness.score >= 40 ? '#D97706' : '#DC2626' }}>{completeness.score}%</span>
+        {completeness && completeness.score < 100 && (() => {
+          const FIELD_MAP: Record<string, { label: string; href: string }> = {
+            fullName: { label: 'Nama', href: '/profile#fullName' },
+            bio: { label: 'Bio', href: '/profile#bio' },
+            skills: { label: 'Skills', href: '/profile#skills' },
+            experience: { label: 'Pengalaman', href: '/profile#experience' },
+            education: { label: 'Pendidikan', href: '/profile#education' },
+            location: { label: 'Lokasi', href: '/profile#location' },
+            resumeUrl: { label: 'CV', href: '/profile#resumeUrl' },
+            phone: { label: 'Telepon', href: '/profile#phone' },
+            jobPreferences: { label: 'Preferensi Kerja', href: '/preferences' },
+          };
+          const firstMissing = completeness.missing[0];
+          const redirectHref = firstMissing ? (FIELD_MAP[firstMissing]?.href || '/profile') : '/profile';
+          return (
+            <div style={{ background: '#fff', borderRadius: '12px', padding: '20px 24px', marginBottom: '24px', border: '1px solid #E2E8F0', animation: 'fadeIn 0.6s ease-out 0.15s both' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <span style={{ fontWeight: '700', fontSize: '15px', color: '#1E293B' }}>📋 Kelengkapan Profil</span>
+                <span style={{ fontWeight: '800', fontSize: '18px', color: completeness.score >= 70 ? '#16A34A' : completeness.score >= 40 ? '#D97706' : '#DC2626' }}>{completeness.score}%</span>
+              </div>
+              <div style={{ background: '#F1F5F9', borderRadius: '8px', height: '8px', overflow: 'hidden', marginBottom: '12px' }}>
+                <div style={{ background: completeness.score >= 70 ? '#16A34A' : completeness.score >= 40 ? '#F59E0B' : '#EF4444', height: '100%', width: `${completeness.score}%`, borderRadius: '8px', transition: 'width 0.6s ease' }} />
+              </div>
+              {completeness.missing.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '10px' }}>
+                  {completeness.missing.map((m) => {
+                    const field = FIELD_MAP[m] || { label: m, href: '/profile' };
+                    return (
+                      <a key={m} href={`${field.href}?highlight=${m}`} style={{
+                        fontSize: '12px', fontWeight: '700', padding: '3px 10px',
+                        borderRadius: '6px', textDecoration: 'none',
+                        background: 'rgba(239,68,68,0.08)',
+                        color: '#DC2626',
+                        border: '1px solid rgba(239,68,68,0.2)',
+                        display: 'inline-flex', alignItems: 'center', gap: '4px',
+                      }}>
+                        <span style={{ fontSize: '10px' }}>⚠</span> {field.label}
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
+              <a href={`${redirectHref}?highlight=${firstMissing}`} style={{ fontSize: '13px', color: '#1E40FF', fontWeight: '600', textDecoration: 'none' }}>
+                Lengkapi sekarang →
+              </a>
             </div>
-            <div style={{ background: '#F1F5F9', borderRadius: '8px', height: '8px', overflow: 'hidden', marginBottom: '12px' }}>
-              <div style={{ background: completeness.score >= 70 ? '#16A34A' : completeness.score >= 40 ? '#F59E0B' : '#EF4444', height: '100%', width: `${completeness.score}%`, borderRadius: '8px', transition: 'width 0.6s ease' }} />
-            </div>
-            {completeness.missing.length > 0 && (
-              <p style={{ fontSize: '13px', color: '#64748B', margin: '0 0 8px' }}>
-                Lengkapi: {completeness.missing.slice(0, 3).map(m => ({fullName:'Nama',bio:'Bio',skills:'Skills',experience:'Pengalaman',education:'Pendidikan',location:'Lokasi',resumeUrl:'CV',phone:'Telepon',jobPreferences:'Preferensi Kerja'})[m]||m).join(', ')}{completeness.missing.length > 3 ? ` +${completeness.missing.length - 3} lainnya` : ''}
-              </p>
-            )}
-            <a href={completeness.missing.every(m => m === 'jobPreferences') ? '/preferences' : '/profile'} style={{ fontSize: '13px', color: '#1E40FF', fontWeight: '600', textDecoration: 'none' }}>Lengkapi Profil →</a>
-          </div>
-        )}
+          );
+        })()}
 
         {/* Stats Cards */}
         {stats && (

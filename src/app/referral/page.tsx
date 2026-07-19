@@ -399,6 +399,49 @@ export default function ReferralPage() {
           </div>
         </div>
 
+        {/* Tier Rules — Static */}
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
+          backdropFilter: 'blur(12px)', borderRadius: '16px', padding: '32px',
+          boxShadow: '0 2px 12px rgba(0, 81, 255, 0.06)', border: '1px solid rgba(255, 255, 255, 0.6)',
+          marginBottom: '24px',
+        }}>
+          <h2 style={{ fontSize: '18px', fontWeight: '700', margin: '0 0 20px 0', color: '#1E293B' }}>
+            Struktur Komisi & Tier
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+            {[
+              { tier: 'Bronze', icon: '🥉', color: '#CD7F32', pct: '10%', req: '1–4 konversi' },
+              { tier: 'Silver', icon: '🥈', color: '#94A3B8', pct: '13%', req: '5–14 konversi' },
+              { tier: 'Gold',   icon: '🥇', color: '#F59E0B', pct: '16%', req: '15–29 konversi' },
+              { tier: 'Platinum', icon: '💎', color: '#7C3AED', pct: '20%', req: '30+ konversi' },
+            ].map(t => {
+              const active = userStats.currentRank > 0 && (
+                (t.tier === 'Bronze' && userStats.conversions >= 1 && userStats.conversions <= 4) ||
+                (t.tier === 'Silver' && userStats.conversions >= 5 && userStats.conversions <= 14) ||
+                (t.tier === 'Gold' && userStats.conversions >= 15 && userStats.conversions <= 29) ||
+                (t.tier === 'Platinum' && userStats.conversions >= 30)
+              );
+              return (
+                <div key={t.tier} style={{
+                  padding: '16px', borderRadius: '12px', textAlign: 'center',
+                  border: `2px solid ${active ? t.color : '#E2E8F0'}`,
+                  background: active ? `${t.color}10` : 'transparent',
+                }}>
+                  <div style={{ fontSize: '28px', marginBottom: '6px' }}>{t.icon}</div>
+                  <p style={{ fontSize: '14px', fontWeight: '800', color: t.color, margin: '0 0 2px' }}>{t.tier}</p>
+                  <p style={{ fontSize: '24px', fontWeight: '900', color: '#1E293B', margin: '0 0 4px' }}>{t.pct}</p>
+                  <p style={{ fontSize: '11px', color: '#64748B', margin: 0 }}>{t.req}</p>
+                  {active && <span style={{ display: 'inline-block', marginTop: '8px', fontSize: '10px', fontWeight: '700', background: t.color, color: '#fff', padding: '2px 8px', borderRadius: '20px' }}>TIER KAMU</span>}
+                </div>
+              );
+            })}
+          </div>
+          <p style={{ fontSize: '12px', color: '#94A3B8', margin: '12px 0 0', fontWeight: '600' }}>
+            Komisi dihitung dari harga paket yang dibeli referral. Transfer setiap Jumat ke rekening terdaftar.
+          </p>
+        </div>
+
         {/* Rewards Section */}
         {rewards.length > 0 && (
           <div style={{
