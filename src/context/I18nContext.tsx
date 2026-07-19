@@ -336,7 +336,7 @@ const translations: Record<Lang, Record<string, string>> = {
     'nav.faq': 'FAQ',
     
     // Landing Hero
-    'hero.badge': '🚀 Trusted by 50,000+ Job Seekers',
+    'hero.badge': '🎯 World\'s First AI Job Hunter',
     'hero.title1': 'One Setup',
     'hero.title2': '2,000+ Applications. Zero Hassle',
     'hero.subtitle': 'Our AI analyzes your profile and sends applications to thousands of companies automatically. Save 3+ hours per day and focus on what matters.',

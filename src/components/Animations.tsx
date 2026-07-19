@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 
-// Wrapper for scroll-triggered animations (RE-ENTRANT)
-// Animates every time element enters viewport, resets when leaving
+// Wrapper for scroll-triggered animations (FIRE-ONCE)
+// Animates once when element first enters viewport, never resets
 export function ScrollAnimation({ 
   children, 
   delay = 0 
@@ -16,28 +16,18 @@ export function ScrollAnimation({
   const [hasMounted, setHasMounted] = useState(false);
   const timerRef = useRef<number | null>(null);
 
-  const handleVisibilityChange = useCallback((isIntersecting: boolean) => {
-    if (isIntersecting) {
-      // Clear any existing timer
-      if (timerRef.current) clearTimeout(timerRef.current);
-      // Animate in with delay
-      timerRef.current = window.setTimeout(() => setIsVisible(true), delay);
-    } else {
-      // Reset when leaving viewport
-      if (timerRef.current) clearTimeout(timerRef.current);
-      setIsVisible(false);
-    }
-  }, [delay]);
-
   useEffect(() => {
     setHasMounted(true);
     
     const observer = new IntersectionObserver(
-      ([entry]) => handleVisibilityChange(entry.isIntersecting),
-      { 
-        threshold: 0.1, // Trigger when 10% visible
-        rootMargin: '0px 0px -50px 0px' // Trigger slightly before viewport
-      }
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          if (timerRef.current) clearTimeout(timerRef.current);
+          timerRef.current = window.setTimeout(() => setIsVisible(true), delay);
+          observer.disconnect(); // fire-once: stop observing after first trigger
+        }
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
     );
 
     if (ref.current) observer.observe(ref.current);
@@ -46,7 +36,7 @@ export function ScrollAnimation({
       observer.disconnect();
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [handleVisibilityChange]);
+  }, [delay]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div
@@ -66,8 +56,8 @@ export function ScrollAnimation({
   );
 }
 
-// Animated counter component - scroll-triggered animation (RE-ENTRANT)
-// Animates from 0 every time element enters viewport, resets when leaving
+// Animated counter component - scroll-triggered animation (FIRE-ONCE)
+// Animates from 0 once when element first enters viewport
 export function AnimatedCounter({ 
   target, 
   suffix = '',

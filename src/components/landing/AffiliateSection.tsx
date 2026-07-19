@@ -11,41 +11,12 @@ export default function AffiliateSection() {
     <section
       id="affiliate"
       style={{
-        padding: '100px 48px',
+        padding: '56px 48px',
         background: '#FFFFFF',
         position: 'relative',
         borderTop: '1px solid var(--color-border)',
       }}
     >
-      {/* Background glow effects */}
-      <div
-        style={{
-          position: 'fixed',
-          top: '50%',
-          left: '-200px',
-          width: '600px',
-          height: '600px',
-          background: 'radial-gradient(circle, rgba(30, 64, 255, 0.08) 0%, transparent 70%)',
-          borderRadius: '50%',
-          filter: 'blur(120px)',
-          pointerEvents: 'none',
-          zIndex: 0,
-        }}
-      />
-      <div
-        style={{
-          position: 'fixed',
-          bottom: '-200px',
-          right: '-150px',
-          width: '600px',
-          height: '600px',
-          background: 'radial-gradient(circle, rgba(30, 64, 255, 0.08) 0%, transparent 70%)',
-          borderRadius: '50%',
-          filter: 'blur(120px)',
-          pointerEvents: 'none',
-          zIndex: 0,
-        }}
-      />
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
         <div
@@ -80,7 +51,7 @@ export default function AffiliateSection() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            style={{ padding: '56px 56px 56px 64px' }}
+            style={{ padding: '40px 40px 40px 48px' }}
           >
             <p
               style={{
@@ -210,7 +181,7 @@ export default function AffiliateSection() {
               display: 'flex',
               flexDirection: 'column',
               gap: '24px',
-              padding: '56px 64px 56px 40px',
+              padding: '40px 48px 40px 32px',
               background: 'var(--color-muted)',
               borderLeft: '1px solid var(--color-border)',
             }}
