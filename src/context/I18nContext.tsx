@@ -30,7 +30,7 @@ const translations: Record<Lang, Record<string, string>> = {
     'nav.faq': 'FAQ',
     
     // Landing Hero
-    'hero.badge': '🎯 AI Job Hunter Otomatis Pertama di Dunia',
+    'hero.badge': '🎯 AI Job Hunter Pertama di Dunia',
     'hero.title1': 'Sekali Setup',
     'hero.title2': '2.000+ Lamaran. 0% Ribet',
     'hero.subtitle': 'AI kami menganalisis profil Anda dan mengirimkan lamaran ke ribuan perusahaan secara otomatis. Hemat 3+ jam per hari dan fokus pada interview yang penting.',
@@ -255,7 +255,8 @@ const translations: Record<Lang, Record<string, string>> = {
     'pricing.feat.tracking': 'Job Tracking System',
     'pricing.feat.telegram': 'Telegram Bot Notification',
     'pricing.feat.all_pro': 'Semua fitur di paket Pro',
-    'pricing.feat.token': '3x token LinkedIn Auto Apply',
+    'pricing.feat.token_linkedin': '1x token LinkedIn Auto Apply',
+    'pricing.feat.token_career': '2x token Kelas Career Booster',
     'pricing.feat.cv': 'Kelas CV Booster + Template',
     'pricing.feat.portfolio': 'Kelas Portfolio Booster',
     'pricing.feat.support': 'Priority Support 24/7',
@@ -561,7 +562,8 @@ const translations: Record<Lang, Record<string, string>> = {
     'pricing.feat.tracking': 'Job Tracking System',
     'pricing.feat.telegram': 'Telegram Bot Notification',
     'pricing.feat.all_pro': 'All Pro features',
-    'pricing.feat.token': '3x LinkedIn Auto Apply tokens',
+    'pricing.feat.token_linkedin': '1x LinkedIn Auto Apply token',
+    'pricing.feat.token_career': '2x Career Booster Class tokens',
     'pricing.feat.cv': 'CV Booster Class + Template',
     'pricing.feat.portfolio': 'Portfolio Booster Class',
     'pricing.feat.support': '24/7 Priority Support',

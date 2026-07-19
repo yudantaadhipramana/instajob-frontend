@@ -35,7 +35,8 @@ export default function PricingSection() {
       description: t('pricing.plan.premium.desc'),
       features: [
         t('pricing.feat.all_pro'),
-        t('pricing.feat.token'),
+        t('pricing.feat.token_linkedin'),
+        t('pricing.feat.token_career'),
         t('pricing.feat.cv'),
         t('pricing.feat.portfolio'),
         t('pricing.feat.support'),
@@ -69,7 +70,8 @@ export default function PricingSection() {
       description: t('pricing.plan.premium.desc'),
       features: [
         t('pricing.feat.all_pro'),
-        t('pricing.feat.token'),
+        t('pricing.feat.token_linkedin'),
+        t('pricing.feat.token_career'),
         t('pricing.feat.cv'),
         t('pricing.feat.portfolio'),
         t('pricing.feat.support'),
