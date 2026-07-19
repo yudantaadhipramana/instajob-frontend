@@ -121,7 +121,7 @@ export default function SubscriptionPage() {
       </header>
 
       {/* Main — fill remaining height, no scroll */}
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '24px 48px 28px', minHeight: 0 }}>
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '16px 48px 24px', minHeight: 0 }}>
         {/* Page Title */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
@@ -279,32 +279,48 @@ export default function SubscriptionPage() {
                 </p>
               </div>
 
-              {/* Price */}
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                <span style={{
-                  fontSize: '36px',
-                  fontWeight: '800',
-                  color: plan.highlighted ? '#fff' : 'var(--color-primary)',
-                  fontFamily: 'var(--font-heading)',
-                  lineHeight: 1,
-                }}>
-                  Rp {plan.price.toLocaleString('id-ID')}
-                </span>
-                <span style={{
-                  fontSize: '13px',
-                  color: plan.highlighted ? 'rgba(255,255,255,0.6)' : '#94A3B8',
-                  fontFamily: 'var(--font-body)',
-                }}>
-                  {plan.period}
-                </span>
-                <span style={{
-                  fontSize: '12px',
-                  color: plan.highlighted ? 'rgba(255,255,255,0.4)' : '#CBD5E1',
-                  textDecoration: 'line-through',
-                  fontFamily: 'var(--font-body)',
-                }}>
-                  Rp {plan.originalPrice.toLocaleString('id-ID')}
-                </span>
+              {/* Price — anchoring: coret dulu, harga aktif di bawah */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{
+                    fontSize: '13px',
+                    color: plan.highlighted ? 'rgba(255,255,255,0.5)' : '#CBD5E1',
+                    textDecoration: 'line-through',
+                    fontFamily: 'var(--font-body)',
+                    fontWeight: '600',
+                  }}>
+                    Rp {plan.originalPrice.toLocaleString('id-ID')}
+                  </span>
+                  <span style={{
+                    fontSize: '11px',
+                    background: plan.highlighted ? 'rgba(255,255,255,0.15)' : 'rgba(16,185,129,0.12)',
+                    color: plan.highlighted ? '#fff' : '#059669',
+                    padding: '2px 8px',
+                    borderRadius: '4px',
+                    fontWeight: '700',
+                    fontFamily: 'var(--font-body)',
+                  }}>
+                    Hemat {Math.round((1 - plan.price / plan.originalPrice) * 100)}%
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                  <span style={{
+                    fontSize: '36px',
+                    fontWeight: '800',
+                    color: plan.highlighted ? '#fff' : 'var(--color-primary)',
+                    fontFamily: 'var(--font-heading)',
+                    lineHeight: 1,
+                  }}>
+                    Rp {plan.price.toLocaleString('id-ID')}
+                  </span>
+                  <span style={{
+                    fontSize: '13px',
+                    color: plan.highlighted ? 'rgba(255,255,255,0.6)' : '#94A3B8',
+                    fontFamily: 'var(--font-body)',
+                  }}>
+                    {plan.period}
+                  </span>
+                </div>
               </div>
 
               {/* Features */}
