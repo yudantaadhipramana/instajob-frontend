@@ -99,8 +99,8 @@ export default function SubscriptionPage() {
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: '#F8FAFC', overflow: 'hidden' }}>
       {/* Header */}
       <header style={{
-        padding: '0 40px',
-        height: '60px',
+        padding: '0 48px',
+        height: '64px',
         flexShrink: 0,
         display: 'flex',
         alignItems: 'center',
@@ -112,46 +112,46 @@ export default function SubscriptionPage() {
         top: 0,
         zIndex: 100,
       }}>
-        <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-primary)', fontWeight: '600', fontSize: '13px', textDecoration: 'none' }}>
-          <ArrowLeft size={15} />
+        <Link href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-primary)', fontWeight: '600', fontSize: '14px', textDecoration: 'none' }}>
+          <ArrowLeft size={16} />
           {t('nav.dashboard')}
         </Link>
-        <Logo size={28} showText={true} />
+        <Logo size={32} showText={true} />
         <ProfileDropdown />
       </header>
 
       {/* Main — fill remaining height, no scroll */}
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '16px 40px 20px', minHeight: 0 }}>
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '24px 48px 28px', minHeight: 0 }}>
         {/* Page Title */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          style={{ textAlign: 'center', marginBottom: '16px' }}
+          style={{ textAlign: 'center', marginBottom: '20px' }}
         >
           <p style={{
-            fontSize: '11px',
+            fontSize: '12px',
             fontWeight: '700',
             textTransform: 'uppercase',
             letterSpacing: '0.12em',
             color: 'var(--color-primary)',
-            margin: '0 0 6px',
+            margin: '0 0 8px',
             fontFamily: 'var(--font-heading)',
           }}>
             {t('pricing.badge')}
           </p>
           <h1 style={{
-            fontSize: '26px',
+            fontSize: '32px',
             fontWeight: '800',
             color: 'var(--color-foreground)',
-            margin: '0 0 6px',
+            margin: '0 0 8px',
             fontFamily: 'var(--font-heading)',
             letterSpacing: '-0.02em',
           }}>
             {t('pricing.page.title')}
           </h1>
           <p style={{
-            fontSize: '14px',
+            fontSize: '15px',
             color: '#64748B',
             margin: 0,
             fontFamily: 'var(--font-body)',
@@ -161,12 +161,12 @@ export default function SubscriptionPage() {
         </motion.div>
 
         {/* Billing Toggle */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
           <div style={{
             display: 'inline-flex',
             background: '#F1F5F9',
-            borderRadius: '10px',
-            padding: '4px',
+            borderRadius: '12px',
+            padding: '5px',
             gap: '4px',
             border: '1px solid var(--color-border)',
           }}>
@@ -175,20 +175,20 @@ export default function SubscriptionPage() {
                 key={period}
                 onClick={() => setBillingPeriod(period)}
                 style={{
-                  padding: '7px 20px',
-                  borderRadius: '7px',
+                  padding: '9px 28px',
+                  borderRadius: '9px',
                   border: 'none',
                   cursor: 'pointer',
-                  fontSize: '13px',
+                  fontSize: '14px',
                   fontWeight: '700',
                   fontFamily: 'var(--font-body)',
                   background: billingPeriod === period ? '#fff' : 'transparent',
                   color: billingPeriod === period ? 'var(--color-primary)' : '#64748B',
-                  boxShadow: billingPeriod === period ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
+                  boxShadow: billingPeriod === period ? '0 2px 8px rgba(0,0,0,0.1)' : 'none',
                   transition: 'all 0.2s ease',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
+                  gap: '8px',
                 }}
               >
                 {period === 'monthly' ? t('pricing.toggle.monthly') : t('pricing.toggle.quarterly')}
@@ -196,10 +196,10 @@ export default function SubscriptionPage() {
                   <span style={{
                     background: 'linear-gradient(135deg, #10B981, #059669)',
                     color: '#fff',
-                    fontSize: '10px',
+                    fontSize: '11px',
                     fontWeight: '700',
-                    padding: '1px 6px',
-                    borderRadius: '4px',
+                    padding: '2px 8px',
+                    borderRadius: '5px',
                   }}>
                     {t('pricing.toggle.save')}
                   </span>
@@ -213,8 +213,8 @@ export default function SubscriptionPage() {
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
-          gap: '16px',
-          maxWidth: '760px',
+          gap: '24px',
+          maxWidth: '920px',
           margin: '0 auto',
           width: '100%',
         }}>
@@ -229,28 +229,28 @@ export default function SubscriptionPage() {
                 background: plan.highlighted
                   ? 'linear-gradient(135deg, #1E3A8A 0%, #1E40FF 55%, #3B82F6 100%)'
                   : '#FFFFFF',
-                borderRadius: '16px',
+                borderRadius: '20px',
                 border: plan.highlighted ? 'none' : '1.5px solid var(--color-border)',
-                padding: '20px 22px',
+                padding: '28px 32px',
                 boxShadow: plan.highlighted
-                  ? '0 12px 40px rgba(30,64,255,0.25)'
-                  : '0 2px 12px rgba(15,23,42,0.05)',
+                  ? '0 16px 48px rgba(30,64,255,0.28)'
+                  : '0 4px 16px rgba(15,23,42,0.06)',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '12px',
+                gap: '14px',
               }}
             >
               {plan.highlighted && (
                 <div style={{
                   position: 'absolute',
                   top: '-1px',
-                  right: '18px',
+                  right: '24px',
                   background: 'var(--color-accent)',
                   color: '#fff',
-                  fontSize: '10px',
+                  fontSize: '11px',
                   fontWeight: '700',
-                  padding: '4px 10px',
-                  borderRadius: '0 0 8px 8px',
+                  padding: '5px 14px',
+                  borderRadius: '0 0 10px 10px',
                   fontFamily: 'var(--font-body)',
                   letterSpacing: '0.05em',
                 }}>
@@ -261,16 +261,16 @@ export default function SubscriptionPage() {
               {/* Plan name + desc */}
               <div>
                 <h3 style={{
-                  fontSize: '18px',
+                  fontSize: '22px',
                   fontWeight: '800',
                   color: plan.highlighted ? '#fff' : 'var(--color-foreground)',
-                  margin: '0 0 3px',
+                  margin: '0 0 4px',
                   fontFamily: 'var(--font-heading)',
                 }}>
                   {plan.name}
                 </h3>
                 <p style={{
-                  fontSize: '12px',
+                  fontSize: '13px',
                   color: plan.highlighted ? 'rgba(255,255,255,0.7)' : '#64748B',
                   margin: 0,
                   fontFamily: 'var(--font-body)',
@@ -280,9 +280,9 @@ export default function SubscriptionPage() {
               </div>
 
               {/* Price */}
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
                 <span style={{
-                  fontSize: '28px',
+                  fontSize: '36px',
                   fontWeight: '800',
                   color: plan.highlighted ? '#fff' : 'var(--color-primary)',
                   fontFamily: 'var(--font-heading)',
@@ -291,15 +291,15 @@ export default function SubscriptionPage() {
                   Rp {plan.price.toLocaleString('id-ID')}
                 </span>
                 <span style={{
-                  fontSize: '12px',
+                  fontSize: '13px',
                   color: plan.highlighted ? 'rgba(255,255,255,0.6)' : '#94A3B8',
                   fontFamily: 'var(--font-body)',
                 }}>
                   {plan.period}
                 </span>
                 <span style={{
-                  fontSize: '11px',
-                  color: plan.highlighted ? 'rgba(255,255,255,0.45)' : '#CBD5E1',
+                  fontSize: '12px',
+                  color: plan.highlighted ? 'rgba(255,255,255,0.4)' : '#CBD5E1',
                   textDecoration: 'line-through',
                   fontFamily: 'var(--font-body)',
                 }}>
@@ -308,12 +308,12 @@ export default function SubscriptionPage() {
               </div>
 
               {/* Features */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', flex: 1 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '9px', flex: 1 }}>
                 {plan.features.map((feature, idx) => (
-                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    {Icons.check(13, plan.highlighted ? '#fff' : 'var(--color-accent)')}
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {Icons.check(14, plan.highlighted ? '#fff' : 'var(--color-accent)')}
                     <span style={{
-                      fontSize: '12px',
+                      fontSize: '13px',
                       color: plan.highlighted ? 'rgba(255,255,255,0.88)' : 'var(--color-foreground)',
                       fontFamily: 'var(--font-body)',
                       fontWeight: '600',
@@ -329,13 +329,13 @@ export default function SubscriptionPage() {
                 onClick={() => handleSelectPlan(plan.key)}
                 style={{
                   width: '100%',
-                  padding: '11px',
+                  padding: '14px',
                   background: plan.highlighted ? '#fff' : 'var(--color-primary)',
                   color: plan.highlighted ? 'var(--color-primary)' : '#fff',
                   border: 'none',
-                  borderRadius: '10px',
+                  borderRadius: '12px',
                   fontWeight: '700',
-                  fontSize: '13px',
+                  fontSize: '14px',
                   cursor: 'pointer',
                   fontFamily: 'var(--font-body)',
                   transition: 'all 0.2s ease',
@@ -357,7 +357,7 @@ export default function SubscriptionPage() {
         </div>
 
         {/* Trust badges */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '14px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', marginTop: '20px' }}>
           {[
             { icon: '🔒', text: t('cta.trust1') },
             { icon: '⚡', text: t('cta.trust2') },
