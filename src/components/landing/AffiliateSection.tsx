@@ -18,7 +18,7 @@ export default function AffiliateSection() {
       }}
     >
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 1, padding: '0 4px' }}>
         <div
           style={{
             position: 'relative',
@@ -32,6 +32,7 @@ export default function AffiliateSection() {
             boxShadow: '0 20px 60px rgba(15, 23, 42, 0.06)',
             overflow: 'hidden',
           }}
+          className="affiliate-card-inner"
         >
           {/* Left accent strip */}
           <div
@@ -51,6 +52,7 @@ export default function AffiliateSection() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
+            className="affiliate-left-panel"
             style={{ padding: '40px 40px 40px 48px' }}
           >
             <p
@@ -177,6 +179,7 @@ export default function AffiliateSection() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
+            className="affiliate-right-panel"
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -356,19 +359,7 @@ export default function AffiliateSection() {
 
       <style jsx>{`
         @media (max-width: 768px) {
-          section {
-            padding: 60px 24px;
-          }
-          div:nth-child(1) > div:nth-child(3) {
-            grid-template-columns: 1fr;
-            gap: 40px;
-          }
-          h2 {
-            font-size: 32px;
-          }
-          p {
-            font-size: 16px;
-          }
+          section { padding: 48px 16px; }
         }
       `}</style>
     </section>

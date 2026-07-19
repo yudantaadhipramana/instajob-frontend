@@ -106,6 +106,7 @@ export default function TestimonialsSection() {
               {t('testimonials.badge')}
             </p>
             <h2
+              className="section-h2"
               style={{
                 fontSize: '40px',
                 fontWeight: '800',
@@ -116,6 +117,7 @@ export default function TestimonialsSection() {
               {t('testimonials.title')}
             </h2>
             <p
+              className="section-subtitle"
               style={{
                 fontSize: '18px',
                 color: '#64748B',
@@ -131,6 +133,7 @@ export default function TestimonialsSection() {
         {/* Category Tabs */}
         <ScrollAnimation delay={100}>
           <div
+            className="testimonials-tabs"
             style={{
               display: 'flex',
               justifyContent: 'center',

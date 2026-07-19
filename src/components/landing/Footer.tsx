@@ -20,6 +20,7 @@ export default function Footer() {
         <ScrollAnimation delay={0}>
           {/* Footer Content */}
           <div
+            className="footer-grid"
             style={{
               display: 'grid',
               gridTemplateColumns: '2.2fr 1fr 1fr 1fr',
@@ -299,17 +300,7 @@ export default function Footer() {
         </ScrollAnimation>
       </div>
 
-      <style jsx>{`
-        @media (max-width: 768px) {
-          footer {
-            padding: 56px 24px 24px;
-          }
-          div > div:first-child {
-            grid-template-columns: 1fr !important;
-            gap: 40px !important;
-          }
-        }
-      `}</style>
+
     </footer>
   );
 }

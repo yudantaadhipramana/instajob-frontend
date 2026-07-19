@@ -39,6 +39,7 @@ export default function FAQSection() {
   return (
     <section
       id="faq"
+      className="faq-section"
       style={{
         padding: '100px 48px',
         background: 'var(--color-background)',
@@ -65,6 +66,7 @@ export default function FAQSection() {
             FAQ
           </p>
           <h2
+            className="section-h2"
             style={{
               fontSize: '40px',
               fontWeight: '800',
@@ -76,6 +78,7 @@ export default function FAQSection() {
             {t('faq.title')}
           </h2>
           <p
+            className="section-subtitle"
             style={{
               fontSize: '18px',
               color: '#64748B',
