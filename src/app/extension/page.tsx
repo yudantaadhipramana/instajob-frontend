@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Logo } from '@/components/Logo';
 import { HomeIcon, JobsIcon, ApplicationsIcon } from '@/components/DashboardIcons';
-import { Settings } from 'lucide-react';
+import { Settings, Puzzle } from 'lucide-react';
 import ProfileDropdown from '@/components/ProfileDropdown';
 
 interface User { id: string; email: string; fullName: string; }
@@ -58,6 +58,7 @@ export default function ExtensionPage() {
               { href: '/jobs', icon: <JobsIcon size={16} color="currentColor" />, label: 'Browse Jobs' },
               { href: '/applications', icon: <ApplicationsIcon size={16} color="currentColor" />, label: 'Applications' },
               { href: '/preferences', icon: <Settings size={16} />, label: 'Preferences' },
+              { href: '/add-ons', icon: <Puzzle size={16} />, label: 'Add-ons' },
             ].map(item => (
               <Link key={item.href} href={item.href} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', borderRadius: '8px', color: '#64748B', textDecoration: 'none', fontSize: '14px', fontWeight: '600' }}>
                 {item.icon}{item.label}

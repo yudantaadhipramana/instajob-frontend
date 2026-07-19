@@ -3,7 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Save, Loader, CheckCircle, AlertCircle, MapPin, Briefcase, DollarSign, Clock, Bell, Link2, Filter, X } from 'lucide-react';
+import { ArrowLeft, Save, Loader, CheckCircle, AlertCircle, MapPin, Briefcase, DollarSign, Clock, Bell, Link2, Filter, X, Settings, Puzzle, Home } from 'lucide-react';
+import { Logo } from '@/components/Logo';
+import { JobsIcon, ApplicationsIcon } from '@/components/DashboardIcons';
+import ProfileDropdown from '@/components/ProfileDropdown';
 
 interface PreferencesData {
   jobTitles: string[];
@@ -230,6 +233,26 @@ export default function PreferencesPage() {
         pointerEvents: 'none',
         zIndex: 0,
       }} />
+
+      {/* Nav Bar — same as extension */}
+      <nav style={{ background: '#fff', borderBottom: '1px solid #E2E8F0', padding: '0 32px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
+          <Logo size={36} showText={true} />
+          <div style={{ display: 'flex', gap: '4px' }}>
+            {[
+              { href: '/dashboard', icon: <Home size={16} />, label: 'Dashboard' },
+              { href: '/jobs', icon: <JobsIcon size={16} color="currentColor" />, label: 'Browse Jobs' },
+              { href: '/applications', icon: <ApplicationsIcon size={16} color="currentColor" />, label: 'Applications' },
+              { href: '/preferences', icon: <Settings size={16} />, label: 'Preferences' },
+              { href: '/add-ons', icon: <Puzzle size={16} />, label: 'Add-ons' },
+            ].map(item => (
+              <Link key={item.href} href={item.href} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', borderRadius: '8px', color: item.href === '/preferences' ? '#1E40FF' : '#64748B', textDecoration: 'none', fontSize: '14px', fontWeight: item.href === '/preferences' ? '700' : '600', background: item.href === '/preferences' ? 'rgba(30,64,255,0.06)' : 'transparent' }}>
+                {item.icon}{item.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </nav>
 
       {/* Main Content */}
       <div style={{

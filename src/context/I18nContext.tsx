@@ -260,6 +260,8 @@ const translations: Record<Lang, Record<string, string>> = {
     'pricing.feat.cv': 'Kelas CV Booster + Template',
     'pricing.feat.portfolio': 'Kelas Portfolio Booster',
     'pricing.feat.support': 'Priority Support 24/7',
+    'pricing.page.title': 'Pilih Paket Terbaik Untuk Anda',
+    'pricing.page.subtitle': 'Investasi terbaik untuk karir impianmu. Mulai dari Rp 6.000/hari, tanpa kartu kredit.',
     'pricing.cta.start': 'Mulai Sekarang',
     'pricing.cta.premium': 'Mulai Premium',
     'pricing.badge.popular': 'POPULER',
@@ -569,6 +571,8 @@ const translations: Record<Lang, Record<string, string>> = {
     'pricing.feat.support': '24/7 Priority Support',
     'pricing.cta.start': 'Start Now',
     'pricing.cta.premium': 'Start Premium',
+    'pricing.page.title': 'Choose the Best Plan for You',
+    'pricing.page.subtitle': 'Best investment for your dream career. Starting from Rp 6,000/day, no credit card required.',
     'pricing.badge.popular': 'POPULAR',
     
     // Affiliate
