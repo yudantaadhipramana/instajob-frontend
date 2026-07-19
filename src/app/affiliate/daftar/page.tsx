@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
 import { z } from 'zod';
+import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator';
 
 const InstagramSVG = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
@@ -234,6 +235,9 @@ export default function AffiliateDaftarPage() {
                         style={fieldStyle(errors.password)}
                         onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
                         onBlur={e => e.target.style.borderColor = errors.password ? '#FECACA' : 'rgba(0,0,0,0.1)'} />
+                      {form.password.length > 0 && (
+                        <PasswordStrengthIndicator password={form.password} />
+                      )}
                     </div>
                     {errors.password && <span style={{ fontSize: '13px', color: '#DC2626', fontFamily: 'var(--font-body)' }}>{errors.password}</span>}
                   </div>

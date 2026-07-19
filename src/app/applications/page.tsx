@@ -26,10 +26,20 @@ interface User {
   fullName: string;
 }
 
+interface DashboardStats {
+  totalJobs: number;
+  appliedToday: number;
+  sent: number;
+  replied: number;
+  pendingApplications?: number;
+  acceptedApplications?: number;
+}
+
 export default function ApplicationsPage() {
   const router = useRouter();
   const [applications, setApplications] = useState<Application[]>([]);
   const [filteredApplications, setFilteredApplications] = useState<Application[]>([]);
+  const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -51,16 +61,27 @@ export default function ApplicationsPage() {
 
       try {
         const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
-        const response = await fetch(`${apiBase}/api/applications`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
+        
+        // Fetch applications + stats parallel
+        const [appsRes, statsRes] = await Promise.all([
+          fetch(`${apiBase}/api/applications`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }),
+          fetch(`${apiBase}/api/dashboard/stats`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          })
+        ]);
 
-        if (response.ok) {
-          const data = await response.json();
+        if (appsRes.ok) {
+          const data = await appsRes.json();
           const raw = data.applications || data;
           // Map nested job relation to flat fields expected by UI
           const appsList = raw.map((a: any) => ({
@@ -73,6 +94,11 @@ export default function ApplicationsPage() {
           setFilteredApplications(appsList);
         } else {
           setError('Failed to load applications');
+        }
+
+        if (statsRes.ok) {
+          const stats = await statsRes.json();
+          setDashboardStats(stats);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load applications');
@@ -355,11 +381,11 @@ export default function ApplicationsPage() {
           gap: '16px',
           marginBottom: '32px',
         }}>
-          {[
-            { label: 'Total', value: stats.total, color: '#0051FF' },
-            { label: 'Pending', value: stats.pending, color: '#F59E0B' },
-            { label: 'Accepted', value: stats.accepted, color: '#10B981' },
-            { label: 'Rejected', value: stats.rejected, color: '#EF4444' },
+          {dashboardStats ? [
+            { label: 'Available Jobs', value: dashboardStats.totalJobs, color: '#0051FF' },
+            { label: 'Applied Today', value: dashboardStats.appliedToday, color: '#10B981' },
+            { label: 'Sent', value: dashboardStats.sent || dashboardStats.pendingApplications || 0, color: '#F59E0B' },
+            { label: 'Reply', value: dashboardStats.replied || dashboardStats.acceptedApplications || 0, color: '#7C3AED' },
           ].map((stat) => (
             <div key={stat.label} style={{
               background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 100%)',
@@ -387,7 +413,7 @@ export default function ApplicationsPage() {
                 {stat.value}
               </p>
             </div>
-          ))}
+          )) : null}
         </div>
 
         {/* Filter & Search Section */}

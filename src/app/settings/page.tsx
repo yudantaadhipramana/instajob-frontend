@@ -697,7 +697,10 @@ export default function SettingsPage() {
                 <Save size={16} />
                 Save Changes
               </>
-            )}\n          </button>\n          </div>\n        </div>
+            )}
+          </button>
+          </div>
+        </div>
 
         {/* Telegram Account Linking */}
         <div style={{

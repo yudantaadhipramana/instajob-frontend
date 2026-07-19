@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Logo } from '@/components/Logo';
+import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator';
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -72,6 +73,9 @@ function ResetPasswordForm() {
                 placeholder="Minimal 6 karakter"
                 style={{ width: '100%', padding: '10px 12px', fontSize: '14px', border: '1px solid #CBD5E1', borderRadius: '8px', boxSizing: 'border-box', fontFamily: 'inherit' }}
               />
+              {password.length > 0 && (
+                <PasswordStrengthIndicator password={password} />
+              )}
             </div>
             <div style={{ marginBottom: '24px' }}>
               <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: '#334155', marginBottom: '6px' }}>Konfirmasi Password</label>

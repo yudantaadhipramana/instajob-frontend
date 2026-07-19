@@ -18,8 +18,8 @@ interface DashboardStats {
   totalJobs: number;
   totalApplied: number;
   appliedToday: number;
-  pendingApplications: number;
-  acceptedApplications: number;
+  pendingApplications: number; // ponytail: rename to sent when backend field added
+  acceptedApplications: number; // ponytail: rename to replied when backend field added
   recentApplications: any[];
 }
 
@@ -476,7 +476,7 @@ export default function DashboardPage() {
                       letterSpacing: '0.08em',
                       marginBottom: '8px'
                     }}>
-                      Pending Review
+                      Sent
                     </div>
                     <div style={{ fontSize: '42px', fontWeight: '900', color: '#F59E0B', margin: 0 }}>
                       {stats.pendingApplications}
@@ -528,7 +528,7 @@ export default function DashboardPage() {
                       letterSpacing: '0.08em',
                       marginBottom: '8px'
                     }}>
-                      Accepted
+                      Reply
                     </div>
                     <div style={{ fontSize: '42px', fontWeight: '900', color: '#7C3AED', margin: 0 }}>
                       {stats.acceptedApplications}
@@ -578,7 +578,7 @@ export default function DashboardPage() {
                   ⚡ Otomasi Lamaran Instan
                 </h2>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                  <Link href="/jobs" style={{
+                  <Link href="/auto-apply" style={{
                     display: 'block',
                     padding: '24px',
                     background: 'rgba(0, 81, 255, 0.03)',
@@ -603,14 +603,14 @@ export default function DashboardPage() {
                       <SearchIcon size={32} color="#0051ff" />
                     </div>
                     <div style={{ fontWeight: '700', color: '#0F172A', marginBottom: '6px', fontSize: '15px' }}>
-                      Cari Pekerjaan
+                      Mail Auto Apply
                     </div>
                     <div style={{ fontSize: '13px', color: '#64748B', lineHeight: '1.5' }}>
-                      Filter & temukan pekerjaan yang relevan
+                      Otomatis lamar via email Gmail
                     </div>
                   </Link>
 
-                  <Link href="/auto-apply" style={{
+                  <Link href="/extension" style={{
                     display: 'block',
                     padding: '24px',
                     background: 'rgba(0, 81, 255, 0.03)',
@@ -635,10 +635,10 @@ export default function DashboardPage() {
                       <MonitorIcon size={32} color="#0051ff" />
                     </div>
                     <div style={{ fontWeight: '700', color: '#0F172A', marginBottom: '6px', fontSize: '15px' }}>
-                      Monitor AI Agent
+                      Web Auto Apply
                     </div>
                     <div style={{ fontSize: '13px', color: '#64748B', lineHeight: '1.5' }}>
-                      Pantau log & status lamaran AI
+                      Otomatis lamar via extension browser
                     </div>
                   </Link>
                 </div>

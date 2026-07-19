@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import Link from 'next/link';
 import { Logo } from '@/components/Logo';
+import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -16,10 +17,29 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  
+  // Password strength validation
+  const [passwordStrength, setPasswordStrength] = useState({
+    minLength: false,
+    hasUppercase: false,
+    hasLowercase: false,
+    hasNumber: false,
+    hasSpecialChar: false,
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const validatePassword = (password: string) => {
+    setPasswordStrength({
+      minLength: password.length >= 8,
+      hasUppercase: /[A-Z]/.test(password),
+      hasLowercase: /[a-z]/.test(password),
+      hasNumber: /[0-9]/.test(password),
+      hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+    });
   };
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -286,7 +306,10 @@ export default function RegisterPage() {
                 type="password"
                 name="password"
                 value={formData.password}
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  handleInputChange(e);
+                  validatePassword(e.target.value);
+                }}
                 required
                 className="register-input"
                 style={{
@@ -299,6 +322,9 @@ export default function RegisterPage() {
                   fontFamily: 'inherit',
                 }}
               />
+              {formData.password.length > 0 && (
+                <PasswordStrengthIndicator password={formData.password} />
+              )}
             </div>
 
             {/* Confirm Password */}

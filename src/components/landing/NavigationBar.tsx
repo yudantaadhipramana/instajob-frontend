@@ -3,20 +3,31 @@
 import { useI18n } from '@/context/I18nContext';
 import { Logo } from './Logo';
 import { useState, useCallback, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 export default function NavigationBar() {
   const { t, lang, setLang } = useI18n();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+  const isAffiliatePage = pathname?.startsWith('/affiliate');
+
+  useEffect(() => {
+    setIsLoggedIn(!!localStorage.getItem('instajob_token'));
+  }, []);
 
   const handleLogin = useCallback(() => {
-    router.push('/login');
-  }, [router]);
+    router.push(isAffiliatePage ? '/affiliate/login' : '/login');
+  }, [router, isAffiliatePage]);
 
   const handleRegister = useCallback(() => {
-    router.push('/register');
+    router.push(isAffiliatePage ? '/affiliate/daftar' : '/register');
+  }, [router, isAffiliatePage]);
+
+  const handleDashboard = useCallback(() => {
+    router.push('/dashboard');
   }, [router]);
 
   const scrollToSection = (id: string) => {
@@ -170,39 +181,60 @@ export default function NavigationBar() {
           </button>
         </div>
 
-        {/* Auth Buttons */}
-        <button
-          onClick={handleLogin}
-          style={{
-            padding: '10px 24px',
-            background: 'transparent',
-            color: 'var(--color-primary)',
-            border: '1px solid var(--color-primary)',
-            borderRadius: '8px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            transition: '0.2s',
-            fontFamily: 'var(--font-body)',
-          }}
-        >
-          {t('nav.login')}
-        </button>
-        <button
-          onClick={handleRegister}
-          style={{
-            padding: '10px 24px',
-            background: 'var(--color-primary)',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '8px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            transition: '0.2s',
-            fontFamily: 'var(--font-body)',
-          }}
-        >
-          {t('nav.signup')}
-        </button>
+        {/* Auth Buttons / Dashboard */}
+        {isLoggedIn ? (
+          <button
+            onClick={handleDashboard}
+            style={{
+              padding: '10px 24px',
+              background: 'var(--color-primary)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '8px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: '0.2s',
+              fontFamily: 'var(--font-body)',
+            }}
+          >
+            Dashboard
+          </button>
+        ) : (
+          <>
+            <button
+              onClick={handleLogin}
+              style={{
+                padding: '10px 24px',
+                background: 'transparent',
+                color: 'var(--color-primary)',
+                border: '1px solid var(--color-primary)',
+                borderRadius: '8px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: '0.2s',
+                fontFamily: 'var(--font-body)',
+              }}
+            >
+              {t('nav.login')}
+            </button>
+            <button
+              onClick={handleRegister}
+              style={{
+                padding: '10px 24px',
+                background: 'var(--color-primary)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '8px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: '0.2s',
+                fontFamily: 'var(--font-body)',
+              }}
+            >
+              {t('nav.signup')}
+            </button>
+          </>
+        )}
       </div>
 
       {/* Mobile Menu Button */}
@@ -269,39 +301,61 @@ export default function NavigationBar() {
               </button>
             );
           })}
-          <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
-            <button
-              onClick={handleLogin}
-              style={{
-                flex: 1,
-                padding: '12px 16px',
-                background: 'transparent',
-                color: 'var(--color-primary)',
-                border: '1px solid var(--color-primary)',
-                borderRadius: '8px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                fontFamily: 'var(--font-body)',
-              }}
-            >
-              {t('nav.login')}
-            </button>
-            <button
-              onClick={handleRegister}
-              style={{
-                flex: 1,
-                padding: '12px 16px',
-                background: 'var(--color-primary)',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '8px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                fontFamily: 'var(--font-body)',
-              }}
-            >
-              {t('nav.signup')}
-            </button>
+          {/* Auth Buttons / Dashboard Mobile */}
+          <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+            {isLoggedIn ? (
+              <button
+                onClick={handleDashboard}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  background: 'var(--color-primary)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  fontFamily: 'var(--font-body)',
+                }}
+              >
+                Dashboard
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={handleLogin}
+                  style={{
+                    flex: 1,
+                    padding: '12px 16px',
+                    background: 'transparent',
+                    color: 'var(--color-primary)',
+                    border: '1px solid var(--color-primary)',
+                    borderRadius: '8px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    fontFamily: 'var(--font-body)',
+                  }}
+                >
+                  {t('nav.login')}
+                </button>
+                <button
+                  onClick={handleRegister}
+                  style={{
+                    flex: 1,
+                    padding: '12px 16px',
+                    background: 'var(--color-primary)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    fontFamily: 'var(--font-body)',
+                  }}
+                >
+                  {t('nav.signup')}
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}

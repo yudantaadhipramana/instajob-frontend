@@ -156,7 +156,7 @@ export default function LoginPage() {
           </div>
 
           {/* Google OAuth */}
-          <div style={{ marginBottom: '24px' }}>
+          <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'center' }}>
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
               onError={() => setError('Google login failed')}

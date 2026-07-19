@@ -76,7 +76,7 @@ export default function SubscriptionPage() {
     },
     {
       id: 'monthly',
-      name: 'Monthly',
+      name: 'Pro',
       price: 179000,
       originalPrice: 279000,
       period: 'per month',
@@ -88,28 +88,23 @@ export default function SubscriptionPage() {
         'AI Email Auto Apply (unlimited)',
         'AI LinkedIn Auto Apply (unlimited)',
         'Job Tracking System (unlimited)',
-        'Telegram Bot Automation',
-        'Priority Support',
-        'Advanced Analytics'
+        'Telegram Bot Automation'
       ]
     },
     {
-      id: 'quarterly',
-      name: 'Quarterly',
-      price: 650000,
-      originalPrice: 897000,
-      period: 'per 3 months',
-      description: 'Best value',
+      id: 'premium',
+      name: 'Premium',
+      price: 239000,
+      originalPrice: 350000,
+      period: 'per month',
+      description: 'Full automation',
       recommended: false,
       features: [
-        'AI Job Scouting (unlimited)',
-        'AI Job Matching (unlimited)',
-        'AI Email Auto Apply (unlimited)',
-        'AI LinkedIn Auto Apply (unlimited)',
-        'Job Tracking System (unlimited)',
-        'Telegram Bot Automation',
-        'Priority Support',
-        'Advanced Analytics'
+        'All Pro features',
+        'Priority Token Usage',
+        'AI CV Generator',
+        'Portfolio Builder',
+        'Priority Support'
       ]
     }
   ];
