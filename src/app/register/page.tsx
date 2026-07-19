@@ -14,6 +14,7 @@ export default function RegisterPage() {
     email: '',
     password: '',
     confirmPassword: '',
+    referralCode: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -61,6 +62,7 @@ export default function RegisterPage() {
           fullName: formData.fullName,
           email: formData.email,
           password: formData.password,
+          referralCode: formData.referralCode.trim() || undefined,
         }),
       });
 
@@ -178,12 +180,11 @@ export default function RegisterPage() {
           </div>
 
           {/* Google OAuth */}
-          <div style={{ marginBottom: '24px' }}>
+          <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'center' }}>
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
               onError={() => setError('Google login failed')}
               text="signup_with"
-              width="100%"
             />
           </div>
 
@@ -358,6 +359,43 @@ export default function RegisterPage() {
                   fontFamily: 'inherit',
                 }}
               />
+            </div>
+
+            {/* Referral Code (optional) */}
+            <div style={{ marginBottom: '24px' }}>
+              <label
+                className="register-label"
+                style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#334155',
+                  marginBottom: '6px',
+                }}
+              >
+                Kode Referral <span style={{ color: '#94A3B8', fontWeight: '400' }}>(opsional)</span>
+              </label>
+              <input
+                type="text"
+                name="referralCode"
+                value={formData.referralCode}
+                onChange={handleInputChange}
+                placeholder="Contoh: REF_ABC123"
+                className="register-input"
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  fontSize: '14px',
+                  border: '1px solid #CBD5E1',
+                  borderRadius: '8px',
+                  boxSizing: 'border-box',
+                  fontFamily: 'inherit',
+                  textTransform: 'uppercase',
+                }}
+              />
+              <p style={{ fontSize: '12px', color: '#64748B', margin: '6px 0 0 0' }}>
+                Dapatkan 7 hari gratis unlimited apply via Gmail
+              </p>
             </div>
 
             {/* Submit Button */}

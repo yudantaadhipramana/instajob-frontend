@@ -9,6 +9,7 @@ interface ProfileDropdownProps {
     id: string;
     email: string;
     fullName: string;
+    profilePicture?: string;
   };
 }
 
@@ -59,7 +60,7 @@ export default function ProfileDropdown({ user }: ProfileDropdownProps) {
           width: '40px',
           height: '40px',
           borderRadius: '50%',
-          background: getAvatarColor(),
+          background: user?.profilePicture ? 'transparent' : getAvatarColor(),
           color: '#fff',
           border: '2px solid rgba(255, 255, 255, 0.2)',
           cursor: 'pointer',
@@ -70,6 +71,7 @@ export default function ProfileDropdown({ user }: ProfileDropdownProps) {
           fontSize: '14px',
           transition: 'all 0.2s ease',
           boxShadow: 'none',
+          overflow: 'hidden',
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'scale(1.05)';
@@ -81,7 +83,15 @@ export default function ProfileDropdown({ user }: ProfileDropdownProps) {
         }}
         title={user?.fullName}
       >
-        {getInitials()}
+        {user?.profilePicture ? (
+          <img
+            src={user.profilePicture}
+            alt={user.fullName || 'Avatar'}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ) : (
+          getInitials()
+        )}
       </button>
 
       {/* Dropdown Menu - YouTube Style */}

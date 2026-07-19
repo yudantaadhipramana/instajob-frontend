@@ -18,9 +18,13 @@ interface DashboardStats {
   totalJobs: number;
   totalApplied: number;
   appliedToday: number;
-  pendingApplications: number; // ponytail: rename to sent when backend field added
-  acceptedApplications: number; // ponytail: rename to replied when backend field added
+  sent: number;
+  replied: number;
+  // legacy aliases (backend still sends both)
+  pendingApplications?: number;
+  acceptedApplications?: number;
   recentApplications: any[];
+  hasStartedBot?: boolean;
 }
 
 export default function DashboardPage() {
@@ -59,11 +63,11 @@ export default function DashboardPage() {
           setStats(data);
         } else {
           setStats({
-            totalJobs: 100,
-            totalApplied: 12,
-            appliedToday: 3,
-            pendingApplications: 5,
-            acceptedApplications: 2,
+            totalJobs: 0,
+            totalApplied: 0,
+            appliedToday: 0,
+            sent: 0,
+            replied: 0,
             recentApplications: []
           });
         }
@@ -479,7 +483,7 @@ export default function DashboardPage() {
                       Sent
                     </div>
                     <div style={{ fontSize: '42px', fontWeight: '900', color: '#F59E0B', margin: 0 }}>
-                      {stats.pendingApplications}
+                      {stats.sent || 0}
                     </div>
                   </div>
                   <div style={{
@@ -531,7 +535,7 @@ export default function DashboardPage() {
                       Reply
                     </div>
                     <div style={{ fontSize: '42px', fontWeight: '900', color: '#7C3AED', margin: 0 }}>
-                      {stats.acceptedApplications}
+                      {stats.replied || 0}
                     </div>
                   </div>
                   <div style={{
@@ -681,23 +685,23 @@ export default function DashboardPage() {
                     display: 'flex', 
                     alignItems: 'center', 
                     gap: '10px', 
-                    color: '#34D399', 
+                    color: stats.hasStartedBot ? '#34D399' : '#94A3B8',
                     fontSize: '14px', 
                     fontWeight: '700',
                     padding: '8px 12px',
-                    background: 'rgba(52, 211, 153, 0.1)',
+                    background: stats.hasStartedBot ? 'rgba(52, 211, 153, 0.1)' : 'rgba(148, 163, 184, 0.1)',
                     borderRadius: '8px',
                     width: 'fit-content'
                   }}>
                     <span style={{ 
                       width: '8px', 
                       height: '8px', 
-                      background: '#34D399', 
+                      background: stats.hasStartedBot ? '#34D399' : '#94A3B8',
                       borderRadius: '50%',
-                      boxShadow: '0 0 12px rgba(52, 211, 153, 0.6)',
-                      animation: 'pulse 2s ease-in-out infinite'
+                      boxShadow: stats.hasStartedBot ? '0 0 12px rgba(52, 211, 153, 0.6)' : 'none',
+                      animation: stats.hasStartedBot ? 'pulse 2s ease-in-out infinite' : 'none'
                     }}></span>
-                    AI Agent Aktif
+                    {stats.hasStartedBot ? 'AI Agent Aktif' : 'AI Agent Belum Aktif'}
                   </div>
                 </div>
                 
@@ -711,7 +715,7 @@ export default function DashboardPage() {
                   position: 'relative',
                   zIndex: 1,
                 }}>
-                  AI kami memindai <strong>100+ lowongan</strong> baru setiap hari dan siap mencocokkan CV Anda secara otomatis.
+                  AI kami memindai <strong>100+ lowongan</strong> baru setiap hari{stats.hasStartedBot ? ' dan siap mencocokkan CV Anda secara otomatis' : '. Klik Mail Auto Apply untuk memulai'}.
                 </div>
               </div>
             </div>

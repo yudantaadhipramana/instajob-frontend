@@ -191,7 +191,14 @@ export default function ProfilePage() {
         setIsSaving(false);
         return;
       }
-      setUser(formData); setSaveSuccess(true);
+      const updatedUser = { ...formData };
+      setUser(updatedUser);
+      
+      // Sync localStorage so navbar ProfileDropdown reflects new profilePicture immediately
+      const storedUser = JSON.parse(localStorage.getItem('instajob_user') || '{}');
+      localStorage.setItem('instajob_user', JSON.stringify({ ...storedUser, ...updatedUser }));
+      
+      setSaveSuccess(true);
       showToast('Profil berhasil tersimpan! ✓', 'success');
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err: any) {

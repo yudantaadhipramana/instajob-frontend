@@ -421,8 +421,8 @@ export default function SettingsPage() {
             e.currentTarget.style.color = '#64748B';
           }}
         >
-          <ProfileIcon size={18} color="currentColor" />
-          Profile
+          <Settings size={18} color="currentColor" />
+          Preferences
         </Link>
       </div>
 
