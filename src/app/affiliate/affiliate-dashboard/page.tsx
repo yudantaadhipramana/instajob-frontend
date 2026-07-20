@@ -16,6 +16,12 @@ export default function AffiliateDashboardPage() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const memberToken = localStorage.getItem('instajob_token');
+    // Member biasa masuk → redirect ke member-dashboard
+    if (!token && memberToken) {
+      router.push('/affiliate/member-dashboard');
+      return;
+    }
     if (!token) {
       router.push('/affiliate/login');
       return;
@@ -155,10 +161,10 @@ export default function AffiliateDashboardPage() {
   // Badge tier system: Bronze 0, Silver 30, Gold 100, Platinum 250
   const referralCount = data?.referralCount || 0;
   const getCurrentTier = () => {
-    if (referralCount >= 250) return { emoji: '💎', name: 'Platinum', rate: '35%', color: '#E5E4E2', next: null, progress: 100 };
-    if (referralCount >= 100) return { emoji: '🥇', name: 'Gold', rate: '30%', color: '#FFD700', next: 250, progress: ((referralCount - 100) / 150) * 100 };
-    if (referralCount >= 30) return { emoji: '🥈', name: 'Silver', rate: '25%', color: '#C0C0C0', next: 100, progress: ((referralCount - 30) / 70) * 100 };
-    return { emoji: '🥉', name: 'Bronze', rate: '20%', color: '#CD7F32', next: 30, progress: (referralCount / 30) * 100 };
+    if (referralCount >= 250) return { emoji: '💎', name: 'Platinum', rate: '20%', color: '#E5E4E2', next: null, progress: 100 };
+    if (referralCount >= 100) return { emoji: '🥇', name: 'Gold', rate: '16%', color: '#FFD700', next: 250, progress: ((referralCount - 100) / 150) * 100 };
+    if (referralCount >= 30) return { emoji: '🥈', name: 'Silver', rate: '13%', color: '#C0C0C0', next: 100, progress: ((referralCount - 30) / 70) * 100 };
+    return { emoji: '🥉', name: 'Bronze', rate: '10%', color: '#CD7F32', next: 30, progress: (referralCount / 30) * 100 };
   };
 
   const currentTier = getCurrentTier();

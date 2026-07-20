@@ -33,6 +33,12 @@ export default function MemberDashboardPage() {
 
   useEffect(() => {
     const token = localStorage.getItem('instajob_token');
+    const affiliateToken = localStorage.getItem('token');
+    // Affiliate masuk → redirect ke affiliate-dashboard
+    if (!token && affiliateToken) {
+      router.push('/affiliate/affiliate-dashboard');
+      return;
+    }
     const ud = localStorage.getItem('instajob_user');
     if (!token || !ud) { router.push('/login'); return; }
     setUser(JSON.parse(ud));

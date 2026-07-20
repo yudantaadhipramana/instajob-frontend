@@ -257,13 +257,6 @@ export default function ProfileDropdown({ user }: ProfileDropdownProps) {
               <span>Referrals</span>
             </div>
 
-            {/* Divider */}
-            <div style={{
-              height: '1px',
-              background: '#f0f0f0',
-              margin: '8px 0',
-            }}></div>
-
             {/* Settings */}
             <Link
               href="/settings"
@@ -293,13 +286,6 @@ export default function ProfileDropdown({ user }: ProfileDropdownProps) {
               </svg>
               <span>Settings</span>
             </Link>
-
-            {/* Divider */}
-            <div style={{
-              height: '1px',
-              background: '#f0f0f0',
-              margin: '8px 0',
-            }}></div>
 
             {/* Sign Out */}
             <button
