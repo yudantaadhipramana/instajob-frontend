@@ -165,7 +165,7 @@ export default function ProfileDropdown({ user }: ProfileDropdownProps) {
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
-              <span>View profile</span>
+              <span>Profile</span>
             </Link>
 
             {/* Subscriptions */}
@@ -206,12 +206,20 @@ export default function ProfileDropdown({ user }: ProfileDropdownProps) {
               onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-              <span>Penarikan Dana</span>
+              <span>Withdrawal</span>
             </div>
 
-            {/* Affiliate Dashboard */}
+            {/* Affiliate Dashboard — smart routing */}
             <div
-              onClick={() => { router.push('/affiliate/affiliate-dashboard'); setIsOpen(false); }}
+              onClick={() => {
+                const affiliateToken = localStorage.getItem('token');
+                if (affiliateToken) {
+                  router.push('/affiliate/affiliate-dashboard');
+                } else {
+                  router.push('/affiliate/member-dashboard');
+                }
+                setIsOpen(false);
+              }}
               style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px 20px', color: '#030303', fontSize: '13px', fontWeight: '400', transition: 'background 0.15s ease', cursor: 'pointer' }}
               onMouseEnter={(e) => { e.currentTarget.style.background = '#f9f9f9'; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
@@ -219,9 +227,6 @@ export default function ProfileDropdown({ user }: ProfileDropdownProps) {
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
               <span>Dashboard Affiliate</span>
             </div>
-
-            {/* Divider */}
-            <div style={{ height: '1px', background: '#f0f0f0', margin: '8px 0' }}></div>
 
             {/* Referral */}
             <div

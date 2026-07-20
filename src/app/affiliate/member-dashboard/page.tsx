@@ -164,7 +164,6 @@ export default function MemberDashboardPage() {
           { href: '/applications', icon: <ApplicationsIcon size={15} color="currentColor" />, label: 'Applications' },
           { href: '/preferences', icon: <Settings size={15} />, label: 'Preferences' },
           { href: '/add-ons', icon: <Puzzle size={15} />, label: 'Add-ons' },
-          { href: '/referral', icon: <span style={{ fontSize: '14px' }}>🎯</span>, label: 'Referral' },
         ].map(item => (
           <Link key={item.href} href={item.href} style={{
             padding: '14px 18px', textDecoration: 'none',

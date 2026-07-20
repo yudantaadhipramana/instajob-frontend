@@ -27,14 +27,12 @@ export default function HeaderActions({ user }: { user?: User }) {
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [inboxCount, setInboxCount] = useState(0);
   const notifRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('instajob_token');
     if (!token) return;
 
-    // Fetch notif count
     fetch(`${API}/api/notifications`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.ok ? r.json() : null)
       .then(d => {
@@ -44,19 +42,8 @@ export default function HeaderActions({ user }: { user?: User }) {
           setUnreadCount(list.filter((n: Notification) => !n.read).length);
         }
       }).catch(() => {});
-
-    // Fetch inbox count
-    fetch(`${API}/api/inbox`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => r.ok ? r.json() : null)
-      .then(d => {
-        if (d) {
-          const list = d.messages || d.data || [];
-          setInboxCount(list.filter((m: any) => !m.read).length);
-        }
-      }).catch(() => {});
   }, []);
 
-  // Close notif dropdown on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
@@ -146,39 +133,13 @@ export default function HeaderActions({ user }: { user?: User }) {
               )}
             </div>
             <div style={{ padding: '10px 18px', borderTop: '1px solid #F1F5F9', textAlign: 'center' }}>
-              <Link href="/inbox" onClick={() => setNotifOpen(false)} style={{ fontSize: '12px', fontWeight: '700', color: '#1E40FF', textDecoration: 'none' }}>
-                Lihat semua di Inbox →
+              <Link href="/notifications" onClick={() => setNotifOpen(false)} style={{ fontSize: '12px', fontWeight: '700', color: '#1E40FF', textDecoration: 'none' }}>
+                Lihat Semuanya →
               </Link>
             </div>
           </div>
         )}
       </div>
-
-      {/* 📬 Inbox Button */}
-      <Link
-        href="/inbox"
-        aria-label="Inbox"
-        style={{ ...BTN_STYLE, textDecoration: 'none', position: 'relative' }}
-        onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.9)'}
-        onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.6)'}
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
-          <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
-        </svg>
-        {inboxCount > 0 && (
-          <span style={{
-            position: 'absolute', top: '-4px', right: '-4px',
-            background: '#EF4444', color: '#fff',
-            fontSize: '10px', fontWeight: '800',
-            minWidth: '16px', height: '16px', borderRadius: '8px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: '0 3px', border: '2px solid #fff',
-          }}>
-            {inboxCount > 9 ? '9+' : inboxCount}
-          </span>
-        )}
-      </Link>
 
       {/* 👤 Profile Dropdown */}
       <ProfileDropdown user={user} />
