@@ -73,24 +73,24 @@ export default function AdminPage() {
         if(r.ok){const x=await r.json();setD((p:any)=>({...p,users:x.users||[]}));}
       } else if (t==='Affiliates') {
         const [aR,pR]=await Promise.all([fetch(`${API}/api/admin/affiliates`,{headers:h}),fetch(`${API}/api/admin/payouts`,{headers:h})]);
-        setD((p:any)=>({...p,affiliates:aR.ok?(await aR.json()).affiliates||[]:[], payouts:pR.ok?(await pR.json()).payouts||[]:[] }));
+        const afData=aR.ok?await aR.json():{}; const pyData=pR.ok?await pR.json():{};
+        setD((p:any)=>({...p,affiliates:afData.affiliates||[], payouts:pyData.payouts||[] }));
       } else if (t==='Add-ons') {
         const r=await fetch(`${API}/api/admin/addons/submissions`,{headers:h});
-        setD((p:any)=>({...p,submissions:r.ok?(await r.json()).submissions||[]:[] }));
+        const adData=r.ok?await r.json():{};
+        setD((p:any)=>({...p,submissions:adData.submissions||[] }));
       } else if (t==='Vouchers') {
         const r=await fetch(`${API}/api/admin/vouchers`,{headers:h});
-        setD((p:any)=>({...p,vouchers:r.ok?(await r.json()).vouchers||[]:[] }));
+        const vData=r.ok?await r.json():{};
+        setD((p:any)=>({...p,vouchers:vData.vouchers||[] }));
       } else if (t==='Tokens') {
         const [eR,cR,uR]=await Promise.all([
           fetch(`${API}/api/admin/tokens?type=extension`,{headers:h}),
           fetch(`${API}/api/admin/tokens?type=career_booster`,{headers:h}),
           fetch(`${API}/api/admin/users`,{headers:h}),
         ]);
-        setD((p:any)=>({...p,
-          extTokens:eR.ok?(await eR.json()).tokens||[]:[],
-          cbTokens:cR.ok?(await cR.json()).tokens||[]:[],
-          users:uR.ok?(await uR.json()).users||[]:[],
-        }));
+        const [exD,cbD,usD]=[eR.ok?await eR.json():{},cR.ok?await cR.json():{},uR.ok?await uR.json():{}];
+        setD((p:any)=>({...p,extTokens:exD.tokens||[],cbTokens:cbD.tokens||[],users:usD.users||[]}));
       }
     } catch { setMsg('Gagal load data.'); }
     finally { setLoading(false); }
