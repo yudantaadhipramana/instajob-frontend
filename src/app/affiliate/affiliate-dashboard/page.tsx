@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
 import Icons from '@/components/Icons';
+import AffiliateHeaderActions from '@/components/AffiliateHeaderActions';
 
 export default function AffiliateDashboardPage() {
   const router = useRouter();
@@ -161,10 +162,10 @@ export default function AffiliateDashboardPage() {
   // Badge tier system: Bronze 0, Silver 30, Gold 100, Platinum 250
   const referralCount = data?.referralCount || 0;
   const getCurrentTier = () => {
-    if (referralCount >= 250) return { emoji: '💎', name: 'Platinum', rate: '20%', color: '#E5E4E2', next: null, progress: 100 };
-    if (referralCount >= 100) return { emoji: '🥇', name: 'Gold', rate: '16%', color: '#FFD700', next: 250, progress: ((referralCount - 100) / 150) * 100 };
-    if (referralCount >= 30) return { emoji: '🥈', name: 'Silver', rate: '13%', color: '#C0C0C0', next: 100, progress: ((referralCount - 30) / 70) * 100 };
-    return { emoji: '🥉', name: 'Bronze', rate: '10%', color: '#CD7F32', next: 30, progress: (referralCount / 30) * 100 };
+    if (referralCount >= 250) return { emoji: '💎', name: 'Platinum', rate: '35%', color: '#E5E4E2', next: null, progress: 100 };
+    if (referralCount >= 100) return { emoji: '🥇', name: 'Gold', rate: '30%', color: '#FFD700', next: 250, progress: ((referralCount - 100) / 150) * 100 };
+    if (referralCount >= 30) return { emoji: '🥈', name: 'Silver', rate: '25%', color: '#C0C0C0', next: 100, progress: ((referralCount - 30) / 70) * 100 };
+    return { emoji: '🥉', name: 'Bronze', rate: '20%', color: '#CD7F32', next: 30, progress: (referralCount / 30) * 100 };
   };
 
   const currentTier = getCurrentTier();
@@ -204,32 +205,8 @@ export default function AffiliateDashboardPage() {
             </h1>
           </div>
         </div>
-        <button
-          onClick={handleLogout}
-          style={{
-            padding: '8px 18px',
-            background: '#F3F4F6',
-            color: '#374151',
-            border: '1px solid #E5E7EB',
-            borderRadius: '8px',
-            fontSize: '13px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            fontFamily: 'var(--font-body)',
-            transition: 'all 0.2s'
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.background = '#E5E7EB';
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.background = '#F3F4F6';
-          }}
-        >
-          Logout
-        </button>
+        <AffiliateHeaderActions user={{ name: data?.name, email: data?.email }} />
       </header>
-
-      {/* Main Content - Compact Layout untuk Fit 1 halaman */}
       <main style={{ padding: '24px 48px', maxWidth: '1440px', margin: '0 auto' }}>
         
         {/* Info Badge + Action Row */}
@@ -674,10 +651,10 @@ export default function AffiliateDashboardPage() {
                 gap: '6px'
               }}>
                 {[
-                  { emoji: '🥉', name: 'Bronze', rate: '10%', req: '0' },
-                  { emoji: '🥈', name: 'Silver', rate: '13%', req: '30' },
-                  { emoji: '🥇', name: 'Gold', rate: '16%', req: '100' },
-                  { emoji: '💎', name: 'Platinum', rate: '20%', req: '250' }
+                  { emoji: '🥉', name: 'Bronze', rate: '20%', req: '0' },
+                  { emoji: '🥈', name: 'Silver', rate: '25%', req: '30' },
+                  { emoji: '🥇', name: 'Gold', rate: '30%', req: '100' },
+                  { emoji: '💎', name: 'Platinum', rate: '35%', req: '250' }
                 ].map((badge, idx) => (
                   <div
                     key={idx}
