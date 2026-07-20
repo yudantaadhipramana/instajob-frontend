@@ -1,24 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { motion } from 'motion/react';
+import Icons from '@/components/Icons';
 import { Logo } from '@/components/Logo';
 import HeaderActions from '@/components/HeaderActions';
-import { Copy, Check, TrendingUp, Users, DollarSign, Award } from 'lucide-react';
-
-const API = process.env.NEXT_PUBLIC_API_URL || 'https://instajob-backend-production.up.railway.app';
-
-const TIERS = [
-  { name: 'Bronze', icon: '🥉', color: '#CD7F32', pct: 10, min: 1,  max: 4  },
-  { name: 'Silver', icon: '🥈', color: '#94A3B8', pct: 13, min: 5,  max: 14 },
-  { name: 'Gold',   icon: '🥇', color: '#F59E0B', pct: 16, min: 15, max: 29 },
-  { name: 'Platinum', icon: '💎', color: '#7C3AED', pct: 20, min: 30, max: Infinity },
-];
-
-function getTier(conversions: number) {
-  return TIERS.find(t => conversions >= t.min && conversions <= t.max) || null;
-}
+import { Home, Settings, Puzzle } from 'lucide-react';
+import { JobsIcon, ApplicationsIcon } from '@/components/DashboardIcons';
 
 interface User { id: string; email: string; fullName: string; }
 
@@ -34,181 +24,321 @@ export default function MemberDashboardPage() {
   useEffect(() => {
     const token = localStorage.getItem('instajob_token');
     const affiliateToken = localStorage.getItem('token');
-    // Affiliate masuk → redirect ke affiliate-dashboard
+    // Affiliate account → redirect ke affiliate-dashboard
     if (!token && affiliateToken) {
       router.push('/affiliate/affiliate-dashboard');
       return;
     }
     const ud = localStorage.getItem('instajob_user');
-    if (!token || !ud) { router.push('/login'); return; }
+    if (!token || !ud) {
+      router.push('/login');
+      return;
+    }
     setUser(JSON.parse(ud));
 
-    fetch(`${API}/api/referral/my-code`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(r => { if (r.status === 401) { router.push('/login'); return null; } return r.json(); })
-      .then(d => {
-        if (!d) return;
-        const raw = d.data || d;
+    const fetchDashboard = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/referral/my-code`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.status === 401) {
+          localStorage.removeItem('instajob_token');
+          router.push('/login');
+          return;
+        }
+
+        if (!response.ok) throw new Error('Gagal memuat data dashboard');
+
+        const result = await response.json();
+        const raw = result.data || result;
         const stats = raw.stats || raw;
         setData({
           code: raw.code || '',
-          referralsSent: stats.referralsSent ?? stats.totalReferrals ?? 0,
-          conversions: stats.conversions ?? stats.totalConversions ?? 0,
-          earningsTotal: stats.earningsTotal ?? stats.totalEarnings ?? 0,
-          earningsThisMonth: stats.earningsThisMonth ?? stats.monthlyEarnings ?? 0,
+          referralCount: stats.referralsSent ?? stats.totalReferrals ?? 0,
+          pendingPayout: stats.pendingBalance ?? 0,
+          totalEarnings: stats.earningsTotal ?? stats.totalEarnings ?? 0,
+          paidTotal: stats.paidTotal ?? 0,
         });
-      })
-      .catch(e => setError(e.message))
-      .finally(() => setLoading(false));
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboard();
   }, [router]);
 
-  const copyCode = () => {
+  const handleCopyCode = () => {
     navigator.clipboard.writeText(data?.code || '');
     setCopiedCode(true);
     setTimeout(() => setCopiedCode(false), 2000);
   };
-  const copyLink = () => {
+
+  const handleCopyLink = () => {
     navigator.clipboard.writeText(`${window.location.origin}/register?ref=${data?.code || ''}`);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
   };
 
-  const tier = getTier(data?.conversions ?? 0);
-  const nextTier = tier ? TIERS[TIERS.indexOf(tier) + 1] : TIERS[0];
+  const formatIDR = (amount: number) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0
+    }).format(amount);
+  };
 
-  if (loading) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F8FAFC' }}>
-      <div style={{ width: '40px', height: '40px', border: '3px solid #E5E7EB', borderTop: '3px solid #1E40FF', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-    </div>
-  );
-
-  if (error) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F8FAFC', fontFamily: 'var(--font-body)' }}>
-      <div style={{ textAlign: 'center', padding: '40px' }}>
-        <p style={{ fontSize: '18px', color: '#EF4444', fontWeight: '700', marginBottom: '12px' }}>⚠️ {error}</p>
-        <button onClick={() => window.location.reload()} style={{ padding: '10px 20px', background: '#1E40FF', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600' }}>Coba Lagi</button>
+  if (loading) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: '48px', height: '48px', border: '3px solid #E5E7EB', borderTop: '3px solid #3B82F6', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
-    </div>
-  );
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+        <div style={{ background: 'white', padding: '40px', borderRadius: '12px', border: '1px solid #E5E7EB', textAlign: 'center', maxWidth: '400px', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+          <div style={{ fontSize: '48px', marginBottom: '16px' }}>⚠️</div>
+          <h2 style={{ fontSize: '20px', fontWeight: '700', marginBottom: '12px', fontFamily: 'var(--font-heading)', color: '#1F2937' }}>Error</h2>
+          <p style={{ fontSize: '15px', color: '#6B7280', marginBottom: '24px', fontFamily: 'var(--font-body)' }}>{error}</p>
+          <button onClick={() => window.location.reload()} style={{ padding: '12px 24px', background: '#3B82F6', color: 'white', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
+            Coba Lagi
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Badge tier system: Bronze 0, Silver 30, Gold 100, Platinum 250
+  const referralCount = data?.referralCount || 0;
+  const getCurrentTier = () => {
+    if (referralCount >= 250) return { emoji: '💎', name: 'Platinum', rate: '20%', color: '#E5E4E2', next: null, progress: 100 };
+    if (referralCount >= 100) return { emoji: '🥇', name: 'Gold', rate: '16%', color: '#FFD700', next: 250, progress: ((referralCount - 100) / 150) * 100 };
+    if (referralCount >= 30) return { emoji: '🥈', name: 'Silver', rate: '13%', color: '#C0C0C0', next: 100, progress: ((referralCount - 30) / 70) * 100 };
+    return { emoji: '🥉', name: 'Bronze', rate: '10%', color: '#CD7F32', next: 30, progress: (referralCount / 30) * 100 };
+  };
+
+  const currentTier = getCurrentTier();
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #FFFFFF 0%, #F5F8FF 50%, #EEF2FF 100%)', fontFamily: 'var(--font-body)' }}>
-      {/* Header */}
-      <header style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.5)', padding: '0 40px', height: '72px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
-        <Logo size={32} showText={true} />
+    <div style={{ minHeight: '100vh', background: '#F9FAFB' }}>
+      {/* Header — same style as affiliate-dashboard but with HeaderActions */}
+      <header style={{
+        background: '#FFFFFF',
+        borderBottom: '1px solid #E5E7EB',
+        padding: '0 48px',
+        height: '64px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+        boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+          <Logo size={32} showText={true} />
+          <div style={{ borderLeft: '1px solid #E5E7EB', paddingLeft: '24px' }}>
+            <h1 style={{ fontSize: '18px', fontWeight: '700', color: '#1F2937', margin: 0, fontFamily: 'var(--font-heading)' }}>
+              Member Dashboard
+            </h1>
+          </div>
+        </div>
         <HeaderActions user={user || undefined} />
       </header>
 
-      <main style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 24px' }}>
-        {/* Page title */}
-        <div style={{ marginBottom: '32px' }}>
-          <h1 style={{ fontSize: '26px', fontWeight: '800', color: '#0F172A', margin: '0 0 6px', letterSpacing: '-0.02em' }}>
-            Dashboard Referral 🎯
-          </h1>
-          <p style={{ color: '#64748B', fontSize: '14px', fontWeight: '600', margin: 0 }}>
-            Undang teman dan dapatkan komisi setiap konversi berhasil.
-          </p>
-        </div>
+      {/* Nav tabs — same as preferences/extension */}
+      <div style={{
+        background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(12px)',
+        borderBottom: '1px solid #E5E7EB', padding: '0 48px',
+        display: 'flex', overflowX: 'auto',
+      }}>
+        {[
+          { href: '/dashboard', icon: <Home size={15} />, label: 'Dashboard' },
+          { href: '/jobs', icon: <JobsIcon size={15} color="currentColor" />, label: 'Browse Jobs' },
+          { href: '/applications', icon: <ApplicationsIcon size={15} color="currentColor" />, label: 'Applications' },
+          { href: '/preferences', icon: <Settings size={15} />, label: 'Preferences' },
+          { href: '/add-ons', icon: <Puzzle size={15} />, label: 'Add-ons' },
+          { href: '/referral', icon: <span style={{ fontSize: '14px' }}>🎯</span>, label: 'Referral' },
+        ].map(item => (
+          <Link key={item.href} href={item.href} style={{
+            padding: '14px 18px', textDecoration: 'none',
+            color: '#64748B', fontWeight: '600', fontSize: '13px',
+            borderBottom: '2px solid transparent', transition: 'all 0.2s ease',
+            display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap',
+          }}>
+            {item.icon}{item.label}
+          </Link>
+        ))}
+      </div>
 
-        {/* Tier badge — THE differentiator vs affiliate-dashboard */}
-        <div style={{
-          background: tier ? `linear-gradient(135deg, ${tier.color}18, ${tier.color}08)` : 'rgba(30,64,255,0.04)',
-          border: `2px solid ${tier?.color || '#E2E8F0'}`,
-          borderRadius: '16px', padding: '20px 24px', marginBottom: '24px',
-          display: 'flex', alignItems: 'center', gap: '16px',
-        }}>
-          <span style={{ fontSize: '40px' }}>{tier?.icon || '🚀'}</span>
-          <div style={{ flex: 1 }}>
-            <p style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.1em', color: tier?.color || '#64748B', margin: '0 0 2px' }}>Tier Saat Ini</p>
-            <p style={{ fontSize: '22px', fontWeight: '900', color: tier?.color || '#1E293B', margin: '0 0 2px' }}>
-              {tier ? tier.name : '—'} <span style={{ fontSize: '16px' }}>({tier?.pct ?? 0}% komisi)</span>
-            </p>
-            {nextTier && (
-              <p style={{ fontSize: '12px', color: '#64748B', margin: 0, fontWeight: '600' }}>
-                {tier ? `${nextTier.min - (data?.conversions ?? 0)} konversi lagi → ${nextTier.name} (${nextTier.pct}%)` : `${nextTier.min} konversi untuk masuk tier ${nextTier.name}`}
-              </p>
-            )}
-          </div>
-          {tier && (
-            <div style={{ textAlign: 'right' }}>
-              <p style={{ fontSize: '11px', color: '#94A3B8', margin: '0 0 2px', fontWeight: '700' }}>Konversi</p>
-              <p style={{ fontSize: '28px', fontWeight: '900', color: tier.color, margin: 0 }}>{data?.conversions ?? 0}</p>
-            </div>
-          )}
-        </div>
+      {/* Main Content — identical layout to affiliate-dashboard */}
+      <main style={{ padding: '24px 48px', maxWidth: '1440px', margin: '0 auto' }}>
 
-        {/* Tier progress */}
-        <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid var(--color-border)', padding: '20px 24px', marginBottom: '24px' }}>
-          <p style={{ fontSize: '13px', fontWeight: '700', color: '#475569', margin: '0 0 14px' }}>Progres Tier</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
-            {TIERS.map(t => {
-              const conv = data?.conversions ?? 0;
-              const reached = conv >= t.min;
-              const current = conv >= t.min && conv <= t.max;
-              return (
-                <div key={t.name} style={{ padding: '12px', borderRadius: '10px', textAlign: 'center', border: `2px solid ${current ? t.color : reached ? t.color + '60' : '#E2E8F0'}`, background: current ? `${t.color}10` : 'transparent', opacity: reached ? 1 : 0.5 }}>
-                  <div style={{ fontSize: '22px', marginBottom: '4px' }}>{t.icon}</div>
-                  <p style={{ fontSize: '12px', fontWeight: '800', color: t.color, margin: '0 0 1px' }}>{t.name}</p>
-                  <p style={{ fontSize: '18px', fontWeight: '900', color: '#1E293B', margin: '0 0 1px' }}>{t.pct}%</p>
-                  <p style={{ fontSize: '10px', color: '#64748B', margin: 0 }}>
-                    {t.max === Infinity ? `${t.min}+` : `${t.min}–${t.max}`} konversi
-                  </p>
-                  {current && <span style={{ display: 'inline-block', marginTop: '6px', fontSize: '9px', fontWeight: '700', background: t.color, color: '#fff', padding: '1px 6px', borderRadius: '20px' }}>AKTIF</span>}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
-          {[
-            { label: 'Total Referral', value: data?.referralsSent ?? 0, icon: <Users size={18} />, color: '#1E40FF' },
-            { label: 'Konversi', value: data?.conversions ?? 0, icon: <TrendingUp size={18} />, color: '#10B981' },
-            { label: 'Total Pendapatan', value: `Rp ${(data?.earningsTotal ?? 0).toLocaleString('id-ID')}`, icon: <DollarSign size={18} />, color: '#F59E0B' },
-          ].map(s => (
-            <div key={s.label} style={{ background: '#fff', borderRadius: '14px', border: '1px solid var(--color-border)', padding: '20px', display: 'flex', gap: '14px', alignItems: 'center' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: `${s.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: s.color, flexShrink: 0 }}>{s.icon}</div>
-              <div>
-                <p style={{ fontSize: '12px', color: '#64748B', margin: '0 0 2px', fontWeight: '600' }}>{s.label}</p>
-                <p style={{ fontSize: '20px', fontWeight: '800', color: '#0F172A', margin: 0 }}>{s.value}</p>
+        {/* Info Badge + Action Row */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            marginBottom: '20px', background: '#FFFFFF', border: '1px solid #E5E7EB',
+            borderRadius: '12px', padding: '16px 24px', boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+            <span style={{ padding: '6px 12px', background: '#DBEAFE', color: '#1E40AF', fontSize: '11px', fontWeight: '700', borderRadius: '6px', fontFamily: 'var(--font-body)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              PAYOUT SETIAP JUMAT
+            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div style={{ width: '8px', height: '8px', background: '#10B981', borderRadius: '50%' }} />
+                <span style={{ fontSize: '13px', fontWeight: '600', color: '#10B981', fontFamily: 'var(--font-body)' }}>Active</span>
+              </div>
+              <span style={{ color: '#E5E7EB' }}>•</span>
+              <span style={{ fontSize: '13px', fontWeight: '600', color: '#3B82F6', fontFamily: 'var(--font-body)' }}>
+                Rate: {currentTier.rate}
+              </span>
+              <span style={{ color: '#E5E7EB' }}>•</span>
+              <span style={{ fontSize: '13px', color: '#6B7280', fontFamily: 'var(--font-body)' }}>Validasi 7 hari</span>
+              <span style={{ color: '#E5E7EB' }}>•</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', background: 'linear-gradient(135deg, rgba(205, 127, 50, 0.1) 0%, rgba(205, 127, 50, 0.15) 100%)', borderRadius: '6px', border: `1px solid ${currentTier.color}` }}>
+                <span style={{ fontSize: '14px' }}>{currentTier.emoji}</span>
+                <span style={{ fontSize: '12px', fontWeight: '700', color: '#374151', fontFamily: 'var(--font-body)' }}>{currentTier.name}</span>
               </div>
             </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button onClick={handleCopyCode} style={{ padding: '8px 16px', background: copiedCode ? '#10B981' : '#F3F4F6', color: copiedCode ? 'white' : '#374151', border: '1px solid #E5E7EB', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: 'var(--font-body)', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              {copiedCode ? '✓' : '📋'} {copiedCode ? 'Tersalin!' : 'Copy Code'}
+            </button>
+            <button onClick={handleCopyLink} style={{ padding: '8px 16px', background: copiedLink ? '#10B981' : '#F3F4F6', color: copiedLink ? 'white' : '#374151', border: '1px solid #E5E7EB', borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', fontFamily: 'var(--font-body)', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              {copiedLink ? '✓' : '🔗'} {copiedLink ? 'Tersalin!' : 'Copy Link'}
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Stats Grid - 5 Columns */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px', marginBottom: '20px' }}>
+          {[
+            { label: 'Total Referrals', value: referralCount, desc: `${referralCount} paid member`, iconColor: '#6366F1' },
+            { label: 'Pending', value: formatIDR(data?.pendingPayout || 0), desc: 'Validasi 7 hari', iconColor: '#F97316' },
+            { label: 'Payable', value: formatIDR(data?.totalEarnings || 0), desc: 'Siap payout', iconColor: '#10B981' },
+            { label: 'Paid', value: formatIDR(data?.paidTotal || 0), desc: 'Sudah dibayar', iconColor: '#10B981' },
+            { label: 'Next Payout', value: 'Jumat', desc: 'Manual transfer', iconColor: '#3B82F6' }
+          ].map((stat, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 + i * 0.03 }}
+              style={{ background: '#FFFFFF', borderRadius: '12px', padding: '20px', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', transition: 'all 0.2s' }}
+              onMouseEnter={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.borderColor = '#D1D5DB'; el.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)'; }}
+              onMouseLeave={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.borderColor = '#E5E7EB'; el.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)'; }}
+            >
+              <div style={{ fontSize: '11px', color: '#9CA3AF', fontWeight: '700', marginBottom: '8px', fontFamily: 'var(--font-body)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{stat.label}</div>
+              <div style={{ fontSize: '26px', fontWeight: '700', color: '#111827', marginBottom: '4px', fontFamily: 'var(--font-heading)', lineHeight: '1.2' }}>{stat.value}</div>
+              <div style={{ fontSize: '12px', color: '#9CA3AF', fontFamily: 'var(--font-body)' }}>{stat.desc}</div>
+            </motion.div>
           ))}
         </div>
 
-        {/* Referral code + link */}
-        {data?.code && (
-          <div style={{ background: '#fff', borderRadius: '14px', border: '1px solid var(--color-border)', padding: '24px' }}>
-            <p style={{ fontSize: '14px', fontWeight: '700', color: '#0F172A', margin: '0 0 16px' }}>Kode & Link Referral</p>
-            <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-              <div style={{ flex: 1, padding: '10px 14px', background: '#F8FAFC', border: '1px solid var(--color-border)', borderRadius: '8px', fontSize: '15px', fontWeight: '800', color: '#1E40FF', letterSpacing: '0.05em' }}>
-                {data.code}
-              </div>
-              <button onClick={copyCode} style={{ padding: '10px 16px', background: copiedCode ? '#10B981' : 'var(--color-primary)', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '700', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', transition: 'background 0.2s' }}>
-                {copiedCode ? <><Check size={14} /> Disalin</> : <><Copy size={14} /> Salin Kode</>}
-              </button>
-            </div>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <div style={{ flex: 1, padding: '10px 14px', background: '#F8FAFC', border: '1px solid var(--color-border)', borderRadius: '8px', fontSize: '12px', color: '#64748B', fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {typeof window !== 'undefined' ? `${window.location.origin}/register?ref=${data.code}` : '...'}
-              </div>
-              <button onClick={copyLink} style={{ padding: '10px 16px', background: copiedLink ? '#10B981' : '#475569', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '700', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', transition: 'background 0.2s' }}>
-                {copiedLink ? <><Check size={14} /> Disalin</> : <><Copy size={14} /> Salin Link</>}
-              </button>
-            </div>
-          </div>
-        )}
+        {/* Content Cards - 4 Columns */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+          {[
+            { title: 'Latest Referrals', iconComponent: Icons.users(36, '#6366F1'), message: 'No referrals yet', desc: 'Referral yang masuk dari link atau kode kamu akan tampil di sini.' },
+            { title: 'Latest Commissions', iconComponent: Icons.money(36, '#F97316'), message: 'No commissions yet', desc: 'Komisi akan muncul setelah invoice subscription pertama member dibayar.' },
+            { title: 'Latest Payouts', iconComponent: Icons.payment(36, '#10B981'), message: 'No payouts yet', desc: 'Payout setiap Jumat akan tampil setelah komisi masuk payable.' }
+          ].map((section, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + i * 0.04 }}
+              style={{ background: '#FFFFFF', borderRadius: '12px', border: '1px solid #E5E7EB', padding: '28px', textAlign: 'center', minHeight: '240px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
+            >
+              <div style={{ marginBottom: '16px', opacity: 0.5 }}>{section.iconComponent}</div>
+              <h3 style={{ fontSize: '17px', fontWeight: '600', color: '#1F2937', marginBottom: '8px', fontFamily: 'var(--font-heading)' }}>{section.title}</h3>
+              <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '6px', fontFamily: 'var(--font-body)', fontWeight: '600' }}>{section.message}</p>
+              <p style={{ fontSize: '12px', color: '#9CA3AF', fontFamily: 'var(--font-body)', lineHeight: '1.5' }}>{section.desc}</p>
+            </motion.div>
+          ))}
 
-        {/* Info footer */}
-        <div style={{ marginTop: '20px', padding: '14px 18px', background: 'rgba(30,64,255,0.03)', border: '1px solid rgba(30,64,255,0.1)', borderRadius: '10px' }}>
-          <p style={{ fontSize: '12px', color: '#475569', margin: 0, fontWeight: '600', lineHeight: 1.6 }}>
-            💡 Komisi dihitung dari harga paket yang dibeli referral kamu. Transfer setiap <strong>Jumat</strong> ke rekening terdaftar di halaman <Link href="/withdrawal" style={{ color: '#1E40FF', textDecoration: 'none' }}>Penarikan Dana</Link>.
-          </p>
+          {/* Badge Journey/Progress Card — SAME layout, tier % berbeda */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.42 }}
+            style={{ background: 'linear-gradient(135deg, rgba(30, 64, 255, 0.05) 0%, rgba(59, 130, 246, 0.08) 100%)', borderRadius: '12px', padding: '28px', border: '1px solid rgba(30, 64, 255, 0.2)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', transition: 'all 0.2s', minHeight: '240px', display: 'flex', flexDirection: 'column' }}
+            onMouseEnter={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.borderColor = 'rgba(30, 64, 255, 0.3)'; el.style.boxShadow = '0 4px 12px rgba(30, 64, 255, 0.12)'; }}
+            onMouseLeave={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.borderColor = 'rgba(30, 64, 255, 0.2)'; el.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)'; }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '16px' }}>
+              <span style={{ fontSize: '32px' }}>{currentTier.emoji}</span>
+              <div>
+                <div style={{ fontSize: '11px', color: '#3B82F6', fontWeight: '700', fontFamily: 'var(--font-body)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Current Tier</div>
+                <div style={{ fontSize: '18px', fontWeight: '700', color: '#1F2937', fontFamily: 'var(--font-heading)' }}>{currentTier.name}</div>
+              </div>
+            </div>
+
+            {currentTier.next && (
+              <>
+                <div style={{ fontSize: '13px', color: '#6B7280', marginBottom: '12px', textAlign: 'center', fontFamily: 'var(--font-body)' }}>
+                  {referralCount} / {currentTier.next} referrals
+                </div>
+                <div style={{ width: '100%', height: '8px', background: 'rgba(30, 64, 255, 0.1)', borderRadius: '10px', overflow: 'hidden', marginBottom: '12px' }}>
+                  <div style={{ width: `${Math.min(currentTier.progress, 100)}%`, height: '100%', background: 'linear-gradient(90deg, #1E40FF 0%, #3B82F6 100%)', borderRadius: '10px', transition: 'width 0.3s ease' }} />
+                </div>
+                <div style={{ fontSize: '12px', color: '#3B82F6', fontWeight: '600', textAlign: 'center', fontFamily: 'var(--font-body)', marginBottom: '16px' }}>
+                  {currentTier.next - referralCount} referral lagi ke tier berikutnya
+                </div>
+              </>
+            )}
+
+            {!currentTier.next && (
+              <div style={{ fontSize: '13px', color: '#10B981', fontWeight: '600', textAlign: 'center', fontFamily: 'var(--font-body)', marginTop: '12px' }}>
+                🎉 Tier tertinggi tercapai!
+              </div>
+            )}
+
+            {/* Tier Badges — 10/13/16/20% */}
+            <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid rgba(30, 64, 255, 0.15)' }}>
+              <div style={{ fontSize: '10px', color: '#9CA3AF', marginBottom: '8px', textAlign: 'center', fontFamily: 'var(--font-body)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Semua Tier
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+                {[
+                  { emoji: '🥉', name: 'Bronze', rate: '10%', req: '0' },
+                  { emoji: '🥈', name: 'Silver', rate: '13%', req: '30' },
+                  { emoji: '🥇', name: 'Gold', rate: '16%', req: '100' },
+                  { emoji: '💎', name: 'Platinum', rate: '20%', req: '250' }
+                ].map((badge, idx) => (
+                  <div key={idx} style={{ padding: '6px', background: referralCount >= parseInt(badge.req) ? `rgba(30,64,255,0.04)` : '#FFFFFF', border: referralCount >= parseInt(badge.req) ? '1px solid rgba(30,64,255,0.2)' : '1px solid #E5E7EB', borderRadius: '6px', fontSize: '9px', fontWeight: '600', color: '#374151', fontFamily: 'var(--font-body)', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <span style={{ fontSize: '16px' }}>{badge.emoji}</span>
+                    <span style={{ fontSize: '10px', fontWeight: '700' }}>{badge.rate}</span>
+                    <span style={{ fontSize: '8px', color: '#9CA3AF' }}>{badge.req}+</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
         </div>
       </main>
+
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 1280px) {
+          main { padding: 20px 32px; }
+        }
+        @media (max-width: 768px) {
+          main { padding: 16px 24px; }
+        }
+      `}</style>
     </div>
   );
 }

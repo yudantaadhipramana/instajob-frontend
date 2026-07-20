@@ -674,10 +674,10 @@ export default function AffiliateDashboardPage() {
                 gap: '6px'
               }}>
                 {[
-                  { emoji: '🥉', name: 'Bronze', rate: '20%', req: '0' },
-                  { emoji: '🥈', name: 'Silver', rate: '25%', req: '30' },
-                  { emoji: '🥇', name: 'Gold', rate: '30%', req: '100' },
-                  { emoji: '💎', name: 'Platinum', rate: '35%', req: '250' }
+                  { emoji: '🥉', name: 'Bronze', rate: '10%', req: '0' },
+                  { emoji: '🥈', name: 'Silver', rate: '13%', req: '30' },
+                  { emoji: '🥇', name: 'Gold', rate: '16%', req: '100' },
+                  { emoji: '💎', name: 'Platinum', rate: '20%', req: '250' }
                 ].map((badge, idx) => (
                   <div
                     key={idx}
