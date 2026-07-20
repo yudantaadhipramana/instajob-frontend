@@ -218,7 +218,7 @@ export default function ProfilePage() {
 
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
-          <button onClick={() => router.push('/dashboard')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px' }}>
+          <button onClick={() => router.push('/affiliate/affiliate-dashboard')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px' }}>
             <ArrowLeft size={16} /> Kembali
           </button>
           <div>

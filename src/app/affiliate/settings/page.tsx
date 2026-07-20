@@ -328,7 +328,7 @@ export default function SettingsPage() {
         gap: '8px',
       }}>
         <Link
-          href="/dashboard"
+          href="/affiliate/affiliate-dashboard"
           style={{
             padding: '16px 24px',
             textDecoration: 'none',
